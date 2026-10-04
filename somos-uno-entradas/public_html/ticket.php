@@ -30,6 +30,7 @@ if ($order) {
     $title = $isInv ? 'tu invitación' : 'estás en la lista';
 }
 $done = $used >= $people;
+$expired = $pass && $pass['kind'] === 'invitacion' && is_past(cfg('invitations.valid_until'));
 
 page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
 ?>
@@ -37,7 +38,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
   <?php if (!empty($_GET['nueva'])): ?>
     <p class="ok-note">listo. también te lo mandamos por mail. hacé una captura por las dudas.</p>
   <?php endif; ?>
-  <article class="ticket <?= $done ? 'is-used' : '' ?>">
+  <article class="ticket <?= $done || $expired ? 'is-used' : '' ?>">
     <header class="ticket-head">
       <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="ticket-logo">
       <div>
@@ -47,7 +48,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
     </header>
     <div class="qr" data-qr="<?= e(url('ticket.php?t=' . $token)) ?>" role="img" aria-label="Código QR de ingreso"></div>
     <p class="ticket-code"><?= e($code) ?></p>
-    <?php if ($done): ?><p class="badge badge-off">ya ingresó</p><?php endif; ?>
+    <?php if ($done): ?><p class="badge badge-off">ya ingresó</p><?php elseif ($expired): ?><p class="badge badge-off">vencida</p><?php endif; ?>
     <dl class="ticket-data">
       <div><dt>nombre</dt><dd><?= e($who) ?></dd></div>
       <div><dt>tipo</dt><dd><?= e($kind) ?></dd></div>
@@ -55,7 +56,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
       <div><dt>dónde</dt><dd><a href="<?= e(cfg('event.maps_url')) ?>" target="_blank" rel="noopener"><?= e(cfg('event.venue')) ?> · <?= e(cfg('event.address')) ?></a></dd></div>
     </dl>
     <p class="ticket-detail"><?= e($detail) ?></p>
-    <p class="ticket-joke"><?= e(cfg('event.joke')) ?></p>
+    <p class="ticket-motto"><?= e(cfg('event.motto')) ?></p>
   </article>
 </main>
 <?php page_end('', ['assets/qrcode.js', 'assets/app.js']);

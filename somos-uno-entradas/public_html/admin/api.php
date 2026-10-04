@@ -53,12 +53,18 @@ function describe(array $entry): array
         ];
     }
     $isInv = $r['kind'] === 'invitacion';
-    $late = $isInv && is_past(cfg('invitations.valid_until'));
+    $late = is_past(cfg('invitations.valid_until'));
+    $until = date('H:i', (int) strtotime((string) cfg('invitations.valid_until')));
+    $warning = '';
+    if ($late) {
+        $warning = $isInv ? "La invitación venció a las $until: paga general." : "Beneficio de lista vencido ($until): paga general.";
+    }
     return [
         'token' => $r['token'], 'code' => $r['id'], 'name' => $r['name'],
         'kind' => $isInv ? 'Invitación · ' . (invite_info($r['code'])['owner'] ?? '') : 'Lista · ' . cfg('lista.benefit'),
-        'total' => 1, 'used' => (int) $r['checked_in'], 'valid' => true,
-        'warning' => $late ? 'Pasó el horario de la invitación: paga general.' : '',
+        'total' => 1, 'used' => (int) $r['checked_in'],
+        'valid' => !($isInv && $late),  // la invitación vencida deja de servir; la lista puede pasar pagando general
+        'warning' => $warning,
     ];
 }
 
@@ -81,6 +87,9 @@ if ($action === 'checkin') {
         );
         $entry['row'] = order_by('id', $r['id']);
     } else {
+        if ($r['kind'] === 'invitacion' && is_past(cfg('invitations.valid_until'))) {
+            out(['ok' => false, 'error' => 'La invitación ya venció: paga general.', 'entry' => describe($entry)]);
+        }
         $st = q('UPDATE passes SET checked_in = 1 WHERE id = ? AND checked_in = 0', [$r['id']]);
         $entry['row'] = q('SELECT * FROM passes WHERE id = ?', [$r['id']])->fetch();
     }

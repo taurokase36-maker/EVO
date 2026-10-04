@@ -14,7 +14,8 @@ return [
     'demo_mode' => true,
 
     // Dirección de tu sitio, con https y sin barra al final.
-    'site_url' => 'https://tudominio.com',
+    // Si lo dejás vacío se detecta solo. Ej: 'https://somosuno.com.ar'
+    'site_url' => '',
 
     'timezone' => 'America/Argentina/Buenos_Aires',
 
@@ -42,15 +43,15 @@ return [
         'kicker'     => 'somos uno × melt underground',
         'headline'   => 'bajo tierra.',
         'date_label' => 'domingo 11·10',
-        'time_label' => '[HORARIO]',            // ej: 23:00 a 06:00
-        'starts_at'  => '2026-10-11 23:00',     // para la cuenta regresiva
+        'time_label' => '18:00 a 03:00',
+        'starts_at'  => '2026-10-11 18:00',     // para la cuenta regresiva
+        'capacity'   => 160,                    // capacidad total del lugar
         'venue'      => 'Melt Underground',
         'address'    => 'Laprida 1423, Recoleta',
         'maps_url'   => 'https://maps.google.com/?q=Laprida+1423,+Buenos+Aires',
         'genres'     => 'minimal · house · techno',
         'lineup'     => ['EVO', 'ODA', 'Sandman'],
-        'tagline'    => 'somos uno y estamos en una. esta vez, bajo tierra.',
-        'joke'       => 'el lunes es feriado. tu excusa, no.',
+        'motto'      => 'somos uno.',
         'age'        => '+18 con DNI',
         'door_price' => 10000,                  // precio en puerta (solo informativo)
     ],
@@ -69,20 +70,21 @@ return [
     //  until  = hasta cuándo se vende ('AAAA-MM-DD HH:MM') o null
     // ---------------------------------------------------------------
     'tickets' => [
-        ['id' => 'early',   'name' => 'Early bird', 'price' => 5000,  'anchor' => 10000, 'stock' => 50,  'until' => '2026-10-09 23:59', 'note' => 'cupo limitado'],
-        ['id' => 'general', 'name' => 'General',    'price' => 10000, 'anchor' => 0,     'stock' => 250, 'until' => null,               'note' => 'mismo precio que en puerta'],
+        ['id' => 'early',   'name' => 'Early bird', 'price' => 5000,  'anchor' => 10000, 'stock' => 30,  'until' => '2026-10-09 23:59', 'note' => 'cupo limitado'],
+        ['id' => 'general', 'name' => 'General',    'price' => 10000, 'anchor' => 0,     'stock' => 65,  'until' => null,               'note' => 'mismo precio que en puerta'],
     ],
     'max_per_order'       => 4,
     'service_fee_percent' => 0,    // ej: 5 = se le suma 5% al comprador como "cargo por servicio"
     'reserve_minutes'     => 30,   // cuánto se reserva el cupo mientras la persona paga
 
     // ---------------------------------------------------------------
-    //  LISTA PÚBLICA (gratis anotarse, beneficio en puerta)
+    //  LISTA PÚBLICA (gratis anotarse, beneficio en puerta hasta valid_until de invitaciones)
     // ---------------------------------------------------------------
     'lista' => [
         'enabled'  => true,
-        'benefit'  => '$7.000 en puerta hasta la 1:00',
-        'capacity' => 150,
+        'benefit'  => '$7.000 en puerta hasta las 00:00',
+        'note'     => 'Sujeto a capacidad del lugar.',
+        'capacity' => 40,
         'closes'   => '2026-10-11 20:00',
     ],
 
@@ -92,13 +94,13 @@ return [
     //  CAMBIÁ LOS CÓDIGOS por otros difíciles de adivinar.
     // ---------------------------------------------------------------
     'invitations' => [
-        'valid_until' => '2026-10-12 01:00',
-        'rules'       => 'Nominal, con DNI. Válida hasta la 1:00: después se paga la general.',
+        // Desde esta hora el QR de invitación deja de servir y el beneficio de la lista vence.
+        'valid_until' => '2026-10-12 00:00',
+        'rules'       => 'Nominal, con DNI. Válida hasta las 00:00: después se paga la general.',
         'codes' => [
             'evo-k7m2q'     => ['owner' => 'EVO',     'quota' => 15],
-            'oda-r4t8w'     => ['owner' => 'ODA',     'quota' => 15],
-            'sandman-p9x3v' => ['owner' => 'Sandman', 'quota' => 15],
-            'melt-h2n6z'    => ['owner' => 'Melt',    'quota' => 10],
+            'oda-r4t8w'     => ['owner' => 'ODA',     'quota' => 5],
+            'sandman-p9x3v' => ['owner' => 'Sandman', 'quota' => 5],
         ],
     ],
 
@@ -114,7 +116,8 @@ return [
         ['¿hay dress code?', 'venir.'],
         ['¿es en un sótano?', 'sí, y suena hermoso.'],
         ['¿es una secta?', 'no, es minimal.'],
-        ['¿a qué hora termina?', 'el lunes es feriado. no preguntes eso.'],
+        ['¿a qué hora termina?', 'a las 3:00.'],
+        ['¿hasta qué hora valen la lista y las invitaciones?', 'hasta las 00:00. después, entrada general.'],
         ['¿hay edad mínima?', '+18 con DNI.'],
         ['¿puedo comprar en puerta?', 'sí, a precio general. online sale menos si llegás a la early bird.'],
     ],

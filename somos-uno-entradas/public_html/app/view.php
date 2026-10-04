@@ -4,7 +4,7 @@ declare(strict_types=1);
 function page_start(string $title, string $bodyClass = '', string $base = ''): void
 {
     $c = (array) cfg('brand.colors');
-    $desc = cfg('event.tagline') . ' ' . cfg('event.date_label') . ' · ' . cfg('event.venue');
+    $desc = cfg('event.headline') . ' ' . cfg('event.date_label') . ' · ' . cfg('event.venue') . ' · ' . cfg('event.genres');
     header('Content-Type: text/html; charset=utf-8');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: same-origin');

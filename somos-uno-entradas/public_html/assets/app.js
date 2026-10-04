@@ -8,7 +8,7 @@
     var tick = function () {
       var s = Math.floor((start - Date.now()) / 1000);
       if (isNaN(s)) return;
-      if (s <= 0) { cd.textContent = 'ya empezó. ¿qué hacés acá?'; return; }
+      if (s <= 0) { cd.textContent = 'ya empezó. te esperamos abajo.'; return; }
       var parts = [[Math.floor(s / 86400), 'días'], [Math.floor(s % 86400 / 3600), 'horas'], [Math.floor(s % 3600 / 60), 'min']];
       cd.innerHTML = parts.map(function (p) { return '<div><b>' + p[0] + '</b><span>' + p[1] + '</span></div>'; }).join('');
     };

@@ -4,12 +4,12 @@ declare(strict_types=1);
 // ---------------------------------------------------------------------
 // Configuración
 // ---------------------------------------------------------------------
-$__cfgFile = __DIR__ . '/config.php';
-if (!is_file($__cfgFile)) {
-    http_response_code(500);
-    exit('Falta app/config.php. Copiá app/config.example.php como app/config.php y completalo.');
-}
+// Si todavía no existe config.php, se usa el ejemplo (en modo demo) para que el sitio funcione apenas se sube.
+$__cfgFile = is_file(__DIR__ . '/config.php') ? __DIR__ . '/config.php' : __DIR__ . '/config.example.php';
 $GLOBALS['CFG'] = require $__cfgFile;
+if (basename($__cfgFile) === 'config.example.php') {
+    $GLOBALS['CFG']['demo_mode'] = true;
+}
 date_default_timezone_set((string) cfg('timezone', 'America/Argentina/Buenos_Aires'));
 
 function cfg(string $path, $default = null)
@@ -32,7 +32,20 @@ function demo(): bool { return (bool) cfg('demo_mode', false); }
 function e($s): string { return htmlspecialchars((string) $s, ENT_QUOTES, 'UTF-8'); }
 function money(int $n): string { return '$' . number_format($n, 0, ',', '.'); }
 function now(): string { return date('Y-m-d H:i:s'); }
-function url(string $path = ''): string { return rtrim((string) cfg('site_url'), '/') . '/' . ltrim($path, '/'); }
+function base_url(): string
+{
+    $configured = rtrim((string) cfg('site_url', ''), '/');
+    if ($configured !== '') {
+        return $configured;
+    }
+    // Detecta el dominio y la carpeta del sitio (sirve también desde /admin)
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    $host = preg_replace('/[^a-z0-9.:\-]/i', '', (string) ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+    $dir = str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/')));
+    $dir = preg_replace('#/admin$#', '', rtrim($dir, '/'));
+    return ($https ? 'https' : 'http') . '://' . $host . $dir;
+}
+function url(string $path = ''): string { return base_url() . '/' . ltrim($path, '/'); }
 function is_past(?string $when): bool { return $when !== null && $when !== '' && time() > strtotime($when); }
 
 function redirect(string $to): void
@@ -213,10 +226,22 @@ function tier_taken(string $tierId): int
     )->fetchColumn();
 }
 
+/** Lugares libres del evento: capacidad total − entradas pagas (aprobadas o reservadas) − invitaciones. La lista no garantiza lugar. */
+function capacity_left(): int
+{
+    $cut = date('Y-m-d H:i:s', time() - 60 * (int) cfg('reserve_minutes', 30));
+    $paid = (int) q(
+        "SELECT COALESCE(SUM(qty),0) FROM orders WHERE status = 'approved' OR (status = 'pending' AND created_at >= ?)",
+        [$cut]
+    )->fetchColumn();
+    $inv = (int) q("SELECT COUNT(*) FROM passes WHERE kind = 'invitacion'")->fetchColumn();
+    return max(0, (int) cfg('event.capacity', PHP_INT_MAX) - $paid - $inv);
+}
+
 /** Estado de una tanda: ['open' => bool, 'left' => int, 'label' => texto si está cerrada] */
 function tier_state(array $t): array
 {
-    $left = max(0, (int) $t['stock'] - tier_taken($t['id']));
+    $left = max(0, min((int) $t['stock'] - tier_taken($t['id']), capacity_left()));
     if ($left === 0) {
         return ['open' => false, 'left' => 0, 'label' => 'agotada'];
     }
@@ -254,7 +279,8 @@ function invite_info(string $code): ?array
         return null;
     }
     $used = (int) q("SELECT COUNT(*) FROM passes WHERE kind = 'invitacion' AND code = ?", [$code])->fetchColumn();
-    return $codes[$code] + ['code' => $code, 'used' => $used, 'left' => max(0, (int) $codes[$code]['quota'] - $used)];
+    $left = max(0, min((int) $codes[$code]['quota'] - $used, capacity_left()));
+    return $codes[$code] + ['code' => $code, 'used' => $used, 'left' => $left];
 }
 
 /** Crea un pase (lista o invitación). Si ese mail ya tiene uno del mismo tipo, devuelve el existente. */
@@ -477,7 +503,7 @@ function send_order_email(?array $o): void
         'Hola ' . e($o['name']) . '. Tenés <b>' . (int) $o['qty'] . ' × ' . e($tier) . '</b> para ' . e(cfg('event.title')) . '.',
         url('ticket.php?t=' . $o['token']),
         'ver mi entrada (QR)',
-        'Código ' . e($o['id']) . '. Mostrá el QR en la puerta: vale para ' . (int) $o['qty'] . ' persona(s). ' . e(cfg('event.joke'))
+        'Código ' . e($o['id']) . '. Mostrá el QR en la puerta: vale para ' . (int) $o['qty'] . ' persona(s). ' . e(cfg('event.motto'))
     );
     if (send_mail($o['email'], 'Tu entrada · ' . cfg('event.title'), $html)) {
         q('UPDATE orders SET emailed = 1 WHERE id = ?', [$o['id']]);
@@ -497,7 +523,7 @@ function send_pass_email(?array $p): void
             : 'Quedaste en la lista de ' . e(cfg('event.title')) . ': ' . e(cfg('lista.benefit')) . '.'),
         url('ticket.php?t=' . $p['token']),
         'ver mi pase (QR)',
-        'Código ' . e($p['id']) . '. ' . e(cfg('event.joke'))
+        'Código ' . e($p['id']) . '. ' . e(cfg('event.motto'))
     );
     if (send_mail($p['email'], ($isInv ? 'Tu invitación · ' : 'Estás en la lista · ') . cfg('event.title'), $html)) {
         q('UPDATE passes SET emailed = 1 WHERE id = ?', [$p['id']]);

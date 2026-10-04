@@ -76,6 +76,8 @@ foreach ($passes as $r) {
     $passStats[$r['kind']] = ['n' => (int) $r['n'], 'inside' => (int) $r['inside']];
 }
 $inside = $totals['inside'] + $passStats['lista']['inside'] + $passStats['invitacion']['inside'];
+$capacity = (int) cfg('event.capacity', 0);
+$free = capacity_left();
 
 // Ranking de embajadores (entradas pagas + lista)
 $rank = [];
@@ -116,7 +118,8 @@ page_start('Panel · ' . cfg('brand.name'), 'page-admin', $B);
     <div><span class="label">recaudado bruto</span><strong><?= money($totals['gross']) ?></strong><small>neto estimado <?= money($net) ?></small></div>
     <div><span class="label">lista</span><strong><?= $passStats['lista']['n'] ?></strong><small>de <?= (int) cfg('lista.capacity', 0) ?></small></div>
     <div><span class="label">invitaciones</span><strong><?= $passStats['invitacion']['n'] ?></strong></div>
-    <div><span class="label">adentro</span><strong><?= $inside ?></strong></div>
+    <div><span class="label">adentro</span><strong><?= $inside ?><?= $capacity ? ' / ' . $capacity : '' ?></strong></div>
+    <div><span class="label">lugares libres</span><strong><?= $free ?></strong><small>para venta online e invitaciones</small></div>
   </section>
 
   <section class="admin-grid">

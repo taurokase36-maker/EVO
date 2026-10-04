@@ -52,7 +52,7 @@
       var left = en.total - en.used;
       if (!en.valid || left <= 0) {
         beep(false);
-        show('bad', en.name, en, left <= 0 ? '<p><b>Ya ingresó.</b></p>' : '');
+        show('bad', en.name, en, left <= 0 && en.valid ? '<p><b>Ya ingresó.</b></p>' : '');
         return;
       }
       var opts = '';

@@ -13,27 +13,48 @@ Está hecha en PHP puro, sin instalar nada, y funciona en el hosting compartido 
 
 ---
 
-## 1. Subir los archivos a Hostinger (10 minutos)
+## 1. Subir los archivos a Hostinger (5 minutos)
+
+> **Importante:** el zip ya trae `index.php` en la raíz. No uses la herramienta "Importar / migrar sitio web": usá el **Administrador de archivos**.
 
 1. Entrá a **hPanel → Sitios web → Administrar → Administrador de archivos**.
-2. Abrí la carpeta **`public_html`** de tu dominio.
-3. Subí **todo el contenido** de la carpeta `public_html/` de este proyecto: `index.php`, `app/`, `admin/`, `assets/`, `data/`, `.htaccess`, etc.
-   - Lo más fácil es comprimir la carpeta en un `.zip`, subir el zip y usar **Extraer**.
-   - Los archivos `.htaccess` empiezan con un punto. Si no los ves, activá "mostrar archivos ocultos".
-4. En hPanel → **Avanzado → Configuración de PHP**, elegí **PHP 8.1 o superior**.
-5. Activá el **SSL** (https) del dominio en hPanel → Seguridad → SSL. Mercado Pago lo necesita.
+2. Entrá a la carpeta **`public_html`** de tu dominio. Si tiene un `default.php` o un `index.html` viejo, borralo.
+3. Tocá **Subir**, elegí `somos-uno-entradas.zip` y, cuando termine, hacé clic derecho sobre el zip → **Extraer** → en "extraer a" dejá **la misma carpeta `public_html`** (no crees una carpeta nueva).
+4. Revisá que **`index.php` quede directamente dentro de `public_html`**, junto a las carpetas `app`, `admin`, `assets` y `data`. Después podés borrar el zip.
+5. En hPanel → **Avanzado → Configuración de PHP**, elegí **PHP 8.1 o superior**.
+6. Activá el **SSL** (https) en hPanel → Seguridad → SSL. Mercado Pago lo necesita.
+
+Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pagos se aprueban solos y no se cobra nada.
 
 ## 2. Configurar (5 minutos)
 
-1. Dentro de `public_html/app/`, duplicá `config.example.php` y llamá a la copia **`config.php`**.
+1. Dentro de `public_html/app/`, duplicá `config.example.php` y llamá a la copia **`config.php`**. Mientras no exista, el sitio usa el ejemplo en modo demo.
 2. Editá `config.php` y completá:
-   - `site_url`: tu dominio con https y sin barra al final, por ejemplo `https://somosuno.com.ar`.
+   - `site_url`: tu dominio, por ejemplo `https://somosuno.com.ar`. Si lo dejás vacío se detecta solo, pero es mejor escribirlo.
    - `admin.password`: la contraseña del panel completo.
    - `admin.door_password`: otra contraseña, solo para el escáner de la puerta.
-   - Los datos del evento: horario, line up, precios, cupos y fechas de cierre.
    - **Los códigos de invitación.** Cambialos por otros difíciles de adivinar.
-3. Dejá `demo_mode => true` y entrá a tu dominio. Probá comprar: en modo demo el pago se aprueba solo, sin cobrar.
-4. Entrá a `tudominio.com/admin` con tu contraseña y mirá que la compra de prueba aparezca.
+3. Entrá a `tudominio.com/admin` con tu contraseña y probá una compra en modo demo.
+
+### Cómo viene configurado el 11/10
+- **Horario:** de 18:00 a 03:00. **Capacidad: 160 personas.**
+- **Early bird:** 30 entradas a $5.000 (con $10.000 tachado), hasta el viernes 9 a las 23:59.
+- **General:** 65 entradas online a $10.000.
+- **Invitaciones:** 25 en total (EVO 15, ODA 5, Sandman 5). Son nominales y el **QR deja de servir a las 00:00**.
+- **Lista:** cupo de 40, con $7.000 en puerta hasta las 00:00 y sujeto a capacidad.
+- **Tope total:** la venta online y las invitaciones nunca pasan de 160. Se dejan unos 40 lugares para la lista y la puerta.
+
+**Números con casa llena** (cobrando a 10 días en Mercado Pago):
+
+| | Personas | Bruto |
+|---|---|---|
+| Early bird | 30 × $5.000 | $150.000 |
+| General online | 65 × $10.000 | $650.000 |
+| Invitaciones | 25 × $0 | $0 |
+| Lista o puerta | 40 × $7.000 a $10.000 | $280.000 a $400.000 |
+| **Total** | **160** | **$1.080.000 a $1.200.000** |
+
+Mercado Pago descuenta unos $42.480 de lo online. **Neto: entre $1.037.520 y $1.157.520.**
 
 ## 3. Conectar Mercado Pago (10 minutos)
 
@@ -77,9 +98,10 @@ Si no configurás el mail, la entrada igual aparece en pantalla después de paga
 
 **En la puerta:**
 - Abrí el escáner en el celular, tocá "activar cámara" y apuntá al QR.
-- Si la entrada es para varias personas, elegís cuántas entran.
+- **Verde:** puede pasar. Si la entrada es para varias personas, elegís cuántas entran.
+- **Rojo:** no puede pasar. Ya ingresó, la entrada no es válida o es una **invitación después de las 00:00**.
+- **Amarillo:** es de la lista pero pasó las 00:00. Puede entrar pagando la general.
 - Si alguien no tiene el QR, buscalo por nombre o código.
-- Las invitaciones fuera de horario aparecen en amarillo.
 
 **Después del evento:** desde el panel podés descargar el CSV con todos los mails. Es tu base de público para la próxima fecha.
 

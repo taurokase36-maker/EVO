@@ -30,13 +30,12 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <p class="kicker"><?= e(cfg('event.kicker')) ?></p>
     <h1 class="display"><?= e(cfg('event.headline')) ?></h1>
     <p class="hero-date"><?= e(cfg('event.date_label')) ?> · <?= e(cfg('event.venue')) ?></p>
-    <p class="hero-tag"><?= e(cfg('event.tagline')) ?></p>
+    <p class="hero-motto"><?= e(cfg('event.motto')) ?></p>
     <div class="countdown" data-start="<?= e(date('c', (int) strtotime((string) cfg('event.starts_at')))) ?>" aria-live="polite"></div>
     <div class="hero-cta">
       <a href="#entradas" class="btn btn-solid">comprar entrada</a>
       <?php if ($lista['open']): ?><a href="#lista" class="btn btn-ghost">anotarme en la lista</a><?php endif; ?>
     </div>
-    <p class="hero-joke"><?= e(cfg('event.joke')) ?></p>
   </div>
 </header>
 
@@ -108,6 +107,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <h2 class="section-title">lista</h2>
     <div class="card">
       <p class="lead"><?= e(cfg('lista.benefit')) ?></p>
+      <?php if (cfg('lista.note')): ?><p class="muted lista-note"><?= e(cfg('lista.note')) ?></p><?php endif; ?>
       <?php if ($lista['open']): ?>
         <form method="post" action="lista.php" class="buy">
           <?= csrf_field() ?>
