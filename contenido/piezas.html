@@ -1,0 +1,191 @@
+<!doctype html>
+<!-- THE ECLIPSE · piezas de la semana. ?p=01-anuncio-story (ver la lista PIEZAS abajo).
+     Para exportar todas a PNG: node render.js -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>THE ECLIPSE · piezas</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=GFS+Didot&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #000; color: #efe2d6; font: 14px system-ui; }
+  canvas { display: block; max-height: 100vh; max-width: 100vw; margin: 0 auto; }
+  nav { position: fixed; top: 8px; left: 8px; display: flex; flex-direction: column; gap: 4px; }
+  nav a { color: inherit; opacity: .6; } nav a:hover { opacity: 1; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<nav id="nav"></nav>
+<script src="motor.js"></script>
+<script>
+(function () {
+  'use strict';
+  var M = Motor, C = M.C;
+  var NAME = 'THE ECLIPSE', ALBUM = 'THE SUN';
+  var italic = function (px) { return 'italic ' + px + 'px "Cormorant Garamond"'; };
+  var cinzel = function (px, w) { return (w || 400) + ' ' + px + 'px Cinzel'; };
+  var soft = function (a) { return M.rgba(C.cream, a); };
+
+  var STORY = [1080, 1920], POST = [1080, 1350];
+
+  var PIEZAS = {
+    // ---------------- LÁMINA 2 · el sol grabado ----------------
+    '01-anuncio-story': [STORY, function () {
+      M.background(); M.marble(42);
+      M.engravedSun(540, 840, 250, { rays: 1100, spread: 1.0, seed: 'grabado' });
+      M.huella(540, 840, 200, 'the-sun', 16, 0.9);
+      M.clock(540, 840, 440, { inscription: 'ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ' });
+      M.vignette(0.55);
+      M.text('SOMOS UNO  ×  MELT UNDERGROUND  PRESENTAN', 540, 262, cinzel(22, 600), soft(0.7), { spacing: 5 });
+      M.title(NAME, 540, 1440, 132, 960);
+      M.text('release party de ' + ALBUM + ' · el nuevo álbum de EVO', 540, 1505, italic(40), soft(0.88));
+      M.text('XI · X · MMXXVI   ·   XVIII — III', 540, 1565, cinzel(30), C.accent, { spacing: 6 });
+      M.text('Melt Underground · Laprida 1423', 540, 1615, italic(32), soft(0.6));
+    }],
+    '02-anuncio-post': [POST, function () {
+      M.background(); M.marble(43);
+      M.engravedSun(540, 530, 190, { rays: 1000, spread: 1.0, seed: 'grabado' });
+      M.huella(540, 530, 152, 'the-sun', 16, 0.9);
+      M.clock(540, 530, 335, { inscription: 'ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ' });
+      M.vignette(0.5);
+      M.title(NAME, 540, 1040, 112, 940);
+      M.text('release party de ' + ALBUM + ' · el nuevo álbum de EVO', 540, 1098, italic(36), soft(0.88));
+      M.text('XI · X · MMXXVI   ·   XVIII — III', 540, 1150, cinzel(28), C.accent, { spacing: 6 });
+      M.credits(1240, 22);
+    }],
+
+    // ---------------- LÁMINA 1 · la pared ----------------
+    '03-la-pared-story': [STORY, function () {
+      M.background();
+      M.wall({ top: 560, bot: 1300, people: [
+        { x: 250, y: 1260, h: 520, seed: 1 }, { x: 430, y: 1280, h: 600, seed: 2 }, { x: 600, y: 1270, h: 560, seed: 3 },
+        { x: 770, y: 1280, h: 610, seed: 4 }, { x: 920, y: 1260, h: 480, seed: 5 }, { x: 340, y: 1300, h: 440, seed: 6 }, { x: 690, y: 1310, h: 450, seed: 7 }] });
+      M.engravedSun(540, 330, 82, { rays: 520, spread: 0.9, seed: 'pared' });
+      M.huella(540, 330, 62, 'the-sun', 9, 0.8);
+      M.vignette(0.6);
+      M.title(NAME, 540, 1430, 120, 940);
+      M.text('entrás con el ocaso  ·  salís con otra luz', 540, 1495, italic(42), soft(0.88));
+      M.text('XVIII — III', 540, 1555, cinzel(32), C.accent, { spacing: 8 });
+      M.credits(1610, 24);
+    }],
+    '04-line-up-story': [STORY, function () {
+      M.background();
+      M.wall({ top: 520, bot: 1320, blur: 6, people: [
+        { x: 260, y: 1290, h: 600, seed: 21 }, { x: 540, y: 1300, h: 690, seed: 22 }, { x: 820, y: 1290, h: 610, seed: 23 }] });
+      M.vignette(0.55);
+      M.text('LINE UP', 540, 300, cinzel(28, 600), C.accent, { spacing: 12 });
+      M.title(NAME, 540, 410, 96, 900);
+      [['EVO', 260], ['ODA', 540], ['SANDMAN', 820]].forEach(function (d) { M.title(d[0], d[1], 1415, 56, 250, { spacing: 6 }); });
+      M.text('XI · X   ·   XVIII — III', 540, 1500, cinzel(30), C.accent, { spacing: 6 });
+      M.text('minimal · house · techno', 540, 1552, italic(36), soft(0.7));
+      M.credits(1605, 24);
+    }],
+
+    // ---------------- LÁMINA 3 · la lámina ----------------
+    '05-la-noche-post': [POST, function () {
+      M.background();
+      var fig = M.offscreen(1080, 1920, function () { M.background(); M.caveSection({ G: 760, frame: [76, 520, 928, 1000] }); });
+      M.ctx.drawImage(fig, 0, 500, 1080, 1020, 97, 205, 886, 837);
+      M.ctx.strokeStyle = soft(0.6); M.ctx.lineWidth = 2; M.ctx.strokeRect(48, 40, 984, 1270);
+      M.ctx.lineWidth = 0.8; M.ctx.strokeRect(58, 50, 964, 1250);
+      M.title(NAME, 540, 150, 84, 800);
+      M.text('FIG. I', 120, 196, cinzel(18), soft(0.6), { align: 'left', spacing: 5 });
+      M.text('ΣΠΗΛΑΙΟΝ', 960, 196, '18px "GFS Didot"', soft(0.6), { align: 'right', spacing: 7 });
+      [['α', 'XVIII · el ocaso: entrás'], ['β', 'el descenso'], ['γ', 'XXIV · el fuego: suena ' + ALBUM], ['ε', 'las sombras: nosotros'], ['δ', 'III · la salida, con otra luz']].forEach(function (l, i) {
+        var y = 1092 + i * 38;
+        M.text(l[0], 250, y, 'italic 30px "GFS Didot"', C.accent, { align: 'left' });
+        M.text(l[1], 292, y, italic(31), soft(0.88), { align: 'left' });
+      });
+      M.credits(1282, 18);
+    }],
+    '08-hoy-story': [STORY, function () {
+      M.background();
+      M.caveSection({ G: 800, frame: [76, 470, 928, 1000] });
+      M.ctx.strokeStyle = soft(0.6); M.ctx.lineWidth = 2; M.ctx.strokeRect(64, 458, 952, 1024);
+      M.vignette(0.4);
+      M.text(NAME, 540, 240, cinzel(30, 600), C.accent, { spacing: 10 });
+      M.title('HOY', 540, 345, 112, 600);
+      M.text('XVIII — III  ·  MELT UNDERGROUND', 540, 410, cinzel(24), soft(0.75), { spacing: 5 });
+      M.text('el sol se pone a las 19:08.', 540, 1550, italic(44), soft(0.9));
+      M.text('adentro, sale.', 540, 1602, italic(44), C.cream);
+    }],
+    '09-gracias-story': [STORY, function () {
+      M.background();
+      M.caveSection({ G: 820, frame: [76, 470, 928, 1000], rising: true, sunX: 790, sunR: 120, labels: false });
+      M.ctx.strokeStyle = soft(0.6); M.ctx.lineWidth = 2; M.ctx.strokeRect(64, 458, 952, 1024);
+      M.vignette(0.4);
+      M.text(NAME + '  →  ' + ALBUM, 540, 250, cinzel(28, 600), C.accent, { spacing: 8 });
+      M.title('GRACIAS POR BAJAR', 540, 360, 76, 900);
+      M.text('salimos con otra luz.', 540, 1555, italic(46), C.cream);
+      M.text('lo que escuchaste adentro, pronto afuera.', 540, 1608, italic(34), soft(0.7));
+    }],
+
+    // ---------------- iteraciones: la luna y el eclipse ----------------
+    '06-luna-nueva-story': [STORY, function () {
+      M.background(); M.marble(44);
+      var sun = [540, 520], mo = [562, 960], earth = [540, 1250];
+      M.sunDisk(sun[0], sun[1], 150);
+      // líneas de la alineación: tierra → sol y tierra → luna (3,8° de diferencia)
+      var g = M.ctx;
+      g.save(); g.setLineDash([4, 10]); g.strokeStyle = soft(0.55); g.lineWidth = 1.6;
+      g.beginPath(); g.moveTo(earth[0], earth[1] - 62); g.lineTo(sun[0], sun[1] + 160); g.stroke();
+      g.strokeStyle = M.rgba(C.accent, 0.8);
+      g.beginPath(); g.moveTo(earth[0], earth[1] - 62); g.lineTo(mo[0] + (mo[0] - earth[0]) * 0.9, mo[1] - (earth[1] - mo[1]) * 0.9); g.stroke(); g.restore();
+      g.save(); g.strokeStyle = C.accent; g.lineWidth = 1.4; g.beginPath(); g.arc(earth[0], earth[1] - 62, 120, -Math.PI / 2, -Math.PI / 2 + 0.0663); g.stroke(); g.restore();
+      M.text('3,8°', earth[0] + 16, earth[1] - 196, 'italic 26px "GFS Didot"', C.accent, { align: 'left' });
+      M.moon(mo[0], mo[1], 50, { lit: 0.03, angle: -Math.PI / 2, rim: 0.5 });
+      // la tierra, grabada
+      var l = M.layer(), lg = l.getContext('2d');
+      M.engrave(lg, { angle: Math.PI / 4, spacing: 5, maxW: 1.6, wobble: 0.3, light: function (x, y) { var d = Math.hypot(x - earth[0], y - earth[1]) / 62; return d > 1 ? 0 : 0.3 + 0.7 * (1 - d * 0.6) * (y < earth[1] ? 1 : 0.6); } });
+      g.drawImage(l, 0, 0);
+      g.strokeStyle = soft(0.8); g.lineWidth = 1.6; g.beginPath(); g.arc(earth[0], earth[1], 62, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = C.accent; g.beginPath(); g.arc(earth[0] + 18, earth[1] - 30, 5, 0, Math.PI * 2); g.fill();
+      [['ΗΛΙΟΣ', 'el sol', sun[0] + 200, sun[1] + 8], ['ΣΕΛΗΝΗ', 'la luna, nueva', mo[0] + 90, mo[1] + 8], ['ΓΗ', 'nosotros', earth[0] + 100, earth[1] + 8]].forEach(function (t) {
+        M.text(t[0], t[2], t[3] - 14, '24px "GFS Didot"', soft(0.75), { align: 'left', spacing: 5 });
+        M.text(t[1], t[2], t[3] + 22, italic(30), soft(0.6), { align: 'left' });
+      });
+      M.vignette(0.5);
+      M.text('ΝΟΥΜΗΝΙΑ', 540, 262, '26px "GFS Didot"', soft(0.6), { spacing: 12 });
+      M.title('LUNA NUEVA', 540, 1440, 100, 900);
+      M.text('la luna se pone entre la tierra y el sol.', 540, 1500, italic(38), soft(0.88));
+      M.text('el 11 se esconde a las 20:26, detrás del sol:', 540, 1545, italic(38), soft(0.88));
+      M.text('la noche más oscura del mes.', 540, 1590, italic(38), C.cream);
+      M.text(NAME + '  ·  XI · X', 540, 1645, cinzel(26, 600), C.accent, { spacing: 6 });
+    }],
+    '07-early-bird-story': [STORY, function () {
+      M.background(); M.marble(45);
+      var cx = 540, cy = 1250, RA = 420, R = 78;
+      [-160, -125, -90, -55, -20].forEach(function (deg, k) {
+        var a = deg * Math.PI / 180, x = cx + RA * Math.cos(a), y = cy + RA * Math.sin(a);
+        if (k === 4) { M.engravedSun(x, y, R, { rays: 520, spread: 1.0, seed: 'total', weight: 0.8 }); M.huella(x, y, R * 0.75, 'the-sun', 7, 0.8); return; }
+        M.sunDisk(x, y, R);
+        if (k > 0) {   // la luna avanza desde arriba a la izquierda
+          var d = 2 * R * (1 - k / 4), ma = -2.4;
+          M.moon(x + Math.cos(ma) * d, y + Math.sin(ma) * d, R * 1.02, { rim: 0.12 });
+        }
+        M.text(['I', 'II', 'III', 'IV'][k], x, y + R + 52, cinzel(20), soft(0.5), { spacing: 3 });
+      });
+      M.vignette(0.5);
+      M.text(NAME, 540, 262, cinzel(26, 600), C.accent, { spacing: 10 });
+      M.title('EARLY BIRD', 540, 470, 104, 900);
+      M.text('se apaga el viernes IX · 23:59', 540, 1355, italic(46), C.cream);
+      M.title('$5.000', 540, 1450, 64, 600, { spacing: 4 });
+      M.text('después, $10.000', 540, 1505, italic(34), soft(0.65));
+      M.text('XI · X  ·  XVIII — III  ·  MELT UNDERGROUND', 540, 1570, cinzel(24), C.accent, { spacing: 4 });
+      M.text('entradas en el link de la bio', 540, 1620, italic(32), soft(0.6));
+    }]
+  };
+
+  var id = new URLSearchParams(location.search).get('p') || '01-anuncio-story';
+  var nav = document.getElementById('nav');
+  Object.keys(PIEZAS).sort().forEach(function (k) { var a = document.createElement('a'); a.href = '?p=' + k; a.textContent = k; nav.appendChild(a); });
+  if (new URLSearchParams(location.search).has('export')) nav.remove();
+  window.PIEZAS = Object.keys(PIEZAS).sort();
+  var p = PIEZAS[id]; if (!p) return;
+  var cv = document.getElementById('c'); cv.width = p[0][0]; cv.height = p[0][1];
+  M.use(cv);
+  M.fonts().then(function () { p[1](); M.grain(0.04); window.DONE = true; });
+})();
+</script>
+</body>
+</html>

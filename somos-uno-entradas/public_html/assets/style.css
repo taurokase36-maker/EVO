@@ -67,8 +67,8 @@ button.link { background: none; border: 0; color: var(--accent); font: inherit; 
   content: ''; position: absolute; top: 10%; right: 11%; width: 9px; height: 9px; border-radius: 50%;
   background: var(--cream); box-shadow: 0 0 12px 4px var(--cream), 0 0 34px 10px var(--accent);
 }
-.eclipse .display { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-style: normal; letter-spacing: .03em; font-size: clamp(60px, 17vw, 128px); white-space: nowrap; text-shadow: 0 0 24px var(--bg); }
-.hero-sub { font-family: var(--mono); font-size: 14px; letter-spacing: .5em; text-transform: uppercase; color: var(--accent); margin-right: -.5em; }
+.eclipse .display { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-style: normal; letter-spacing: .03em; font-size: clamp(42px, 12.5vw, 112px); white-space: nowrap; text-shadow: 0 0 24px var(--bg); }
+.hero-sub { font-family: var(--mono); font-size: 13px; letter-spacing: .32em; text-transform: uppercase; color: var(--accent); margin-right: -.32em; }
 .hero-date { font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
 .hero-motto { font-family: var(--serif); font-style: italic; font-size: 30px; line-height: 1.1; }
 .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }

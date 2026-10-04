@@ -37,7 +37,7 @@ Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pag
 3. Entrá a `tudominio.com/admin` con tu contraseña y probá una compra en modo demo.
 
 ### Cómo viene configurado el 11/10
-- **Concepto:** *Somos Uno × Melt Underground presentan THE SUN · release party*. Estética eclipse: negro con corona roja, logos de Somos Uno y Melt en la portada, y un bloque que presenta el álbum.
+- **Concepto:** *Somos Uno × Melt Underground presentan THE ECLIPSE · release party de THE SUN*. Estética eclipse: negro con corona roja, logos de Somos Uno y Melt en la portada, y un bloque que presenta el álbum.
   > **Si ya creaste tu `config.php` antes de este cambio**, no se actualiza solo: copiá de `config.example.php` los bloques `brand` (colores y `partner_logo`), `event` (`title`, `kicker`, `headline`, `subhead`, `motto`), `release` y `faq`.
 - **Horario:** de 18:00 a 03:00. **Capacidad: 160 personas.**
 - **Early bird:** 30 entradas a $5.000 (con $10.000 tachado), hasta el viernes 9 a las 23:59.

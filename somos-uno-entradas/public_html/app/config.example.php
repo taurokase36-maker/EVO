@@ -40,10 +40,10 @@ return [
     //  EVENTO
     // ---------------------------------------------------------------
     'event' => [
-        'title'      => 'Somos Uno × Melt Underground presentan THE SUN · release party',
+        'title'      => 'Somos Uno × Melt Underground presentan THE ECLIPSE · release party de THE SUN',
         'kicker'     => 'somos uno × melt underground presentan',
-        'headline'   => 'THE SUN',
-        'subhead'    => 'release party',
+        'headline'   => 'THE ECLIPSE',
+        'subhead'    => 'release party de THE SUN',
         'date_label' => 'domingo 11·10',
         'time_label' => '18:00 a 03:00',
         'starts_at'  => '2026-10-11 18:00',     // para la cuenta regresiva
@@ -62,8 +62,8 @@ return [
     'release' => [
         'label' => 'el lanzamiento',
         'title' => 'THE SUN',
-        'text'  => 'El nuevo álbum de EVO no sale de una vez: sale de a un single. Esa noche suena el primero, '
-                 . 'en vivo y por primera vez, en el sótano de Melt. El sol se pone afuera y sale adentro.',
+        'text'  => 'El nuevo álbum de EVO no sale de una vez: sale de a un single. La corona del sol solo se ve '
+                 . 'durante un eclipse: esa noche, en el sótano de Melt, suena el primero. Entrás con el ocaso y salís con otra luz.',
     ],
 
     'pillars' => [
@@ -124,6 +124,7 @@ return [
 
     'faq' => [
         ['¿qué es THE SUN?', 'el nuevo álbum de EVO. sale de a un single y el primero se estrena esa noche.'],
+        ['¿por qué THE ECLIPSE?', 'el 10 hay luna nueva: la luna pasa entre la tierra y el sol. el 11 se esconde a las 20:26 y queda la noche más oscura del mes. adentro, sale el sol.'],
         ['¿hay dress code?', 'negro. venir.'],
         ['¿es en un sótano?', 'sí, y suena hermoso.'],
         ['¿es una secta?', 'no, es minimal.'],

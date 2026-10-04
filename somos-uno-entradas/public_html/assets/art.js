@@ -109,11 +109,13 @@
         });
         if (line) lines.push(line);
         lines.forEach(function (l, i) { ctx.fillText(spaced(l), 540, 210 + i * 50); });
-        ctx.font = '170px "Instrument Serif", Georgia, serif';
+        var hs = 170;   // el título se achica hasta entrar en el ancho
+        do { ctx.font = hs + 'px "Instrument Serif", Georgia, serif'; hs -= 6; } while (hs > 60 && ctx.measureText(d.headline || '').width > 960);
         ctx.fillText(d.headline || '', 540, 1330);
         ctx.fillStyle = accent;
-        ctx.font = '700 38px "Space Mono", monospace';
-        ctx.fillText((d.sub || '').toUpperCase().split('').join(' '), 540, 1410);
+        var sub = spaced(d.sub || ''), ss = 38;
+        do { ctx.font = '700 ' + ss + 'px "Space Mono", monospace'; ss -= 2; } while (ss > 16 && ctx.measureText(sub).width > 960);
+        ctx.fillText(sub, 540, 1410);
         ctx.fillStyle = cream;
         ctx.font = 'italic 70px "Instrument Serif", Georgia, serif';
         ctx.fillText(d.motto || '', 540, 1510);
