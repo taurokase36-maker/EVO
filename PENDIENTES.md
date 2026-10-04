@@ -2,7 +2,7 @@
 
 ## Esta semana (antes del domingo 11)
 - [ ] **Primer single:** subirlo ya a la distribuidora. Si no llega al domingo, estrenarlo en Melt y sacarlo a plataformas después.
-- [ ] **Nombre:** decidir si en el line up va "EVO" o "EVO THE SUN" (o revelarlo esa noche). Elegir entre renombrar el perfil de Spotify o abrir uno nuevo.
+- [ ] **Nombre público: EVO THE SUN.** Renombrar Instagram, Spotify (perfil actual o uno nuevo), SoundCloud y el press kit. Las propuestas en PDF de `propuestas/` todavía dicen EVO.
 - [ ] **Teaser:** ponerle el track con el primer beat en el 0:00 y subirlo a historias (`teaser/solaris-teaser.mp4`).
 - [ ] **Amigo de visuales:** mandarle el texto del concepto, el teaser y las láminas (`propuestas/caverna/`).
 - [ ] **Contenido de la semana:** publicar según el calendario de `contenido/copys.md` (piezas en `contenido/semana/`).

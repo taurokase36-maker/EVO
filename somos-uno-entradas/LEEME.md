@@ -42,7 +42,7 @@ Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pag
 - **Horario:** de 18:00 a 03:00. **Capacidad: 160 personas.**
 - **Early bird:** 30 entradas a $5.000 (con $10.000 tachado), hasta el viernes 9 a las 23:59.
 - **General:** 65 entradas online a $10.000.
-- **Invitaciones:** 25 en total (EVO 15, ODA 5, Sandman 5). Son nominales y el **QR deja de servir a las 00:00**.
+- **Invitaciones:** 25 en total (EVO THE SUN 15, ODA 5, Sandman 5). Son nominales y el **QR deja de servir a las 00:00**.
 - **Lista:** cupo de 40, con $7.000 en puerta hasta las 00:00 y sujeto a capacidad.
 - **Tope total:** la venta online y las invitaciones nunca pasan de 160. Se dejan unos 40 lugares para la lista y la puerta.
 

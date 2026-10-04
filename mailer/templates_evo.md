@@ -1,10 +1,10 @@
-# Templates del mailer: EVO
+# Templates del mailer: EVO THE SUN
 
 Para cada uno: en el mailer, ir a **Templates → + Nuevo template**, pegar el asunto y el cuerpo, y elegir el tipo de contacto.
 Las variables entre `{}` las completa el mailer solo. Lo que está entre `[corchetes]` lo completás vos antes de cada campaña.
 
 **Configuración recomendada** (en Configuración):
-- Nombre artístico: `EVO` · Ciudad: `Buenos Aires`
+- Nombre artístico: `EVO THE SUN` · Ciudad: `Buenos Aires`
 - Press kit: link al PDF nuevo (Drive con acceso "cualquiera con el link") · Instagram: `@evo.evo.evo._`
 - Email de respuestas: `evo.evomusic@gmail.com`
 - Límite por 24 h: **25** · Pausa entre mails: **60** segundos · Seguimiento: **10** días

@@ -57,12 +57,12 @@ return [
             ['18:00 — 19:30', 'COCO'],
             ['19:30 — 21:00', 'GREMORA B2B SANDMAN'],
             ['21:00 — 22:30', 'ODA'],
-            ['22:30 — 00:00', 'EVO + DAMIAN'],
+            ['22:30 — 00:00', 'EVO THE SUN'],
             ['00:00 — 01:30', 'LUCILA'],
             ['01:30 — 03:00', 'RUF'],
         ],
         // Invitado especial: aparece debajo del line up. '' en name = no mostrar.
-        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica, junto a EVO (22:30)'],
+        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica, junto a EVO THE SUN (22:30)'],
         'motto'      => 'para la gente del sol.',
         'age'        => '+18 con DNI',
         'door_price' => 10000,                  // precio en puerta (solo informativo)
@@ -70,7 +70,7 @@ return [
 
     // Nota chica debajo del line up (un detalle extra, no el foco). '' = no mostrar.
     'release' => [
-        'text' => 'Y un detalle: esa noche EVO estrena el primer single de THE SUN, su nuevo álbum.',
+        'text' => 'Y un detalle: esa noche EVO THE SUN estrena el primer single de THE SUN, su nuevo álbum.',
     ],
 
     // Qué es SOLARIS (bloque debajo del line up)
@@ -127,7 +127,7 @@ return [
         'valid_until' => '2026-10-12 00:00',
         'rules'       => 'Nominal, con DNI. Válida hasta las 00:00: después se paga la general.',
         'codes' => [
-            'evo-k7m2q'     => ['owner' => 'EVO',     'quota' => 15],
+            'evo-k7m2q'     => ['owner' => 'EVO THE SUN', 'quota' => 15],
             'oda-r4t8w'     => ['owner' => 'ODA',     'quota' => 5],
             'sandman-p9x3v' => ['owner' => 'Sandman', 'quota' => 5],
         ],
@@ -136,7 +136,7 @@ return [
     // Embajadores: links de difusión para saber quién trae más gente.
     // tudominio.com/?ref=oda  → las compras y la lista quedan a nombre de ODA.
     'ambassadors' => [
-        'evo'     => 'EVO',
+        'evo'     => 'EVO THE SUN',
         'oda'     => 'ODA',
         'sandman' => 'Sandman',
         'coco'    => 'COCO',

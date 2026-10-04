@@ -14,17 +14,17 @@ Después:
 
 Si cambiás el código, regeneralo con `python3 visuales/empaquetar.py` (actualiza los dos). Para trabajar sobre el código, usá `visuales/index.html`.
 
-## Las seis escenas (los personajes de SOLARIS)
-Todas giran alrededor de los muñecos: bailan con coreografías que cambian en cada beat (brazos arriba, palmas, señalar, saltar, agacharse…) y hacen olas entre ellos.
+## Las seis escenas (la mascota de SOLARIS)
+El muñeco que baila es la mascota. Se mueve **fluido y sutil**: cambia de pose cada 2 beats con transiciones suaves y se balancea todo el tiempo.
 
 | Tecla | Escena | Qué hace |
 |---|---|---|
-| 1 | **el ritual** | Ronda de personajes alrededor del sol eclipsado: son sus rayos. La ronda gira y baila en ola |
+| 1 | **el ritual** | Ronda de personajes alrededor del sol eclipsado, como sus rayos. Gira y baila en ola |
 | 2 | **la pared** | La pared de la caverna, limpia, con las sombras de los personajes y la luz del fuego. En la roca, pinturas rupestres sutiles |
-| 3 | **el eclipse** | La luna cruza el sol en 8 compases. Abajo, el público mira y en la totalidad salta con los brazos arriba |
-| 4 | **solaris** | El logo, con un personaje bailando arriba de cada letra |
+| 3 | **la caverna** | Un cubo de grano que gira y respira, con aristas de luz y un pequeño sol en la esquina. Adentro, en la pared del fondo, baila la sombra de la mascota. **Drop**: el cubo se abre y se ilumina. Muy liviana |
+| 4 | **solaris** | Solo el logo, con "for the solar people" y el logo de Somos Uno |
 | 5 | **el gigante** | Un personaje enorme hecho de líneas de grabado, con el sol de aureola y su sombra |
-| 6 | **la multitud** | Filas de personajes bailando hacia el sol. Cada 4 compases, ola de brazos de izquierda a derecha |
+| 6 | **polvo solar** | Fibras de partículas que fluyen como humo y dibujan a la mascota bailando, con un anillo de sol tenue. Liviana |
 
 ## Controles
 
@@ -34,9 +34,10 @@ Todo está en la **barra de abajo** (aparece al mover el mouse), en el teclado y
 |---|---|---|
 | Escenas | 1 a 6, ◀ ▶ | `1`…`6`, `N` `P` |
 | Tempo | −, BPM (se puede escribir), +, tap, sync · 1 | `↑` `↓`, `Espacio`, `S` |
-| Efectos | drop, flash, blackout, logo, auto | `D` `F` `B` `L` `A` |
+| Efectos | drop (abre la caverna), flash, blackout, logo, auto | `D` `F` `B` `L` `A` |
 | FX | espejo (2 o 4 lados), congelar, pulso ½, pulso ×2, strobe (mientras lo apretás), reset fx | `E` `C` · `X` (mantener) · `R` |
-| Line up | coco, gremora b2b sandman, oda, evo + damian, lucila, ruf (nombre + horario), the sun, for the solar people. Un toque lo muestra, otro lo saca. **auto**: muestra quién toca según la hora, 4 compases cada 32 | `⇧`+`1`…`6`, `⇧`+`7` `⇧`+`8` · `-` saca · `T` auto |
+| Line up | coco, gremora b2b sandman, oda, evo the sun, lucila, ruf (solo el nombre, abajo), the sun, for the solar people. Un toque lo muestra, otro lo saca. **auto**: muestra quién toca según la hora, 4 compases cada 32 | `⇧`+`1`…`6`, `⇧`+`7` `⇧`+`8` · `-` saca · `T` auto |
+| Invitado especial | **★ damian santos**: aparece aparte, arriba a la izquierda ("invitado especial · saxo en vivo"). Se puede mostrar junto con EVO THE SUN. En modo auto aparece solo durante el set de EVO THE SUN | `⇧`+`9` |
 | Sistema | ajustes (todos los sliders), midi, calidad baja, pantalla completa, ?, esconder | `M` `Q` `Enter` `H` |
 
 **Ajustes** (sliders, faders o perillas): brillo, pulso, fuego/corona, logo encima, velocidad, grano, sombras, fundido entre escenas, zoom, color (de carmesí a oro), estela, golpe de cámara en el beat, anillos de la huella, **cantidad de personajes** (en todas las escenas), glitch, strobe al tempo (negras, corcheas o semicorcheas), rotación y tamaño de la corona.
@@ -55,7 +56,7 @@ Todo está en la **barra de abajo** (aparece al mover el mouse), en el teclado y
 | Perillas, fila 3 | anillos · cantidad de personajes · glitch · strobe |
 | Encoders de arriba 1–3 | rotación (sin tope) · BPM fino (±0,1 por paso) · tamaño de la corona |
 
-**Botones (2 minutos):** tocá **midi** → **asignar todos los botones en orden** y apretá los botones del K2 uno tras otro. El panel te dice qué función toca en cada paso; **saltear** pasa a la siguiente. Orden: escenas 1–6, tap, sync, flash, blackout, logo, drop, auto, BPM +, BPM −, calidad, siguiente, anterior, espejo, congelar, pulso ½, pulso ×2, strobe, reset fx, los seis nombres del line up, the sun, for the solar people, line up automático y sacar texto. También podés asignar uno solo con **aprender**.
+**Botones (2 minutos):** tocá **midi** → **asignar todos los botones en orden** y apretá los botones del K2 uno tras otro. El panel te dice qué función toca en cada paso; **saltear** pasa a la siguiente. Orden: escenas 1–6, tap, sync, flash, blackout, logo, drop, auto, BPM +, BPM −, calidad, siguiente, anterior, espejo, congelar, pulso ½, pulso ×2, strobe, reset fx, los seis nombres del line up, the sun, for the solar people, line up automático, sacar texto e invitado especial. También podés asignar uno solo con **aprender**.
 
 - El **strobe** funciona mientras mantenés apretado el botón.
 - Con las escenas asignadas, **se prende la luz del botón de la escena activa**.

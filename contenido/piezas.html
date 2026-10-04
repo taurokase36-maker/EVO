@@ -23,7 +23,7 @@
   var M = Motor, C = M.C;
   var NAME = 'SOLARIS', SLOGAN = 'FOR THE SOLAR PEOPLE', SLOGAN_ES = 'para la gente del sol';
   var GUEST = 'DAMIAN SANTOS', GUEST_DETAIL = 'saxo en vivo sobre base electrónica';
-  var LINEUP = [['18:00', 'COCO'], ['19:30', 'GREMORA B2B SANDMAN'], ['21:00', 'ODA'], ['22:30', 'EVO + DAMIAN'], ['00:00', 'LUCILA'], ['01:30', 'RUF']];
+  var LINEUP = [['18:00', 'COCO'], ['19:30', 'GREMORA B2B SANDMAN'], ['21:00', 'ODA'], ['22:30', 'EVO THE SUN', '+ damian santos · saxo en vivo'], ['00:00', 'LUCILA'], ['01:30', 'RUF']];
   var RELEASE = 'y esa noche, el estreno del primer single de THE SUN';
   var italic = function (px) { return 'italic ' + px + 'px "Cormorant Garamond"'; };
   // textos chicos en Space Mono (acompaña al logo en Major Mono)
@@ -109,9 +109,10 @@
       M.text(NAME + '  ·  ' + SLOGAN, 540, 232, cinzel(22, 600), C.accent, { spacing: 6 });
       M.title('line up', 540, 330, 92, 700);
       LINEUP.forEach(function (l, i) {
-        var y = 1105 + i * 82;
+        var y = 1090 + i * 90 + (i > 3 ? 14 : 0);
         M.text(l[0], 400, y, cinzel(26, 600), C.accent, { align: 'right', spacing: 2 });
         M.title(l[1], 430, y + 4, 46, 600, { align: 'left', spacing: 2 });
+        if (l[2]) M.text(l[2], 432, y + 34, italic(26), soft(0.7), { align: 'left' });
       });
       M.text('domingo XI · X  ·  Melt Underground', 540, 1610, italic(36), soft(0.75));
     }],

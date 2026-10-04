@@ -21,10 +21,10 @@
   var SCENES = [
     { name: 'el ritual', draw: sceneRitual },
     { name: 'la pared', draw: scenePared },
-    { name: 'el eclipse', draw: sceneTransito },
+    { name: 'la caverna', draw: sceneCaverna },
     { name: 'solaris', draw: sceneLogo },
     { name: 'el gigante', draw: sceneGrabado },
-    { name: 'la multitud', draw: sceneMultitud }
+    { name: 'polvo solar', draw: scenePolvo }
   ];
 
   var st = {
@@ -89,14 +89,13 @@
       cavePaintings(cx, 0, 0, W, H, 'roca', '#d98a5a', 0.5, 46); cx.restore();
       cx.save(); cx.clip(wp); cavePaintings(cx, W * 0.09, H * 0.17, W * 0.82, H * 0.42, 'pared', '#f0b48a', 0.2, 16); cx.restore();
     });
-    TX.sky = M.offscreen(W, H, function () {   // cielo grabado para la multitud
-      M.background();
-      var l = M.layer(), lg = l.getContext('2d');
-      M.engrave(lg, { angle: 0, spacing: Math.max(6, S / 140), maxW: 1.8, light: function (x, y) { return y > H * 0.7 ? 0 : 0.12 + 0.85 * M.clamp(1 - Math.hypot(x - W / 2, (y - H * 0.34) * 1.4) / (S * 0.75)); } });
-      lg.globalCompositeOperation = 'source-atop'; var tg = lg.createRadialGradient(W / 2, H * 0.34, S * 0.1, W / 2, H * 0.34, S * 0.9);
-      tg.addColorStop(0, M.rgba(C.accent, 0.9)); tg.addColorStop(1, M.rgba(C.accent, 0.1)); lg.fillStyle = tg; lg.fillRect(0, 0, W, H);
-      M.ctx.drawImage(l, 0, 0);
-    });
+    TX.half = document.createElement('canvas'); TX.half.width = Math.round(W / 2); TX.half.height = Math.round(H / 2);
+    TX.dust = document.createElement('canvas'); TX.dust.width = Math.round(W / 2); TX.dust.height = Math.round(H / 2);
+    TX.dust.getContext('2d').fillStyle = C.bg; TX.dust.getContext('2d').fillRect(0, 0, TX.dust.width, TX.dust.height); DUST = null;
+    var stp = document.createElement('canvas'); stp.width = stp.height = 256;   // grano: puntitos blancos con transparencia al azar
+    var sx2 = stp.getContext('2d'), si = sx2.createImageData(256, 256), sr = M.rng(31);
+    for (var j = 0; j < si.data.length; j += 4) { si.data[j] = si.data[j + 1] = si.data[j + 2] = 255; si.data[j + 3] = Math.pow(sr(), 1.6) * 255; }
+    sx2.putImageData(si, 0, 0); TX.stipple = stp;
     TX.mask = document.createElement('canvas'); TX.mask.width = Math.round(W / 5); TX.mask.height = Math.round(H / 5);
     var shq = 3 + Math.round(P.shadow * 5);   // más "sombras" = más chica la capa = bordes más suaves
     TX.shadow = document.createElement('canvas'); TX.shadow.width = Math.round(W / shq); TX.shadow.height = Math.round(H / shq); TX.shq = shq;
@@ -227,19 +226,25 @@
   ];
   var POSE_KEYS = ['la', 'le', 'ra', 're', 'lg', 'kn', 'lean', 'jump'];
   // Pose de un personaje en el beat b. seq = índice de coreografía, delay en beats (para hacer olas), force = pose forzada
+  // Movimiento fluido y sutil: una pose cada 2 beats con transición continua, y encima un balanceo suave.
   function poseAt(b, seq, delay, force) {
-    var bb = b - (delay || 0), n = Math.floor(bb), ph = bb - n;
+    var db = b - (delay || 0), bb = db / 2, n = Math.floor(bb), ph = bb - n;
     var list = CHOREO[((seq % CHOREO.length) + CHOREO.length) % CHOREO.length];
     var A = POSES[force || list[((n - 1) % 8 + 8) % 8]], Bp = POSES[force || list[(n % 8 + 8) % 8]];
-    var e = Math.min(1, ph / 0.28); e = 1 - Math.pow(1 - e, 3);   // cambia rápido, justo en el golpe
+    var e = ph * ph * (3 - 2 * ph);
     var out = { ph: ph };
     POSE_KEYS.forEach(function (k) { out[k] = A[k] + (Bp[k] - A[k]) * e; });
+    var w = db * Math.PI, sp = 0.6 + P.speed * 0.8;
+    out.la += 0.22 * sp * Math.sin(w + seq); out.ra += 0.22 * sp * Math.sin(w + seq + 1.7);
+    out.le += 0.16 * sp * Math.sin(w * 0.5 + seq * 2); out.re += 0.16 * sp * Math.sin(w * 0.5 + seq * 2 + 1);
+    out.lean += 0.06 * sp * Math.sin(w * 0.5 + seq); out.kn = Math.max(0, out.kn + 0.08 * Math.sin(w));
+    out.jump *= 0.45;
     return out;
   }
   // Dibuja un personaje. (x, feet) = pies, h = altura. Usa el strokeStyle/fillStyle que ya tenga c.
   function figure(c, x, feet, h, p, k) {
     var jump = p.jump * Math.sin(Math.min(1, p.ph) * Math.PI) * h * 0.2;
-    var bounce = (k || 0) * h * 0.03 + p.kn * h * 0.12;
+    var bounce = (k || 0) * h * 0.018 + p.kn * h * 0.12;
     c.save(); c.translate(x, feet - jump); c.rotate(p.lean);
     var hipY = -h * 0.47 + bounce, neckY = -h * 0.82 + bounce * 1.1;
     c.lineCap = 'round'; c.lineJoin = 'round';
@@ -364,63 +369,92 @@
   }
 
   // =====================================================================
-  //  3 · EL ECLIPSE: la luna cruza el sol y la gente lo festeja (ciclo de 8 compases)
+  //  3 · LA CAVERNA: un cubo de grano que gira y respira; en su pared del fondo baila la sombra del personaje
   // =====================================================================
-  function sceneTransito(c, t, B) {
+  var CUBE_V = [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]];
+  var CUBE_F = [[0, 1, 2, 3], [5, 4, 7, 6], [4, 0, 3, 7], [1, 5, 6, 2], [4, 5, 1, 0], [3, 2, 6, 7]];
+  var CUBE_E = [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]];
+  function sceneCaverna(c, t, B) {
     bg(c);
-    var r = S * 0.2, sx = CX, sy = H * 0.4, sc = r / R;
-    var L = 32, p = (((B.b - st.transitBeat) % L) + L) % L / L;
-    var u = p * 2 - 1, au = Math.max(0, Math.abs(u) - 0.25) / 0.75, dx = r * 2.6 * (u < 0 ? -1 : 1) * Math.pow(au, 1.3), dy = dx * 0.22;
-    var d = Math.hypot(dx, dy), mr = r * 1.04, visible = Math.min(1, d / (r + mr)), total = d < mr - r + r * 0.01;
-    var edge = d - (mr - r), diamond = edge > -r * 0.01 && edge < r * 0.14 ? 1 - Math.max(0, edge) / (r * 0.14) : 0;
-    ambient(c, sx, sy, (0.15 + 0.5 * visible + 0.25 * B.k) * P.glow);
-    if (total) {
-      eclipseAt(c, sx, sy, r, t, B);
-    } else {
-      c.save(); c.globalAlpha = 0.85 + 0.15 * B.k; c.translate(sx, sy); c.scale(sc, sc); c.drawImage(TX.sun, -TX.sun.width / 2, -TX.sun.height / 2); c.restore();
-      c.save(); c.globalCompositeOperation = 'lighter'; var sg = c.createRadialGradient(sx, sy, r, sx, sy, r * (1.8 + visible));
-      sg.addColorStop(0, rgba(C.fire, 0.35 * visible)); sg.addColorStop(1, rgba(C.glow, 0)); c.fillStyle = sg; c.fillRect(0, 0, W, H); c.restore();
-      c.fillStyle = C.bg; c.beginPath(); c.arc(sx + dx, sy + dy, mr, 0, Math.PI * 2); c.fill();
-      c.strokeStyle = rgba(C.cream, 0.12); c.lineWidth = 1.2; c.stroke();
-    }
-    if (diamond > 0) { var a = Math.atan2(-dy, -dx); glint(c, sx + Math.cos(a) * r, sy + Math.sin(a) * r, r * (0.25 + 0.45 * diamond), diamond); }
-    // suelo y público: dos filas de personajes que miran el cielo y festejan la totalidad
-    var gr = c.createLinearGradient(0, H * 0.72, 0, H);
-    gr.addColorStop(0, rgba(C.bg, 0)); gr.addColorStop(0.5, rgba(C.bg, 0.9)); gr.addColorStop(1, C.bg);
-    c.fillStyle = gr; c.fillRect(0, H * 0.72, W, H * 0.28);
-    var hype = total || diamond > 0.3, n = Math.round(5 + P.crowd * 9), seq = Math.floor(B.b / 8);
-    [[0.86, 0.22, 0.55], [1.02, 0.34, 0]].forEach(function (row, ri) {
-      var m = n + (ri ? 0 : 3);
-      for (var i = 0; i < m; i++) {
-        var x = W * ((i + 0.5 + (ri ? 0 : 0.5)) / m), h = H * row[1] * (0.9 + 0.2 * (((i * 53) % 7) / 6));
-        var pose = poseAt(B.b, seq + i + ri, ((i * 0.13) % 0.5), hype ? (Math.floor(B.b) % 2 ? 'jump' : 'up') : null);
-        silhouette(c, x, H * row[0], h, pose, B.k, rgba(C.fire, 0.9 * (0.3 + visible) + (total ? 0.4 : 0)));
-      }
+    var hl = TX.half, h = hl.getContext('2d'), hw = hl.width, hh = hl.height, q = hw / W;
+    h.globalCompositeOperation = 'source-over'; h.globalAlpha = 1; h.clearRect(0, 0, hw, hh);
+    var spd = 0.3 + P.speed * 1.2, boom = st.dropAt ? Math.exp(-(t - st.dropAt) * 0.9) : 0;
+    var ax = 0.45 * Math.sin(t * 0.11 * spd) + 0.35, ay = t * 0.17 * spd + (P.rotate - 0.5) * Math.PI * 2, az = 0.12 * Math.sin(t * 0.07);
+    var size = S * 0.25 * (0.8 + P.corona * 0.4) * (1 + 0.03 * B.k), f = 4.2;
+    var L = [-0.55, -0.6, -0.58];   // la luz (el sol) viene de arriba a la izquierda, adelante
+    var V = CUBE_V.map(function (v, i) {   // el cubo respira: cada vértice se mueve un poco, como el de la referencia
+      var m = 1 + 0.07 * Math.sin(t * 0.8 + i * 1.7) + 0.05 * B.k;
+      var x = v[0] * m, y = v[1] * m, z = v[2] * m;
+      var cy = Math.cos(ay), sy = Math.sin(ay), x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
+      var cx = Math.cos(ax), sx = Math.sin(ax), y1 = y * cx - z1 * sx, z2 = y * sx + z1 * cx;
+      var cz = Math.cos(az), sz = Math.sin(az), x2 = x1 * cz - y1 * sz, y2 = x1 * sz + y1 * cz;
+      return [x2, y2, z2];
     });
+    function proj(p, off) { var z = p[2] + (off ? off[2] : 0), k = f / (f + z); return [CX + (p[0] + (off ? off[0] : 0)) * size * k, CY + (p[1] + (off ? off[1] : 0)) * size * k, z]; }
+    var faces = CUBE_F.map(function (fc) {
+      var a = V[fc[0]], b = V[fc[1]], d = V[fc[3]];
+      var u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], w = [d[0] - a[0], d[1] - a[1], d[2] - a[2]];
+      var n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]], nl = Math.hypot(n[0], n[1], n[2]) || 1;
+      n = [n[0] / nl, n[1] / nl, n[2] / nl];
+      var z = fc.reduce(function (acc, i) { return acc + V[i][2]; }, 0) / 4;
+      var off = [n[0] * boom * 0.7, n[1] * boom * 0.7, n[2] * boom * 0.7];   // drop: las caras se abren
+      return { fc: fc, n: n, z: z, lit: Math.max(0, -(n[0] * L[0] + n[1] * L[1] + n[2] * L[2])), off: off };
+    }).sort(function (a, b) { return b.z - a.z; });   // de atrás hacia adelante
+    // caras: degradé de luz, se acumulan como si fueran translúcidas
+    faces.forEach(function (F, idx) {
+      var P2 = F.fc.map(function (i) { var p = proj(V[i], F.off); return [p[0] * q, p[1] * q]; });
+      var bright = (0.3 + 0.7 * F.lit) * (0.6 + 0.4 * P.glow) * (1 + boom);
+      var gr = h.createLinearGradient(P2[0][0], P2[0][1], P2[2][0], P2[2][1]);
+      gr.addColorStop(0, rgba(C.cream, Math.min(1, bright))); gr.addColorStop(0.5, rgba(C.cream, bright * 0.45)); gr.addColorStop(1, rgba(C.fire, bright * 0.2));
+      h.globalCompositeOperation = idx === 0 ? 'source-over' : 'lighter'; h.globalAlpha = idx === 0 ? 1 : 0.6;
+      h.fillStyle = gr; h.beginPath(); P2.forEach(function (p, i) { i ? h.lineTo(p[0], p[1]) : h.moveTo(p[0], p[1]); }); h.closePath(); h.fill();
+      if (idx === 0) F.P2 = P2;
+    });
+    // la sombra del personaje en la pared del fondo (se ve a través de las caras, sutil)
+    var back = faces[0].P2;
+    h.save(); h.globalCompositeOperation = 'destination-out'; h.globalAlpha = 0.6;
+    var o = back[0], ex = [back[1][0] - o[0], back[1][1] - o[1]], ey = [back[3][0] - o[0], back[3][1] - o[1]];
+    h.transform(ex[0], ex[1], ey[0], ey[1], o[0], o[1]);
+    h.strokeStyle = h.fillStyle = '#000'; figure(h, 0.5, 0.94, 0.82, poseAt(B.b, Math.floor(B.b / 8) + 2, 0), B.k);
+    h.restore();
+    h.globalAlpha = 1;
+    // grano: la imagen se arma con puntitos que titilan
+    h.globalCompositeOperation = 'destination-in';
+    var ox = Math.floor(Math.random() * 256), oy = Math.floor(Math.random() * 256);
+    h.save(); h.translate(-ox, -oy); h.fillStyle = h.createPattern(TX.stipple, 'repeat'); h.fillRect(ox, oy, hw, hh); h.restore();
+    h.globalCompositeOperation = 'source-over';
+    c.save(); c.imageSmoothingEnabled = false; c.globalCompositeOperation = 'lighter'; c.drawImage(hl, 0, 0, W, H); c.globalAlpha = 0.5; c.drawImage(hl, 0, 0, W, H); c.restore();
+    // aristas finas y luminosas
+    c.save(); c.lineCap = 'round'; c.globalCompositeOperation = 'lighter';
+    CUBE_E.forEach(function (e) {
+      var a = proj(V[e[0]]), b = proj(V[e[1]]), front = (a[2] + b[2]) / 2 < 0;
+      c.strokeStyle = rgba(C.cream, (front ? 0.55 : 0.18) * (0.7 + 0.3 * B.k + boom)); c.lineWidth = (front ? 1.6 : 1) * S / 1080;
+      c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
+    });
+    // la fuga de luz: un pequeño sol eclipsado en la esquina más iluminada
+    var best = 0, bv = -1e9; V.forEach(function (v, i) { var d = -(v[0] * L[0] + v[1] * L[1] + v[2] * L[2]); if (d > bv) { bv = d; best = i; } });
+    var lp = proj(V[best]), lr = S * 0.2 * (1 + 0.25 * B.k + boom);
+    var lg = c.createRadialGradient(lp[0], lp[1], 0, lp[0], lp[1], lr * 2.2);
+    lg.addColorStop(0, rgba(C.cream, 0.7)); lg.addColorStop(0.15, rgba(C.fire, 0.6 * P.glow)); lg.addColorStop(0.45, rgba(C.accent, 0.3 * P.glow)); lg.addColorStop(1, rgba(C.glow, 0));
+    c.fillStyle = lg; c.fillRect(lp[0] - lr * 2.2, lp[1] - lr * 2.2, lr * 4.4, lr * 4.4);
+    c.restore();
+    c.save(); c.fillStyle = C.bg; c.beginPath(); c.arc(lp[0], lp[1], lr * 0.18, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = rgba(C.cream, 0.9); c.lineWidth = 1.5 * S / 1080; c.shadowColor = C.accent; c.shadowBlur = 14; c.stroke(); c.restore();
   }
-  function drop() {   // salta al anillo de diamante y la totalidad
+  function drop() {   // la caverna se abre y se ilumina
     if (st.scene !== 2) setScene(2, true);
-    st.transitBeat = beatInfo(now()).b - 32 * 0.33; toast('drop · totalidad');
+    st.dropAt = now(); st.flash = Math.max(st.flash, 0.5); toast('drop · la caverna se abre');
   }
 
   // =====================================================================
-  //  4 · SOLARIS: el logo, con un personaje bailando arriba de cada letra
+  //  4 · SOLARIS: el logo, solo
   // =====================================================================
   function sceneLogo(c, t, B) {
     bg(c);
     ambient(c, CX, CY, (0.2 + 0.3 * B.k) * P.glow);
     huella(c, CX, CY, S * 0.55, t * 0.5, B, 0.12);
     var size = Math.min(W * 0.12, H * 0.22) * (1 + 0.02 * B.k), base = CY + size * 0.45;
-    var total = wordmark(c, CX, base, size, B.k, 1);
-    c.font = size + 'px ' + BRAND;
-    var cap = c.measureText('h').actualBoundingBoxAscent, chars = 'solaris'.split(''), sp = size * 0.06, x = CX - total / 2, seq = Math.floor(B.b / 8);
-    chars.forEach(function (ch, i) {
-      var w = c.measureText(ch).width;
-      c.save(); c.strokeStyle = c.fillStyle = C.cream; c.shadowColor = C.accent; c.shadowBlur = 16 + 24 * B.k;
-      figure(c, x + w / 2, base - cap - size * 0.04, size * 0.62, poseAt(B.b, seq, i * 0.1), B.k);   // ola de izquierda a derecha
-      c.restore();
-      x += w + sp;
-    });
+    wordmark(c, CX, base, size, B.k, 1);
     slogan(c, CX, base + size * 0.5, Math.max(14, size * 0.14), 0.95);
     somosUno(c, CX, H * 0.88, S * 0.08, B.k);
   }
@@ -470,26 +504,76 @@
   }
 
   // =====================================================================
-  //  6 · LA MULTITUD: filas de personajes bailando hacia el sol, con olas
+  //  6 · POLVO SOLAR: fibras de partículas que fluyen y dibujan al personaje bailando
   // =====================================================================
-  function sceneMultitud(c, t, B) {
-    c.drawImage(TX.sky, 0, 0);
-    var sy = H * 0.34, r = S * 0.13;
-    ambient(c, CX, sy, (0.2 + 0.35 * B.k) * P.glow);
-    eclipseAt(c, CX, sy, r, t, B);
-    var bar = Math.floor(B.b / 4), wave = bar % 4 === 3;   // cada 4 compases, ola de brazos de izquierda a derecha
-    var rows = 4, seq = Math.floor(B.b / 8);
-    for (var ri = 0; ri < rows; ri++) {
-      var depth = ri / (rows - 1);                        // 0 = fondo, 1 = adelante
-      var h = H * (0.13 + depth * 0.3), feet = H * (0.63 + depth * 0.44), n = Math.round((5 + P.crowd * 6) * (1.5 - depth * 0.6));
-      var rimC = rgba(C.fire, 0.35 + 0.5 * (1 - depth));
-      for (var i = 0; i < n; i++) {
-        var fx = (i + 0.5 + (ri % 2) * 0.5) / n, x = W * (fx * 1.1 - 0.05);
-        var force = null, delay = ((i * 7 + ri * 3) % 5) * 0.06;
-        if (wave) { var wb = (B.b % 4) * 1.2 - fx * 3.2; force = wb > 0 && wb < 1.1 ? 'up' : null; }
-        silhouette(c, x, feet, h * (0.92 + 0.16 * (((i * 31 + ri) % 5) / 4)), poseAt(B.b, seq + i + ri, delay, force), B.k * (0.4 + depth * 0.6), rimC);
-      }
+  var DUST = null;
+  function makeDust() {
+    var r = M.rng(77), n = 3600, arr = new Float32Array(n * 6);   // x, y, hueso, t, desvío, fase
+    for (var i = 0; i < n; i++) {
+      var o = i * 6, g = (r() + r() + r() - 1.5) / 1.5;   // desvío con forma de campana: más denso en el centro del hueso
+      arr[o] = r() * W * 0.5; arr[o + 1] = r() * H * 0.5; arr[o + 2] = Math.floor(r() * 10); arr[o + 3] = r(); arr[o + 4] = g; arr[o + 5] = r() * 6.283;
     }
+    DUST = { n: n, a: arr };
+  }
+  // huesos del personaje (mismas proporciones que figure): [x1, y1, x2, y2, grosor]
+  function skeleton(x, feet, h, p, k) {
+    var jump = p.jump * Math.sin(Math.min(1, p.ph) * Math.PI) * h * 0.2, bounce = (k || 0) * h * 0.018 + p.kn * h * 0.12;
+    var cs = Math.cos(p.lean), sn = Math.sin(p.lean);
+    function T(px, py) { return [x + px * cs - py * sn, feet - jump + px * sn + py * cs]; }
+    var hipY = -h * 0.47 + bounce, neckY = -h * 0.82 + bounce * 1.1, bones = [];
+    var hip = T(0, hipY), neck = T(0, neckY);
+    bones.push([hip, neck, h * 0.07]);
+    var head = T(0, neckY - h * 0.09);
+    bones.push([[head[0] - h * 0.02, head[1] - h * 0.04], [head[0] + h * 0.02, head[1] + h * 0.04], h * 0.075]);
+    [-1, 1].forEach(function (sd) {
+      var ta = p.lg + p.kn * 0.7, sa = p.lg - p.kn * 0.5;
+      var kx = sd * Math.sin(ta) * h * 0.25, ky = hipY + Math.cos(ta) * h * 0.25, kn = T(kx, ky);
+      bones.push([hip, kn, h * 0.04]); bones.push([kn, T(kx + sd * Math.sin(sa) * h * 0.24, ky + Math.cos(sa) * h * 0.24), h * 0.035]);
+    });
+    [[-1, p.la, p.le], [1, p.ra, p.re]].forEach(function (a) {
+      var sd = a[0], sx = sd * h * 0.06, sy = neckY + h * 0.03, ex = sx + sd * Math.sin(a[1]) * h * 0.2, ey = sy + Math.cos(a[1]) * h * 0.2, fa = a[1] + a[2];
+      var sh = T(sx, sy), el = T(ex, ey);
+      bones.push([sh, el, h * 0.032]); bones.push([el, T(ex + sd * Math.sin(fa) * h * 0.19, ey + Math.cos(fa) * h * 0.19), h * 0.028]);
+    });
+    return bones;   // 10 huesos: torso, cabeza, 4 de piernas, 4 de brazos
+  }
+  function scenePolvo(c, t, B) {
+    var dl = TX.dust, d = dl.getContext('2d'), hw = dl.width, hh = dl.height;
+    if (!DUST) makeDust();
+    // el cuadro anterior se desvanece despacio: así quedan las fibras
+    d.globalCompositeOperation = 'source-over'; d.fillStyle = 'rgba(7,2,2,0.14)'; d.fillRect(0, 0, hw, hh);
+    var spd = 0.3 + P.speed * 1.2, bones = skeleton(hw * 0.5, hh * 0.95, hh * 0.86, poseAt(B.b, Math.floor(B.b / 8) + 3, 0), B.k * 0.6);
+    var count = Math.round(DUST.n * (0.35 + P.crowd * 0.65)), a = DUST.a;
+    var paths = [new Path2D(), new Path2D(), new Path2D()], spread = 1 + 0.5 * B.k, flow = t * 0.35 * spd;
+    for (var i = 0; i < count; i++) {
+      var o = i * 6, x = a[o], y = a[o + 1], bone = bones[a[o + 2] | 0], tt = a[o + 3], dev = a[o + 4], ph = a[o + 5];
+      tt += 0.0015 * spd; if (tt > 1) tt -= 1; a[o + 3] = tt;   // las fibras corren a lo largo de los brazos y piernas
+      var p0 = bone[0], p1 = bone[1], bx = p1[0] - p0[0], by = p1[1] - p0[1], bl = Math.hypot(bx, by) || 1;
+      var nx = -by / bl, ny = bx / bl, off = dev * bone[2] * 2.2 * spread;
+      var tx = p0[0] + bx * tt + nx * off, ty = p0[1] + by * tt + ny * off;
+      // campo de flujo suave (humo)
+      tx += Math.sin(ty * 0.03 + flow + ph) * hh * 0.012 * (1 + Math.abs(dev) * 2);
+      ty += Math.cos(tx * 0.03 - flow + ph) * hh * 0.012 * (1 + Math.abs(dev) * 2);
+      var nx2 = x + (tx - x) * 0.09, ny2 = y + (ty - y) * 0.09;
+      var bi = Math.abs(dev) < 0.25 ? 0 : Math.abs(dev) < 0.6 ? 1 : 2;
+      paths[bi].moveTo(x, y); paths[bi].lineTo(nx2, ny2);
+      a[o] = nx2; a[o + 1] = ny2;
+    }
+    d.globalCompositeOperation = 'lighter'; d.lineWidth = 1;
+    d.strokeStyle = rgba(C.cream, 0.5); d.stroke(paths[0]);
+    d.strokeStyle = rgba(C.fire, 0.4 * (0.5 + P.glow * 0.7)); d.stroke(paths[1]);
+    d.strokeStyle = rgba(C.accent, 0.35 * (0.5 + P.glow * 0.7)); d.stroke(paths[2]);
+    // un anillo de sol muy tenue detrás de la cabeza
+    var hd = bones[1][0]; d.strokeStyle = rgba(C.accent, 0.08 + 0.1 * B.k); d.lineWidth = 2;
+    d.beginPath(); d.arc(hd[0], hd[1] + hh * 0.04, hh * 0.13 * (1 + 0.06 * B.k), 0, Math.PI * 2); d.stroke();
+    d.globalCompositeOperation = 'source-over';
+    bg(c);
+    c.save(); c.imageSmoothingQuality = 'high'; c.drawImage(dl, 0, 0, W, H); c.restore();
+    // grano por encima, para que se sienta como polvo
+    c.save(); c.globalCompositeOperation = 'destination-out'; c.globalAlpha = 0.35;
+    var ox = Math.floor(Math.random() * 256), oy = Math.floor(Math.random() * 256);
+    c.translate(-ox, -oy); c.fillStyle = c.createPattern(TX.stipple, 'repeat'); c.fillRect(ox, oy, W, H); c.restore();
+    c.save(); c.globalCompositeOperation = 'destination-over'; c.fillStyle = C.bg; c.fillRect(0, 0, W, H); c.restore();
   }
 
   // ---------- capas encima de todo ----------
@@ -508,7 +592,17 @@
       var ty = st.scene === 3 ? H * 0.2 : H * 0.8;
       while (ts > 20 && c.measureText(st.text.toLowerCase()).width > W * 0.9) { ts -= 4; c.font = ts + 'px ' + BRAND; c.letterSpacing = ts * 0.06 + 'px'; }
       c.fillText(st.text.toLowerCase(), CX, ty);
-      if (st.textSub) { c.shadowBlur = 0; c.font = '700 ' + Math.round(Math.max(16, ts * 0.3)) + 'px ' + MONO; c.letterSpacing = ts * 0.06 + 'px'; c.fillStyle = C.accent; c.fillText(st.textSub, CX, ty + ts * 0.6); }
+      c.restore();
+    }
+    if (st.guest) {   // invitado especial: arriba a la izquierda, aparte del line up
+      var ga = Math.min(1, (t - st.guestAt) / 0.8), gs = Math.min(W * 0.045, H * 0.075), gx = W * 0.05, gy = H * 0.12;
+      c.save(); c.globalAlpha = ga; c.textAlign = 'left';
+      c.font = '700 ' + Math.round(gs * 0.3) + 'px ' + MONO; c.letterSpacing = gs * 0.12 + 'px'; c.fillStyle = C.accent; c.fillText('INVITADO ESPECIAL', gx, gy);
+      c.font = gs + 'px ' + BRAND; c.letterSpacing = gs * 0.06 + 'px'; c.fillStyle = C.cream; c.shadowColor = C.accent; c.shadowBlur = 18 + 20 * B.k;
+      c.fillText('damian santos', gx, gy + gs * 1.15);
+      c.shadowBlur = 0; c.font = '400 ' + Math.round(gs * 0.32) + 'px ' + MONO; c.letterSpacing = gs * 0.08 + 'px'; c.fillStyle = rgba(C.cream, 0.7);
+      c.fillText('SAXO EN VIVO', gx, gy + gs * 1.75);
+      c.strokeStyle = rgba(C.accent, 0.6); c.lineWidth = 1.5; c.beginPath(); c.moveTo(gx, gy + gs * 2.05); c.lineTo(gx + gs * 3, gy + gs * 2.05); c.stroke();
       c.restore();
     }
     if (st.flash > 0.01) {
@@ -545,8 +639,8 @@
     if (st.auto && B.bar >= st.autoNext) { st.autoNext = B.bar + 16; setScene((st.scene + 1) % SCENES.length, true); }
     if (st.lineupAuto) {
       var slot = ((B.bar % 32) + 32) % 32, cs = currentSet();
-      if (slot === 0 && cs && st.text !== cs[1]) { st.text = cs[1]; st.textSub = cs[2]; st.textAt = t; st.autoText = true; }
-      if (slot === 4 && st.autoText) { st.text = null; st.autoText = false; }
+      if (slot === 0 && cs && st.text !== cs[1]) { st.text = cs[1]; st.textAt = t; st.autoText = true; if (cs[0] === 'txtEvo') { st.guest = true; st.guestAt = t; } }
+      if (slot === 4 && st.autoText) { st.text = null; st.guest = false; st.autoText = false; }
     }
     if (st.freeze) { hud(B); requestAnimationFrame(frame); return; }   // congelado: queda la última imagen
     var fadeDur = 0.2 + P.fade * 1.8, f = (t - st.fadeStart) / fadeDur;
@@ -603,16 +697,16 @@
   var ACTIONS = {
     scene1: ['escena 1 · el ritual', function () { setScene(0); }],
     scene2: ['escena 2 · la pared', function () { setScene(1); }],
-    scene3: ['escena 3 · el eclipse', function () { setScene(2); }],
+    scene3: ['escena 3 · la caverna', function () { setScene(2); }],
     scene4: ['escena 4 · solaris', function () { setScene(3); }],
     scene5: ['escena 5 · el gigante', function () { setScene(4); }],
-    scene6: ['escena 6 · la multitud', function () { setScene(5); }],
+    scene6: ['escena 6 · polvo solar', function () { setScene(5); }],
     tap: ['tap tempo', tap],
     sync: ['sync (beat 1)', sync],
     flash: ['flash', function () { st.flash = 1; }],
     blackout: ['blackout', function () { st.blackout = !st.blackout; toast(st.blackout ? 'blackout' : 'luz'); }],
     logoToggle: ['logo encima (prende/apaga)', function () { st.logoOn = !st.logoOn; toast(st.logoOn ? 'logo: sí' : 'logo: no'); }],
-    drop: ['drop (totalidad)', drop],
+    drop: ['drop (la caverna se abre)', drop],
     auto: ['automático', function () { st.auto = !st.auto; st.autoNext = beatInfo(now()).bar + 16; toast(st.auto ? 'automático: sí' : 'automático: no'); }],
     bpmUp: ['BPM +0,5', function () { nudgeBpm(0.5); }],
     bpmDown: ['BPM −0,5', function () { nudgeBpm(-0.5); }]
@@ -627,12 +721,12 @@
   ACTIONS.strobeHold = ['strobe (mientras apretás)', function () { st.strobeHold = true; }, function () { st.strobeHold = false; }];
   ACTIONS.resetFx = ['reset de efectos', function () {
     PARAMS.forEach(function (p) { if (['master', 'pulse', 'glow', 'logo', 'speed', 'grain', 'shadow', 'fade'].indexOf(p[0]) < 0) P[p[0]] = p[2]; });
-    st.mirror = 0; st.freeze = false; st.tempoMul = 1; st.text = null; toast('efectos en cero');
+    st.mirror = 0; st.freeze = false; st.tempoMul = 1; st.text = null; st.guest = false; toast('efectos en cero');
   }];
   // Textos en pantalla: un toque lo muestra, otro toque lo saca. Line up oficial con horarios.
   var TEXTS = [
     ['txtCoco', 'COCO', '18:00 — 19:30', 18], ['txtGremora', 'GREMORA B2B SANDMAN', '19:30 — 21:00', 19.5], ['txtOda', 'ODA', '21:00 — 22:30', 21],
-    ['txtEvo', 'EVO + DAMIAN', '22:30 — 00:00', 22.5], ['txtLucila', 'LUCILA', '00:00 — 01:30', 24], ['txtRuf', 'RUF', '01:30 — 03:00', 25.5],
+    ['txtEvo', 'EVO THE SUN', '22:30 — 00:00', 22.5], ['txtLucila', 'LUCILA', '00:00 — 01:30', 24], ['txtRuf', 'RUF', '01:30 — 03:00', 25.5],
     ['txtSun', 'THE SUN', '', null], ['txtSolar', 'FOR THE SOLAR PEOPLE', '', null]
   ];
   function showText(tx) { st.text = st.text === tx[1] ? null : tx[1]; st.textSub = tx[2]; st.textAt = now(); }
@@ -644,9 +738,10 @@
     return cur;
   }
   ACTIONS.lineupAuto = ['line up automático (por hora)', function () { st.lineupAuto = !st.lineupAuto; toast(st.lineupAuto ? 'line up automático: sí' : 'line up automático: no'); }];
-  ACTIONS.txtOff = ['texto: sacar', function () { st.text = null; }];
+  ACTIONS.txtOff = ['texto: sacar', function () { st.text = null; st.guest = false; }];
+  ACTIONS.txtDamian = ['invitado especial: damian santos', function () { st.guest = !st.guest; st.guestAt = now(); }];
   ACTIONS.bpmKnob = ['BPM fino (encoder)', function () {}];
-  var SHIFT_KEYS = { Digit1: 'txtCoco', Digit2: 'txtGremora', Digit3: 'txtOda', Digit4: 'txtEvo', Digit5: 'txtLucila', Digit6: 'txtRuf', Digit7: 'txtSun', Digit8: 'txtSolar', Digit0: 'txtOff' };
+  var SHIFT_KEYS = { Digit1: 'txtCoco', Digit2: 'txtGremora', Digit3: 'txtOda', Digit4: 'txtEvo', Digit5: 'txtLucila', Digit6: 'txtRuf', Digit7: 'txtSun', Digit8: 'txtSolar', Digit9: 'txtDamian', Digit0: 'txtOff' };
   var KEYS = { '6': 'scene6', n: 'next', p: 'prev', e: 'mirror', c: 'freeze', '-': 'txtOff', t: 'lineupAuto', r: 'resetFx', q: 'quality', '1': 'scene1', '2': 'scene2', '3': 'scene3', '4': 'scene4', '5': 'scene5', ' ': 'tap', s: 'sync', f: 'flash', b: 'blackout', l: 'logoToggle', d: 'drop', a: 'auto', ArrowUp: 'bpmUp', ArrowDown: 'bpmDown' };
   addEventListener('keydown', function (e) {
     if (e.target.tagName === 'INPUT') return;
@@ -826,7 +921,7 @@
     var on = { scene1: st.scene === 0, scene2: st.scene === 1, scene3: st.scene === 2, scene4: st.scene === 3, scene5: st.scene === 4, blackout: st.blackout, logoToggle: st.logoOn, auto: st.auto, quality: !!st.lowres,
       mirror: st.mirror > 0, freeze: st.freeze, half: st.tempoMul === 0.5, double: st.tempoMul === 2, strobeHold: st.strobeHold };
     TEXTS.forEach(function (tx) { on[tx[0]] = st.text === tx[1]; });
-    on.lineupAuto = !!st.lineupAuto; on.scene6 = st.scene === 5;
+    on.lineupAuto = !!st.lineupAuto; on.scene6 = st.scene === 5; on.txtDamian = !!st.guest;
     bar.querySelectorAll('[data-action]').forEach(function (b) { b.classList.toggle('on', !!on[b.getAttribute('data-action')]); });
     document.getElementById('midi-dot').classList.toggle('ok', /XONE|K2|MIDI:\s\S/i.test(midiLabel) && !/sin |denegado|no soporta/.test(midiLabel));
     document.getElementById('b-midi').title = midiLabel;

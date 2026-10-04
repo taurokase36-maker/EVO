@@ -1,7 +1,7 @@
 # SOLARIS · contenido de la semana
 
 **SOLARIS · for the solar people** (para la gente del sol). La fiesta de Somos Uno × Melt Underground.
-Invitado especial: **Damian Santos**, saxo en vivo sobre base electrónica. Detalle extra (nunca el foco): esa noche EVO estrena el primer single de THE SUN.
+Invitado especial: **Damian Santos**, saxo en vivo sobre base electrónica. Detalle extra (nunca el foco): esa noche EVO THE SUN estrena el primer single de THE SUN.
 
 Piezas en `contenido/semana/` (se regeneran con `node contenido/render.js`).
 Historias 1080×1920 · posts 1080×1350. En las historias con entradas, sumá el **sticker de link** a la web.
@@ -27,7 +27,7 @@ Historias 1080×1920 · posts 1080×1350. En las historias con entradas, sumá e
 > Entrás cuando el sol se está poniendo. Salís a las 3 con otra luz.
 >
 > Line up:
-> 18:00 COCO · 19:30 GREMORA b2b SANDMAN · 21:00 ODA · 22:30 EVO + DAMIAN (saxo en vivo) · 00:00 LUCILA · 01:30 RUF
+> 18:00 COCO · 19:30 GREMORA b2b SANDMAN · 21:00 ODA · 22:30 EVO THE SUN (con Damian Santos en saxo) · 00:00 LUCILA · 01:30 RUF
 > Y un detalle: esa noche estreno el primer single de THE SUN.
 >
 > Early bird a $5.000 hasta el viernes. Link en la bio.
