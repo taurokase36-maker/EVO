@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><link href="../../fuentes/fuentes.css" rel="stylesheet">
+<style>html,body{margin:0;background:#070202}</style></head><body><canvas id="c" width="1080" height="700"></canvas>
+<script>
+document.fonts.load('100px "Major Mono Display"','solaris SOLARIS').then(function(){
+  var g=document.getElementById('c').getContext('2d');g.fillStyle='#070202';g.fillRect(0,0,1080,700);
+  g.fillStyle='#efe2d6';g.textAlign='center';
+  g.font='150px "Major Mono Display"';g.fillText('SOLARIS',540,200);g.fillText('solaris',540,420);
+  g.font='34px "Major Mono Display"';g.fillStyle='#d9482c';g.fillText('mayúsculas (arriba) · minúsculas (abajo)',540,560);
+  g.fillText('for the solar people',540,630);window.DONE=true;});
+</script></body></html>

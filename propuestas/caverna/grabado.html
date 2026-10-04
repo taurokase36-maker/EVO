@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <title>SOLARIS · grabado</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=GFS+Didot&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=block" rel="stylesheet">
+<link href="../../fuentes/fuentes.css" rel="stylesheet">
 <style>
   html, body { margin: 0; background: #000; }
   canvas { display: block; height: 100vh; aspect-ratio: 9 / 16; margin: 0 auto; }
@@ -213,7 +213,7 @@
     engravedSun(ctx, 540, 400, 92, { rays: 520, spread: 0.9, seed: 'pared' });
     huella(ctx, 540, 400, 70, 'the-sun', 9, 0.8);
     vignette(0.6);
-    text('SOLARIS', W / 2, 1585, '600 132px Cinzel', C.cream, { spacing: 10, glow: C.accent });
+    text('solaris', W / 2, 1585, '125px "Major Mono Display"', C.cream, { spacing: 6, glow: C.accent });
     text('entrás con el ocaso  ·  salís con otra luz', W / 2, 1650, 'italic 40px "Cormorant Garamond"', rgba(C.cream, 0.85));
     text('XVIII  —  III', W / 2, 1720, '400 34px Cinzel', C.accent, { spacing: 8 });
     credits(1780);
@@ -254,7 +254,7 @@
     }
     textOnCircle('ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ', cx, cy, RO + 46, Math.PI / 2 * 3, '28px "GFS Didot"', rgba(C.cream, 0.6), 6);
     vignette(0.55);
-    text('SOLARIS', W / 2, 1520, '600 140px Cinzel', C.cream, { spacing: 12, glow: C.accent });
+    text('solaris', W / 2, 1520, '133px "Major Mono Display"', C.cream, { spacing: 6, glow: C.accent });
     text('lo que vas a escuchar no se ve desde afuera', W / 2, 1590, 'italic 40px "Cormorant Garamond"', rgba(C.cream, 0.85));
     text('XI · X · MMXXVI', W / 2, 1660, '400 32px Cinzel', C.accent, { spacing: 8 });
     credits(1720);
@@ -332,7 +332,7 @@
     };
     tag('α', 720, G - 120, 640, G - 230); tag('β', 230, 880, 150, 860); tag('γ', fx, fy - 70, 250, 1440); tag('δ', 880, 900, 960, 860); tag('ε', 860, 1150, 960, 1420);
     // encabezado y leyenda
-    text('SOLARIS', W / 2, 330, '600 112px Cinzel', C.cream, { spacing: 10, glow: C.accent });
+    text('solaris', W / 2, 330, '106px "Major Mono Display"', C.cream, { spacing: 6, glow: C.accent });
     text('FIG. I', M0 + 40, 410, '400 24px Cinzel', rgba(C.cream, 0.6), { align: 'left', spacing: 6 });
     text('ΣΠΗΛΑΙΟΝ', W - M0 - 40, 410, '24px "GFS Didot"', rgba(C.cream, 0.6), { align: 'right', spacing: 8 });
     var leg = [['α', 'el ocaso · XVIII'], ['β', 'el descenso'], ['γ', 'el fuego: el sonido'], ['ε', 'las sombras: nosotros'], ['δ', 'la salida · III, con otra luz']];
@@ -345,7 +345,7 @@
   }
 
   var draw = { '1': laPared, '2': elSol, '3': laLamina }[V] || laPared;
-  document.fonts.load('600 40px Cinzel').then(function () { return Promise.all([document.fonts.load('30px "GFS Didot"', 'ΑΣ'), document.fonts.load('italic 40px "Cormorant Garamond"')]); })
+  document.fonts.load('600 40px Cinzel').then(function () { return Promise.all([document.fonts.load('30px "GFS Didot"', 'ΑΣ'), document.fonts.load('italic 40px "Cormorant Garamond"'), document.fonts.load('40px "Major Mono Display"')]); })
     .catch(function () {}).then(function () { draw(); grain(0.04); window.DONE = true; });
 })();
 </script>

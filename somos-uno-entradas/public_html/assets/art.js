@@ -109,9 +109,9 @@
         });
         if (line) lines.push(line);
         lines.forEach(function (l, i) { ctx.fillText(spaced(l), 540, 210 + i * 50); });
-        var hs = 170;   // el título se achica hasta entrar en el ancho
-        do { ctx.font = hs + 'px "Instrument Serif", Georgia, serif'; hs -= 6; } while (hs > 60 && ctx.measureText(d.headline || '').width > 960);
-        ctx.fillText(d.headline || '', 540, 1330);
+        var hs = 170, head = (d.headline || '').toLowerCase();   // logo en Major Mono, en minúscula; se achica hasta entrar
+        do { ctx.font = hs + 'px "Major Mono Display", monospace'; hs -= 6; } while (hs > 60 && ctx.measureText(head).width > 960);
+        ctx.fillText(head, 540, 1330);
         ctx.fillStyle = accent;
         var sub = spaced(d.sub || ''), ss = 38;
         do { ctx.font = '700 ' + ss + 'px "Space Mono", monospace'; ss -= 2; } while (ss > 16 && ctx.measureText(sub).width > 960);
@@ -137,7 +137,8 @@
           }
         }, 'image/png');
       };
-      (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(draw);
+      var need = ['100px "Major Mono Display"', 'italic 76px "Instrument Serif"', '700 30px "Space Mono"'];
+      (document.fonts ? Promise.all(need.map(function (f) { return document.fonts.load(f); })).catch(function () {}) : Promise.resolve()).then(draw);
     });
   }
 })();

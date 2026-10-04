@@ -4,6 +4,7 @@
   --serif: 'Instrument Serif', Georgia, serif;
   --mono: 'Space Mono', ui-monospace, monospace;
   --sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --brand: 'Major Mono Display', 'Space Mono', monospace;   /* logo de SOLARIS: siempre en minúscula */
   --line: color-mix(in srgb, var(--cream) 16%, transparent);
   --soft: color-mix(in srgb, var(--cream) 68%, transparent);
   --panel: color-mix(in srgb, var(--cream) 5%, transparent);
@@ -67,7 +68,7 @@ button.link { background: none; border: 0; color: var(--accent); font: inherit; 
   content: ''; position: absolute; top: 10%; right: 11%; width: 9px; height: 9px; border-radius: 50%;
   background: var(--cream); box-shadow: 0 0 12px 4px var(--cream), 0 0 34px 10px var(--accent);
 }
-.eclipse .display { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-style: normal; letter-spacing: .03em; font-size: clamp(42px, 12.5vw, 112px); white-space: nowrap; text-shadow: 0 0 24px var(--bg); }
+.eclipse .display { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: var(--brand); text-transform: lowercase; font-style: normal; letter-spacing: .04em; font-size: clamp(40px, 12.5vw, 112px); white-space: nowrap; text-shadow: 0 0 24px var(--bg); }
 .hero-sub { font-family: var(--mono); font-size: 13px; letter-spacing: .32em; text-transform: uppercase; color: var(--accent); margin-right: -.32em; }
 .hero-date { font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
 .hero-motto { font-family: var(--serif); font-style: italic; font-size: 30px; line-height: 1.1; }

@@ -1,0 +1,85 @@
+<!doctype html>
+<!-- SOLARIS · propuestas de tipografía. Cada opción en dos versiones: la palabra tal cual y con la O como eclipse. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>SOLARIS · tipografías</title>
+<link href="../../fuentes/fuentes.css" rel="stylesheet">
+<style>html,body{margin:0;background:#000}canvas{display:block;margin:0 auto;max-width:100vw}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="3240"></canvas>
+<script>
+(function () {
+  'use strict';
+  var C = { bg: '#070202', glow: '#6b0d07', accent: '#d9482c', cream: '#efe2d6' };
+  var OPCIONES = [
+    { n: 'A', name: 'Syne ExtraBold', font: '800 {s}px Syne', size: 190, spacing: 0, sub: '500 26px Syne', subSp: 10, why: 'contemporánea y rara: letras con carácter, muy de club. la más "fiesta".' },
+    { n: 'B', name: 'Syncopate Bold', font: '700 {s}px Syncopate', size: 120, spacing: 6, sub: '400 22px "Space Mono"', subSp: 9, why: 'ancha y espaciada, como un horizonte. solar y espacial, limpia.' },
+    { n: 'C', name: 'Major Mono Display', font: '400 {s}px "Major Mono Display"', size: 150, spacing: 4, sub: '400 26px "Major Mono Display"', subSp: 6, lower: true, why: 'unicase monoespaciada: mezcla mayúsculas y minúsculas. misteriosa, underground.' },
+    { n: 'D', name: 'Italiana', font: '400 {s}px Italiana', size: 165, spacing: 14, sub: 'italic 34px "Cormorant Garamond"', subSp: 2, subText: 'for the solar people', why: 'clásica y finísima: lo griego sin el cliché. elegante, pide mucho aire.' },
+    { n: 'E', name: 'Six Caps', font: '400 {s}px "Six Caps"', size: 190, spacing: 18, sub: '700 22px "Space Mono"', subSp: 12, why: 'ultra condensada, alta como columnas o estalactitas. muy gráfica en historias.' },
+    { n: 'F', name: 'Gloock', font: '400 {s}px Gloock', size: 170, spacing: 6, sub: 'italic 34px "Cormorant Garamond"', subSp: 2, subText: 'for the solar people', why: 'serif de alto contraste con filo, como un grabado. la que más pega con las láminas.' }
+  ];
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var CARD = 540;
+
+  function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+
+  // Escribe la palabra letra por letra; si eclipse=true, la O se dibuja como un sol eclipsado
+  function word(o, txt, cx, base, eclipse) {
+    var size = o.size;
+    ctx.font = o.font.replace('{s}', size);
+    ctx.letterSpacing = '0px';
+    var chars = txt.split(''), widths = chars.map(function (ch) { return ctx.measureText(ch).width; });
+    var total = widths.reduce(function (a, b) { return a + b; }, 0) + o.spacing * (chars.length - 1);
+    while (total > 960) { size -= 4; ctx.font = o.font.replace('{s}', size); widths = chars.map(function (ch) { return ctx.measureText(ch).width; }); total = widths.reduce(function (a, b) { return a + b; }, 0) + o.spacing * (chars.length - 1); }
+    var m = ctx.measureText('H'), cap = m.actualBoundingBoxAscent;
+    var x = cx - total / 2;
+    chars.forEach(function (ch, i) {
+      if (eclipse && (ch === 'O' || ch === 'o')) {
+        var w = widths[i], ox = x + w / 2, oy = base - cap / 2, r = Math.min(w, cap) / 2 * 0.98;
+        var g = ctx.createRadialGradient(ox, oy, r * 0.9, ox, oy, r * 2.6);
+        g.addColorStop(0, rgba(C.accent, 0.95)); g.addColorStop(0.2, rgba(C.glow, 0.8)); g.addColorStop(1, rgba(C.glow, 0));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ox, oy, r * 2.6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(ox, oy, r, 0, Math.PI * 2); ctx.fill();
+        ctx.save(); ctx.shadowColor = C.accent; ctx.shadowBlur = 18; ctx.strokeStyle = C.cream; ctx.lineWidth = Math.max(2, size / 70);
+        ctx.beginPath(); ctx.arc(ox, oy, r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+        ctx.fillStyle = C.cream; ctx.beginPath(); ctx.arc(ox + r * 0.62, oy - r * 0.62, Math.max(2.5, size / 60), 0, Math.PI * 2); ctx.fill();
+      } else {
+        ctx.save(); ctx.fillStyle = C.cream; ctx.textAlign = 'left'; ctx.shadowColor = rgba(C.accent, 0.6); ctx.shadowBlur = 24;
+        ctx.fillText(ch, x, base); ctx.restore();
+      }
+      x += widths[i] + o.spacing;
+    });
+  }
+
+  document.fonts.ready.then(function () {
+    var extra = ['700 20px "Space Mono"', '400 20px "Space Mono"', 'italic 24px "Cormorant Garamond"', '500 20px Syne', '400 20px Syncopate'];
+    return Promise.all(OPCIONES.map(function (o) { return document.fonts.load(o.font.replace('{s}', 40), 'SOLARIS'); }).concat(extra.map(function (f) { return document.fonts.load(f, 'SOLARIS for'); })));
+  }).then(function () {
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, cv.width, cv.height);
+    OPCIONES.forEach(function (o, i) {
+      var y0 = i * CARD;
+      var bg = ctx.createRadialGradient(540, y0 + 250, 50, 540, y0 + 250, 700);
+      bg.addColorStop(0, rgba(C.glow, 0.35)); bg.addColorStop(1, rgba(C.glow, 0));
+      ctx.fillStyle = bg; ctx.fillRect(0, y0, 1080, CARD);
+      ctx.strokeStyle = rgba(C.cream, 0.12); ctx.beginPath(); ctx.moveTo(40, y0 + CARD - 1); ctx.lineTo(1040, y0 + CARD - 1); ctx.stroke();
+      ctx.font = '700 20px "Space Mono"'; ctx.fillStyle = C.accent; ctx.textAlign = 'left'; ctx.letterSpacing = '4px';
+      ctx.fillText(o.n + ' · ' + o.name.toUpperCase(), 48, y0 + 54);
+      ctx.letterSpacing = '0px';
+      var txt = o.lower ? 'SoLaRiS' : 'SOLARIS';
+      word(o, txt, 540, y0 + 220, false);
+      word(o, txt, 540, y0 + 400, true);
+      ctx.font = o.sub; ctx.fillStyle = C.accent; ctx.textAlign = 'center'; ctx.letterSpacing = o.subSp + 'px';
+      ctx.fillText(o.subText || 'FOR THE SOLAR PEOPLE', 540, y0 + 462);
+      ctx.letterSpacing = '0px';
+      ctx.font = 'italic 24px "Cormorant Garamond"'; ctx.fillStyle = rgba(C.cream, 0.6);
+      ctx.fillText(o.why, 540, y0 + 508);
+    });
+    window.DONE = true;
+  });
+})();
+</script>
+</body>
+</html>

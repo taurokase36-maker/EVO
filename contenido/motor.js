@@ -200,14 +200,44 @@
     if (opts.glow) { ctx.shadowColor = opts.glow; ctx.shadowBlur = 30; }
     ctx.fillText(str, x, y); ctx.restore();
   }
-  // Título en Cinzel que se achica hasta entrar en maxW
+  // Títulos de marca: Major Mono Display en minúscula (todas las letras del mismo grosor). Se achica hasta entrar en maxW.
+  var BRAND = '"Major Mono Display", monospace';
   function title(str, x, y, size, maxW, opts) {
     opts = opts || {};
-    var sp = opts.spacing === undefined ? size * 0.08 : opts.spacing;
-    ctx.save(); ctx.letterSpacing = sp + 'px';
-    while (size > 20) { ctx.font = '600 ' + size + 'px Cinzel'; if (ctx.measureText(str).width <= maxW) break; size -= 2; sp = size * 0.08; ctx.letterSpacing = sp + 'px'; }
+    str = String(str).toLowerCase();
+    var k = opts.spacing === undefined ? 0.04 : opts.spacing / size, sp = size * k;
+    ctx.save();
+    for (;;) { ctx.font = size + 'px ' + BRAND; ctx.letterSpacing = sp + 'px'; if (size <= 20 || ctx.measureText(str).width <= maxW) break; size -= 2; sp = size * k; }
     ctx.restore();
-    text(str, x, y, '600 ' + size + 'px Cinzel', opts.color || C.cream, { spacing: sp, glow: opts.glow === false ? null : C.accent, align: opts.align });
+    text(str, x, y, size + 'px ' + BRAND, opts.color || C.cream, { spacing: sp, glow: opts.glow === false ? null : C.accent, align: opts.align });
+    return size;
+  }
+  // Logo SOLARIS: como title(), pero la O se dibuja como un sol eclipsado
+  function wordmark(str, x, y, size, maxW) {
+    str = String(str).toLowerCase();
+    var sp, widths, total, chars = str.split('');
+    for (;;) {
+      ctx.font = size + 'px ' + BRAND; sp = size * 0.06;
+      widths = chars.map(function (ch) { return ctx.measureText(ch).width; });
+      total = widths.reduce(function (a, b) { return a + b; }, 0) + sp * (chars.length - 1);
+      if (size <= 20 || total <= maxW) break; size -= 2;
+    }
+    var cap = ctx.measureText('h').actualBoundingBoxAscent, cx = x - total / 2;
+    chars.forEach(function (ch, i) {
+      if (ch === 'o') {
+        var ox = cx + widths[i] / 2, oy = y - cap / 2, r = Math.min(widths[i], cap) / 2;
+        var g = ctx.createRadialGradient(ox, oy, r * 0.9, ox, oy, r * 2.6);
+        g.addColorStop(0, rgba(C.accent, 0.95)); g.addColorStop(0.2, rgba(C.glow, 0.8)); g.addColorStop(1, rgba(C.glow, 0));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(ox, oy, r * 2.6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(ox, oy, r, 0, Math.PI * 2); ctx.fill();
+        ctx.save(); ctx.shadowColor = C.accent; ctx.shadowBlur = 18; ctx.strokeStyle = C.cream; ctx.lineWidth = Math.max(2, size / 48);
+        ctx.beginPath(); ctx.arc(ox, oy, r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+        ctx.fillStyle = C.cream; ctx.beginPath(); ctx.arc(ox + r * 0.62, oy - r * 0.62, Math.max(2.5, size / 55), 0, Math.PI * 2); ctx.fill();
+      } else {
+        text(ch, cx, y, size + 'px ' + BRAND, C.cream, { align: 'left', glow: C.accent });
+      }
+      cx += widths[i] + sp;
+    });
     return size;
   }
   function textOnCircle(str, cx, cy, r, center, font, color, spacing) {
@@ -221,7 +251,7 @@
     });
     ctx.restore();
   }
-  function credits(y, size) { text('SOMOS UNO  ×  MELT UNDERGROUND', W / 2, y, '600 ' + (size || 26) + 'px Cinzel', rgba(C.cream, 0.7), { spacing: 6 }); }
+  function credits(y, size) { text('SOMOS UNO  ×  MELT UNDERGROUND', W / 2, y, '700 ' + Math.round((size || 26) * 0.85) + 'px "Space Mono"', rgba(C.cream, 0.7), { spacing: 5 }); }
   function rule(y, w) { ctx.save(); ctx.strokeStyle = rgba(C.accent, 0.7); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(W / 2 - w / 2, y); ctx.lineTo(W / 2 + w / 2, y); ctx.stroke(); ctx.restore(); }
 
   // ---------- escena: la pared de la caverna con sombras y fuego ----------
@@ -325,9 +355,10 @@
     seedFrom: seedFrom, rng: rng, clamp: clamp, rgba: rgba, layer: layer, smooth: smooth, roman: roman,
     background: background, marble: marble, grain: grain, vignette: vignette, engrave: engrave,
     dancers: dancers, maskOf: maskOf, engravedSun: engravedSun, sunDisk: sunDisk, moon: moon, huella: huella, clock: clock,
-    text: text, title: title, textOnCircle: textOnCircle, credits: credits, rule: rule, wall: wall, caveSection: caveSection,
+    text: text, title: title, wordmark: wordmark, textOnCircle: textOnCircle, credits: credits, rule: rule, wall: wall, caveSection: caveSection,
     fonts: function () {
-      return document.fonts.load('600 40px Cinzel').then(function () { return Promise.all([document.fonts.load('30px "GFS Didot"', 'ΑΣ'), document.fonts.load('italic 40px "Cormorant Garamond"'), document.fonts.load('40px "Cormorant Garamond"')]); }).catch(function () {});
+      return Promise.all(['600 40px Cinzel', '400 40px Cinzel', '40px "Major Mono Display"', '400 30px "Space Mono"', '700 30px "Space Mono"', 'italic 40px "Cormorant Garamond"', '40px "Cormorant Garamond"']
+        .map(function (f) { return document.fonts.load(f); }).concat([document.fonts.load('30px "GFS Didot"', 'ΑΣ')])).catch(function () {});
     }
   };
 })();
