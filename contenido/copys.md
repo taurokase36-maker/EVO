@@ -5,7 +5,7 @@ Historias 1080×1920 · posts 1080×1350. En todas las historias con entradas, s
 
 | Día | Qué sale | Pieza | Lámina base |
 |---|---|---|---|
-| Lun 5 | Anuncio (post + historia) y el teaser con el track | `02-anuncio-post`, `01-anuncio-story`, `teaser/the-sun-teaser.mp4` | 2 · el sol grabado |
+| Lun 5 | Anuncio (post + historia) y el teaser con el track | `02-anuncio-post`, `01-anuncio-story`, `teaser/the-eclipse-teaser.mp4` | 2 · el sol grabado |
 | Mar 6 | La idea: entrás con el ocaso | `03-la-pared-story` | 1 · la pared |
 | Mié 7 | Cómo es la noche (post) | `05-la-noche-post` | 3 · la lámina |
 | Jue 8 | Early bird: se apaga mañana | `07-early-bird-story` | 2 + eclipse en fases |

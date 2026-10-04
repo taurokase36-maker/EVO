@@ -24,14 +24,14 @@ function cfg(string $path, $default = null)
     return $v;
 }
 
-/** Nombre del evento: "THE SUN · release party". */
+/** Nombre del evento: "THE ECLIPSE · release party de THE SUN". */
 function event_name(): string
 {
     $sub = (string) cfg('event.subhead', '');
     return (string) cfg('event.headline', '') . ($sub !== '' ? ' · ' . $sub : '');
 }
 
-/** Con quién lo presenta: "somos uno × melt underground presentan THE SUN · release party". */
+/** Con quién lo presenta: "somos uno × melt underground presentan THE ECLIPSE · release party de THE SUN". */
 function event_full(): string
 {
     return trim(cfg('event.kicker', '') . ' ' . event_name());

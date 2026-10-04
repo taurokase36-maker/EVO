@@ -126,13 +126,13 @@
         ctx.fillText(d.number ? 'SOMOS EL Nº ' + d.number : '', 540, 1700);
         ctx.globalAlpha = 1;
         c.toBlob(function (blob) {
-          var file = new File([blob], 'the-sun.png', { type: 'image/png' });
+          var file = new File([blob], 'the-eclipse.png', { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({ files: [file] }).catch(function () {});
           } else {
             var a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'the-sun.png';
+            a.download = 'the-eclipse.png';
             document.body.appendChild(a); a.click(); a.remove();
           }
         }, 'image/png');
