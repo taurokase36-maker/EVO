@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- THE SUN · teaser para historias (1080x1920).
      Abrilo en el navegador para verlo en loop. Para exportar el MP4: node render.js
-     ?t=6.5 muestra un solo cuadro; ?seed=otra cambia la forma de la huella. -->
+     ?t=6.5 muestra un solo cuadro; ?seed=otra cambia la forma de la huella.
+     Todo pulsa a 127 BPM: el primer beat cae en 0:00 y dura 8 compases (32 beats). -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -18,7 +19,8 @@
 <script>
 (function () {
   'use strict';
-  var W = 1080, H = 1920, DURATION = 12;
+  var W = 1080, H = 1920;
+  var BPM = 127, BEAT = 60 / BPM, DURATION = 32 * BEAT;   // 8 compases ≈ 15,1 s
   var CX = 540, CY = 880, R = 330;              // el sol: centro y radio. Abajo queda libre para el logo.
   var C = { bg: '#070202', glow: '#6b0d07', accent: '#d9482c', cream: '#efe2d6' };
   var params = new URLSearchParams(location.search);
@@ -51,7 +53,19 @@
   function prog(t, a, b) { return clamp((t - a) / (b - a)); }
   function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
   function easeInOut(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+  function b(n) { return n * BEAT; }              // beats → segundos
+  // Golpe a 127 BPM: sube de golpe en cada beat y cae rápido. El primero de cada compás pega más fuerte.
+  function kick(t) {
+    if (t < 0) return 0;
+    var n = Math.floor(t / BEAT), ph = t / BEAT - n;
+    return Math.exp(-ph * 5.5) * (n % 4 === 0 ? 1 : 0.7);
+  }
   function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+
+  // Logo de Somos Uno (versión horizontal, 640x640). Se dibuja girado 90° para que quede vertical.
+  var LOGO_CURVE = new Path2D('M80 258 L80 270 A110 110 0 0 1 190 160 L210 160 A110 110 0 0 1 320 270 L320 370 A110 110 0 0 0 430 480 L450 480 A110 110 0 0 0 560 370 L560 382');
+  var LOGO_CURVE_LEN = 4 * Math.PI * 110 / 2 + 20 + 20 + 100 + 12 + 12;
+  var LOGO_LINE_LEN = 274;
 
   // Rayos de la corona: fijos, giran despacio
   var RAYS = (function () { var r = rng(seedFrom('rays')), out = []; for (var i = 0; i < 140; i++) out.push({ a: r() * Math.PI * 2, len: 0.25 + r() * 0.9, w: 1 + r() * 3, o: 0.15 + r() * 0.5, sp: (r() - 0.5) * 0.04 }); return out; })();
@@ -67,48 +81,52 @@
   // ---------- un cuadro ----------
   function render(t) {
     var breathe = Math.sin(t * 1.3) * 0.5 + 0.5;
+    var amp = easeInOut(prog(t, b(4), b(8)));         // el pulso entra en el compás 2
+    var k = kick(t) * amp;
     ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
     ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
 
     // 1. Resplandor ambiente
-    var amb = easeInOut(prog(t, 1.2, 6)) * (0.42 + 0.12 * breathe);
+    var amb = easeInOut(prog(t, b(2), b(12))) * (0.38 + 0.1 * breathe + 0.22 * k);
     var g = ctx.createRadialGradient(CX, CY, R * 0.8, CX, CY, 1150);
-    g.addColorStop(0, rgba(C.glow, amb)); g.addColorStop(1, rgba(C.glow, 0));
+    g.addColorStop(0, rgba(C.glow, Math.min(1, amb))); g.addColorStop(1, rgba(C.glow, 0));
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-    // 2. Rayos de la corona
-    var rayA = easeOut(prog(t, 2.2, 7));
+    // 2. Rayos de la corona (se estiran en cada golpe y titilan en el contratiempo)
+    var rayA = easeOut(prog(t, b(4), b(14)));
     if (rayA > 0) {
+      var off = kick(t - BEAT / 2) * amp * 0.35;
       ctx.globalCompositeOperation = 'lighter';
-      RAYS.forEach(function (ray) {
+      RAYS.forEach(function (ray, i) {
         var a = ray.a + t * ray.sp + t * 0.015;
-        var len = R * (1 + ray.len * rayA * (0.85 + 0.15 * Math.sin(t * 0.9 + ray.a * 5)));
+        var hit = i % 2 ? k : off;
+        var len = R * (1 + ray.len * rayA * (0.8 + 0.12 * Math.sin(t * 0.9 + ray.a * 5) + 0.35 * hit));
         var x1 = CX + Math.cos(a) * R, y1 = CY + Math.sin(a) * R, x2 = CX + Math.cos(a) * len, y2 = CY + Math.sin(a) * len;
         var lg = ctx.createLinearGradient(x1, y1, x2, y2);
-        lg.addColorStop(0, rgba(C.accent, ray.o * rayA * 0.55)); lg.addColorStop(1, rgba(C.glow, 0));
+        lg.addColorStop(0, rgba(C.accent, Math.min(1, ray.o * rayA * (0.5 + 0.5 * hit)))); lg.addColorStop(1, rgba(C.glow, 0));
         ctx.strokeStyle = lg; ctx.lineWidth = ray.w; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
       });
       ctx.globalCompositeOperation = 'source-over';
     }
 
     // 3. Corona
-    var cor = easeOut(prog(t, 1.6, 5.5)) * (0.85 + 0.15 * breathe);
+    var cor = easeOut(prog(t, b(3), b(10))) * (0.8 + 0.1 * breathe + 0.25 * k);
     if (cor > 0) {
-      var cg = ctx.createRadialGradient(CX, CY, R * 0.97, CX, CY, R * (1.25 + 0.55 * cor));
-      cg.addColorStop(0, rgba(C.accent, 0.95 * cor)); cg.addColorStop(0.16, rgba(C.glow, 0.85 * cor)); cg.addColorStop(1, rgba(C.glow, 0));
-      ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(CX, CY, R * 2, 0, Math.PI * 2); ctx.fill();
+      var cg = ctx.createRadialGradient(CX, CY, R * 0.97, CX, CY, R * (1.25 + 0.5 * cor + 0.12 * k));
+      cg.addColorStop(0, rgba(C.accent, Math.min(1, 0.95 * cor))); cg.addColorStop(0.16, rgba(C.glow, Math.min(1, 0.85 * cor))); cg.addColorStop(1, rgba(C.glow, 0));
+      ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(CX, CY, R * 2.2, 0, Math.PI * 2); ctx.fill();
     }
 
     // 4. Disco negro
     ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2); ctx.fill();
 
-    // 5. Borde: se dibuja en un giro y queda brillando
-    var rim = easeInOut(prog(t, 0.5, 2.6));
+    // 5. Borde: se dibuja en el primer compás y después late
+    var rim = easeInOut(prog(t, b(0.5), b(4)));
     if (rim > 0) {
       var start = -Math.PI / 2;
       ctx.save();
-      ctx.shadowColor = C.accent; ctx.shadowBlur = 28;
-      ctx.strokeStyle = rgba(C.cream, 0.55 + 0.35 * rim); ctx.lineWidth = 2.6;
+      ctx.shadowColor = C.accent; ctx.shadowBlur = 28 + 40 * k;
+      ctx.strokeStyle = rgba(C.cream, Math.min(1, 0.55 + 0.3 * rim + 0.2 * k)); ctx.lineWidth = 2.6 + 2.4 * k;
       ctx.beginPath(); ctx.arc(CX, CY, R, start, start + Math.PI * 2 * rim); ctx.stroke();
       if (rim < 1) {   // cabeza de luz que va trazando el círculo
         var hx = CX + Math.cos(start + Math.PI * 2 * rim) * R, hy = CY + Math.sin(start + Math.PI * 2 * rim) * R;
@@ -117,61 +135,102 @@
       ctx.restore();
     }
 
-    // 6. Huella: los anillos aparecen de a uno, del centro hacia afuera
-    var S = R * 0.78, rot = t * 0.045;
-    RINGS.forEach(function (pts, k) {
-      var t0 = 3.0 + k * 0.27, p = easeInOut(prog(t, t0, t0 + 1.1));
+    // 6. Huella: un anillo nuevo cada medio beat, del centro hacia afuera. El golpe viaja como una onda.
+    var S = R * 0.8, rot = t * 0.045;
+    var dim = 1 - 0.5 * easeInOut(prog(t, b(15), b(17)));   // se apaga un poco cuando entra el logo
+    RINGS.forEach(function (pts, i) {
+      var t0 = b(6 + i * 0.5), p = easeInOut(prog(t, t0, t0 + b(2)));
       if (p <= 0) return;
       var n = Math.max(2, Math.round(p * (pts.length - 1)));
-      var off = Math.floor((k * 37) % pts.length);     // cada anillo empieza a trazarse en otro ángulo
-      var s = S * (1 + 0.018 * Math.sin(t * 1.1 + k * 0.4));
-      var isAccent = k % 4 === 3;
+      var start = Math.floor((i * 37) % pts.length);   // cada anillo empieza a trazarse en otro ángulo
+      var wave = kick(t - i * 0.018) * amp;
+      var s = S * (1 + 0.012 * Math.sin(t * 1.1 + i * 0.4) + 0.045 * wave);
+      var isAccent = i % 4 === 3;
       ctx.save();
-      ctx.translate(CX, CY); ctx.rotate(rot * (1 + k * 0.04));   // giran juntos, apenas desfasados
+      ctx.translate(CX, CY); ctx.rotate(rot * (1 + i * 0.04));   // giran juntos, apenas desfasados
       ctx.beginPath();
-      for (var i = 0; i < n; i++) {
-        var q = pts[(off + i) % (pts.length - 1)];
-        i ? ctx.lineTo(q[0] * s, q[1] * s) : ctx.moveTo(q[0] * s, q[1] * s);
+      for (var j = 0; j < n; j++) {
+        var q = pts[(start + j) % (pts.length - 1)];
+        j ? ctx.lineTo(q[0] * s, q[1] * s) : ctx.moveTo(q[0] * s, q[1] * s);
       }
       if (p >= 1) ctx.closePath();
-      ctx.globalAlpha = (0.3 + 0.7 * (k / RINGS.length)) * Math.min(1, p * 2.5);
+      ctx.globalAlpha = Math.min(1, (0.3 + 0.7 * (i / RINGS.length)) * Math.min(1, p * 2.5) * dim * (1 + 0.4 * wave));
       ctx.strokeStyle = isAccent ? C.accent : C.cream;
-      ctx.lineWidth = isAccent ? 2.6 : 1.6;
-      if (isAccent) { ctx.shadowColor = C.accent; ctx.shadowBlur = 14; }
+      ctx.lineWidth = (isAccent ? 2.6 : 1.6) * (1 + 0.5 * wave);
+      if (isAccent) { ctx.shadowColor = C.accent; ctx.shadowBlur = 14 + 20 * wave; }
       ctx.stroke();
       ctx.restore();
     });
     ctx.globalAlpha = 1;
 
-    // 7. Anillo de diamante: destello arriba a la derecha
-    var fl = prog(t, 8.2, 8.6), fd = prog(t, 8.6, 10);
+    // 7. Logo de Somos Uno en el centro, vertical. Entra en el compás 5 y late con cada golpe.
+    var lp = prog(t, b(16), b(18));
+    if (lp > 0) {
+      var dotPop = function (at) {   // aparece con un rebote (easeOutBack)
+        var x = prog(t, b(at), b(at + 0.6));
+        return x <= 0 ? 0 : 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2);
+      };
+      var lk = kick(t) * amp;
+      var sc = 0.68 * (1 + 0.06 * lk) * (0.92 + 0.08 * easeOut(lp));
+      var sway = Math.sin(t / b(8) * Math.PI * 2) * 0.05;          // se mece un poco cada 2 compases
+      ctx.save();
+      // sombra para que se lea sobre las líneas
+      var sh = ctx.createRadialGradient(CX, CY, 0, CX, CY, R * 0.62);
+      sh.addColorStop(0, rgba(C.bg, 0.85 * easeOut(lp))); sh.addColorStop(1, rgba(C.bg, 0));
+      ctx.fillStyle = sh; ctx.beginPath(); ctx.arc(CX, CY, R * 0.62, 0, Math.PI * 2); ctx.fill();
+      ctx.translate(CX, CY + Math.sin(t * 1.7) * 4); ctx.rotate(Math.PI / 2 + sway); ctx.scale(sc, sc); ctx.translate(-320, -320);
+      ctx.strokeStyle = C.cream; ctx.fillStyle = C.cream; ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+      ctx.shadowColor = C.accent; ctx.shadowBlur = 18 + 45 * lk;
+      ctx.lineWidth = 20;
+      // curva: se dibuja en 2 beats
+      var cp = easeInOut(prog(t, b(16), b(18)));
+      ctx.setLineDash([LOGO_CURVE_LEN * cp, LOGO_CURVE_LEN]);
+      ctx.stroke(LOGO_CURVE);
+      // línea del medio: aparece desde el centro en el beat 18
+      var mp = easeOut(prog(t, b(18), b(19)));
+      if (mp > 0) {
+        ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(320 - LOGO_LINE_LEN / 2 * mp, 320); ctx.lineTo(320 + LOGO_LINE_LEN / 2 * mp, 320); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      // puntos: saltan en los beats 16 y 17
+      [[80, 320, 16], [560, 320, 17]].forEach(function (d) {
+        var pop = dotPop(d[2]);
+        if (pop <= 0) return;
+        ctx.beginPath(); ctx.arc(d[0], d[1], 30 * pop * (1 + 0.12 * lk), 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    // 8. Anillo de diamante: destello arriba a la derecha en el compás 6, después late chiquito
+    var fl = prog(t, b(20), b(20.6)), fd = prog(t, b(20.6), b(24));
     var flash = fl * (1 - fd * 0.75);
     if (flash > 0) {
       var fa = -Math.PI / 4.2, fx = CX + Math.cos(fa) * R, fy = CY + Math.sin(fa) * R;
-      var size = 30 + 230 * fl * (1 - fd * 0.6) + 10 * breathe;
+      var size = 30 + 230 * fl * (1 - fd * 0.6) + 40 * k;
       ctx.globalCompositeOperation = 'lighter';
       var fg = ctx.createRadialGradient(fx, fy, 0, fx, fy, size);
       fg.addColorStop(0, rgba('#ffffff', flash)); fg.addColorStop(0.12, rgba(C.cream, 0.8 * flash));
       fg.addColorStop(0.35, rgba(C.accent, 0.45 * flash)); fg.addColorStop(1, rgba(C.glow, 0));
       ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(fx, fy, size, 0, Math.PI * 2); ctx.fill();
       // destello horizontal tipo lente
-      var sw = 520 * flash;
+      var sw = 520 * flash * (1 + 0.25 * k);
       var sg = ctx.createLinearGradient(fx - sw, fy, fx + sw, fy);
       sg.addColorStop(0, rgba(C.accent, 0)); sg.addColorStop(0.5, rgba(C.cream, 0.7 * flash)); sg.addColorStop(1, rgba(C.accent, 0));
       ctx.fillStyle = sg; ctx.fillRect(fx - sw, fy - 1.5, sw * 2, 3);
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    // 8. Viñeta
+    // 9. Viñeta
     var vg = ctx.createRadialGradient(CX, CY, 500, CX, H / 2, 1250);
     vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.75)');
     ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
 
-    // 9. Fundido de entrada y grano
+    // 10. Fundido de entrada y grano
     var fadeIn = prog(t, 0, 0.6);
     if (fadeIn < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - fadeIn) + ')'; ctx.fillRect(0, 0, W, H); }
     ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.045;
-    ctx.drawImage(GRAIN[Math.floor(t * 24) % 3], 0, 0, W, H);
+    ctx.drawImage(GRAIN[Math.abs(Math.floor(t * 24)) % 3], 0, 0, W, H);
     ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
   }
 
@@ -181,7 +240,7 @@
   if (params.has('t')) { render(parseFloat(params.get('t'))); return; }
   if (params.has('export')) return;     // render.js controla los cuadros
   var t0 = performance.now();
-  (function loop(now) { render(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0);
+  (function loop(now) { render(Math.max(0, (now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0);
 })();
 </script>
 </body>
