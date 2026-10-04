@@ -112,5 +112,6 @@ Abrí `https://tudominio.com` desde el celular:
 ## El día de la fiesta
 
 - **Puerta:** un celular con `tudominio.com/admin/scan.php` para lista e invitaciones, y otro con la actividad de Mercado Pago (o una lista impresa) para quienes pagaron con link. La lista y las invitaciones valen hasta las 00:00.
-- **Proyector:** abrí `tudominio.com/pantalla.php` en Chrome y tocá "pantalla completa".
+- **Proyector:** abrí `tudominio.com/pantalla.php` en Chrome y tocá "pantalla completa" (los mensajes de la gente).
+- **Visuales en vivo:** `tudominio.com/visuales` en Chrome (ver `visuales/LEEME.md`). Ese link es el que le pasás a quien maneje las visuales.
 - **Después del viernes a las 23:59:** desactivá el link de la early bird en Mercado Pago. El botón de la web ya se cierra solo, pero el link sigue funcionando si alguien lo tiene guardado.

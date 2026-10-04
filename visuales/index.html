@@ -32,16 +32,77 @@
   #toast { left: 50%; top: 24px; transform: translateX(-50%); padding: 8px 16px; transition: opacity .4s; pointer-events: none; }
   .hidden { display: none !important; }
   .fade { opacity: 0; }
-  #start { left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; }
+  #start { left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; width: min(520px, 90vw); padding: 28px; }
+  #start h1 { font: 400 clamp(34px, 6vw, 54px) 'Major Mono Display', monospace; margin: 0 0 4px; text-transform: lowercase; letter-spacing: .04em; }
+  #start p { color: rgba(239,226,214,.7); margin: 6px 0; }
+  #start .big { display: block; width: 100%; margin-top: 12px; font-size: 15px; padding: 14px; background: var(--accent); color: var(--bg); font-weight: 700; border-color: var(--accent); }
+  #start .big.ghost { background: none; color: var(--cream); }
+  /* barra de controles: aparece al mover el mouse y se esconde sola */
+  #bar { left: 12px; right: 12px; bottom: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; transition: opacity .35s, transform .35s; }
+  body.idle #bar, body.ui-off #bar, body.idle #ajustes, body.ui-off #ajustes { opacity: 0; transform: translateY(16px); pointer-events: none; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .row .lbl { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin: 0 4px 0 6px; }
+  .sp { flex: 1; }
+  .btn { padding: 7px 12px; font-size: 12px; }
+  .btn.on { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn.scene { min-width: 104px; }
+  #bpm { width: 70px; background: transparent; color: var(--cream); border: 1px solid rgba(239,226,214,.35); border-radius: 8px; font: 700 15px 'Space Mono', monospace; text-align: center; padding: 5px 4px; }
+  .dot-midi { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #555; margin-right: 6px; vertical-align: middle; }
+  .dot-midi.ok { background: #4ade80; }
+  #ajustes { right: 12px; bottom: 150px; width: 300px; transition: opacity .35s, transform .35s; }
+  #ajustes label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 6px 0; font-size: 12px; }
+  #ajustes input[type=range] { width: 150px; accent-color: #d9482c; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="toast" class="panel fade"></div>
-<div id="start" class="panel">cargando las texturas…</div>
-<div id="hud" class="panel hidden"></div>
+<div id="start" class="panel">
+  <h1>solaris</h1>
+  <p>visuales en vivo · for the solar people</p>
+  <p id="start-msg">cargando…</p>
+  <button class="btn big" id="go-full" disabled>empezar en pantalla completa</button>
+  <button class="btn big ghost" id="go-window" disabled>empezar en ventana</button>
+  <p style="font-size:12px;margin-top:14px">Si tenés el K2, enchufalo antes. Cuando Chrome pregunte por <b>dispositivos MIDI</b>, tocá <b>Permitir</b>.</p>
+</div>
+<div id="bar" class="panel hidden">
+  <div class="row">
+    <span class="lbl">escenas</span>
+    <button class="btn scene" data-action="scene1">1 · eclipse</button>
+    <button class="btn scene" data-action="scene2">2 · la pared</button>
+    <button class="btn scene" data-action="scene3">3 · tránsito</button>
+    <button class="btn scene" data-action="scene4">4 · solaris</button>
+    <button class="btn scene" data-action="scene5">5 · grabado</button>
+    <span class="sp"></span>
+    <span class="lbl">efectos</span>
+    <button class="btn" data-action="drop">drop</button>
+    <button class="btn" data-action="flash">flash</button>
+    <button class="btn" data-action="blackout">blackout</button>
+    <button class="btn" data-action="logoToggle">logo</button>
+    <button class="btn" data-action="auto">auto</button>
+  </div>
+  <div class="row">
+    <span class="lbl">tempo</span>
+    <button class="btn" data-action="bpmDown">−</button>
+    <input id="bpm" type="number" min="60" max="200" step="0.1" value="127" title="BPM: escribilo o usá tap">
+    <button class="btn" data-action="bpmUp">+</button>
+    <button class="btn" data-action="tap" title="tocá 4 veces en el beat">tap</button>
+    <button class="btn" data-action="sync" title="tocalo en el 1 del compás">sync · 1</button>
+    <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+    <span id="clock" style="font-size:11px;color:rgba(239,226,214,.6)"></span>
+    <span class="sp"></span>
+    <button class="btn" id="b-ajustes">ajustes</button>
+    <button class="btn" id="b-midi"><span class="dot-midi" id="midi-dot"></span>midi</button>
+    <button class="btn" data-action="quality">calidad baja</button>
+    <button class="btn" id="b-full">pantalla completa</button>
+    <button class="btn" id="b-help">?</button>
+    <button class="btn" id="b-hide" title="esconder los controles (H para volver)">esconder</button>
+  </div>
+</div>
+<div id="ajustes" class="panel hidden"></div>
 <div id="help" class="panel hidden">
   <h2>solaris · visuales</h2>
+  <p style="text-align:right;margin-top:-34px"><button class="btn" id="help-close">cerrar</button></p>
   <p><kbd>1</kbd>…<kbd>5</kbd> escenas: eclipse · la pared · tránsito · solaris · grabado</p>
   <p><kbd>␣</kbd> tap tempo (tocá 4 veces en el beat)</p>
   <p><kbd>S</kbd> sync: el próximo beat es el 1 del compás</p>
@@ -49,7 +110,8 @@
   <p><kbd>F</kbd> flash · <kbd>B</kbd> blackout · <kbd>L</kbd> logo encima</p>
   <p><kbd>D</kbd> drop: en "tránsito" salta a la totalidad del eclipse</p>
   <p><kbd>A</kbd> automático: cambia de escena cada 16 compases</p>
-  <p><kbd>Enter</kbd> pantalla completa · <kbd>H</kbd> esta ayuda · <kbd>M</kbd> mapeo MIDI</p>
+  <p><kbd>Enter</kbd> pantalla completa · <kbd>H</kbd> esconder/mostrar controles · <kbd>M</kbd> mapeo MIDI</p>
+  <p>Los controles de abajo se esconden solos cuando no movés el mouse. Movelo para que vuelvan.</p>
   <p><kbd>Q</kbd> calidad baja/alta (si la compu va lenta)</p>
   <p style="margin-top:10px;color:rgba(239,226,214,.6)">K2 (de fábrica): faders 1–4 = brillo, pulso, fuego, logo · perillas de arriba = velocidad, grano, sombras, fundido. Los botones se asignan en <kbd>M</kbd>.</p>
 </div>

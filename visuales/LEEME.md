@@ -2,12 +2,17 @@
 
 Visuales para proyectar en Melt desde **Chrome**, con la estética de SOLARIS. Pulsan al BPM (127 por defecto) y se controlan con el teclado o con un **Xone:K2** por MIDI. **Funcionan sin internet**: las fuentes están en `fuentes/`.
 
-## Abrirlas
-1. Pasá **`visuales/SOLARIS-visuales.html`** a la compu que va al proyector (WhatsApp, Drive, mail o pendrive). Es un solo archivo con todo adentro, incluidas las fuentes.
-2. Abrilo con **Chrome** (clic derecho → Abrir con → Google Chrome).
-   Si cambiás el código, regeneralo con `python3 visuales/empaquetar.py`. Para trabajar sobre el código, usá `visuales/index.html`.
-3. Si Chrome pregunta por **dispositivos MIDI**, tocá *Permitir*.
-4. Apretá **Enter** para pantalla completa. El mouse se esconde solo.
+## Abrirlas (en una computadora, no en el celular)
+**Opción A · link (la más fácil):** las visuales van dentro de la web. Con la web subida a Hostinger, se abren en Chrome en **`https://tudominio.com/visuales`**. Una vez cargadas siguen andando aunque se corte internet.
+
+**Opción B · archivo:** mandá **`visuales/SOLARIS-visuales.html`** como documento (WhatsApp Web, Drive, mail o pendrive). En la PC: descargalo, clic derecho → *Abrir con* → **Google Chrome**. En el celular se ve como texto: eso es normal, es para abrir en una computadora.
+
+Después:
+1. Tocá **empezar en pantalla completa** (o en ventana).
+2. Si Chrome pregunta por **dispositivos MIDI**, tocá *Permitir*.
+3. **Mové el mouse y aparecen los controles abajo**: escenas, efectos, tempo (−, BPM, +, tap, sync), ajustes, MIDI, pantalla completa. Se esconden solos a los 3 segundos.
+
+Si cambiás el código, regeneralo con `python3 visuales/empaquetar.py` (actualiza los dos). Para trabajar sobre el código, usá `visuales/index.html`.
 
 ## Las cinco escenas
 | Tecla | Escena | Qué hace |
@@ -51,7 +56,7 @@ Visuales para proyectar en Melt desde **Chrome**, con la estética de SOLARIS. P
 | Perilla 4 | duración del fundido entre escenas |
 
 **Los botones se asignan una vez (2 minutos):**
-1. Apretá `M`. Arriba tiene que decir "conectado: XONE:K2".
+1. Tocá **midi** en la barra de abajo (o `M`). Arriba tiene que decir "conectado: XONE:K2", y en la barra el punto de midi se pone verde.
 2. En la fila de una función, tocá **aprender** y apretá el botón del K2 que quieras. Queda guardado en ese Chrome.
 3. Sugerencia: los 4 botones de una fila para las escenas 1 a 4, y otra fila para escena 5, **drop**, **flash** y **tap**. Si te sobra, **blackout** y **sync**.
 

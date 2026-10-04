@@ -376,22 +376,11 @@
     ledFeedback();
   }
 
-  // ---------- HUD, ayuda y avisos ----------
-  var hudEl = document.getElementById('hud'), helpEl = document.getElementById('help'), toastEl = document.getElementById('toast');
-  var toastTimer;
+  // ---------- avisos ----------
+  var toastEl = document.getElementById('toast'), toastTimer;
   function toast(msg) {
     toastEl.textContent = msg; toastEl.classList.remove('fade');
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.add('fade'); }, 1400);
-  }
-  var hudTick = 0;
-  function hud(B) {
-    if (hudEl.classList.contains('hidden') || ++hudTick % 4) return;
-    var beat = ((B.n % 4) + 4) % 4, dots = '';
-    for (var i = 0; i < 4; i++) dots += '<i class="' + (i === beat ? 'on' : '') + '"></i>';
-    hudEl.innerHTML = '<b>' + (st.scene + 1) + ' · ' + SCENES[st.scene].name + '</b>' + (st.auto ? ' · auto' : '') + (st.blackout ? ' · blackout' : '') +
-      '<div class="dots">' + dots + '</div>BPM ' + st.bpm.toFixed(1) + (now() - st.clockAt < 1 ? ' · MIDI clock' : '') +
-      '<br>' + midiLabel + '<br><span style="color:rgba(239,226,214,.55)">' +
-      PARAMS.map(function (p) { return p[1] + ' ' + Math.round(P[p[0]] * 100); }).join(' · ') + '</span>';
   }
 
   // ---------- acciones (teclado y MIDI) ----------
@@ -417,13 +406,20 @@
     if (e.target.tagName === 'INPUT') return;
     var k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (KEYS[k]) { e.preventDefault(); ACTIONS[KEYS[k]][1](); return; }
-    if (k === 'h') { hudEl.classList.toggle('hidden'); helpEl.classList.toggle('hidden'); }
+    if (k === 'h') toggleUI();
     if (k === 'm') toggleMidi();
     if (k === 'Enter') fullscreen();
   });
   addEventListener('dblclick', fullscreen);
   function fullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
-  var idleT; addEventListener('mousemove', function () { document.body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function () { document.body.classList.add('idle'); }, 2500); });
+  // Controles en pantalla: se esconden solos a los 3 s sin mover el mouse (salvo que el mouse esté encima)
+  var idleT, overUI = false;
+  function wake() {
+    document.body.classList.remove('idle'); clearTimeout(idleT);
+    idleT = setTimeout(function () { if (!overUI) document.body.classList.add('idle'); }, 3000);
+  }
+  ['mousemove', 'mousedown', 'touchstart'].forEach(function (ev) { addEventListener(ev, wake, { passive: true }); });
+  function toggleUI() { document.body.classList.toggle('ui-off'); if (!document.body.classList.contains('ui-off')) wake(); }
 
   // ---------- MIDI ----------
   // Mapeo de fábrica pensado para el Xone:K2 (capa 1): faders = CC 16–19, fila de perillas de arriba = CC 4–7. Cualquier canal.
@@ -481,13 +477,13 @@
       });
     });
   }
-  if (navigator.requestMIDIAccess) {
+  function initMidi() {
+    if (midi) return;
+    if (!navigator.requestMIDIAccess) { midiLabel = 'MIDI: este navegador no soporta (usá Chrome)'; document.getElementById('midi-status').textContent = 'Este navegador no tiene MIDI. Abrilo con Google Chrome.'; return; }
     navigator.requestMIDIAccess({ sysex: false }).then(function (m) {
       midi = m; connectInputs(); ledFeedback();
       m.onstatechange = function () { connectInputs(); ledFeedback(); };
-    }).catch(function () { midiLabel = 'MIDI: permiso denegado'; document.getElementById('midi-status').textContent = 'Chrome no dio permiso para usar MIDI. Tocá el candado de la barra de direcciones y permití "Dispositivos MIDI".'; });
-  } else {
-    midiLabel = 'MIDI: este navegador no soporta (usá Chrome)';
+    }).catch(function () { midiLabel = 'MIDI: permiso denegado'; document.getElementById('midi-status').textContent = 'Chrome no dio permiso para usar MIDI. Tocá el ícono a la izquierda de la dirección (arriba) y permití "Dispositivos MIDI". Después recargá la página.'; });
   }
 
   // Panel de mapeo
@@ -509,21 +505,62 @@
   });
   document.getElementById('midi-reset').addEventListener('click', function () { map = JSON.parse(JSON.stringify(DEFAULT_MAP)); save(); renderMidi(); toast('mapeo de fábrica'); });
   document.getElementById('midi-close').addEventListener('click', toggleMidi);
-  function toggleMidi() { learning = null; midiEl.classList.toggle('hidden'); renderMidi(); }
+  function toggleMidi() { initMidi(); learning = null; midiEl.classList.toggle('hidden'); renderMidi(); }
+
+  // ---------- barra de controles ----------
+  var bar = document.getElementById('bar'), bpmIn = document.getElementById('bpm'), ajustes = document.getElementById('ajustes'), helpEl = document.getElementById('help');
+  bar.addEventListener('mouseenter', function () { overUI = true; }); bar.addEventListener('mouseleave', function () { overUI = false; wake(); });
+  ajustes.addEventListener('mouseenter', function () { overUI = true; }); ajustes.addEventListener('mouseleave', function () { overUI = false; wake(); });
+  bar.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-action]'); if (b && ACTIONS[b.getAttribute('data-action')]) { ACTIONS[b.getAttribute('data-action')][1](); b.blur(); }
+  });
+  bpmIn.addEventListener('change', function () { var v = parseFloat(bpmIn.value); if (v >= 60 && v <= 200) { st.bpm = Math.round(v * 10) / 10; toast('BPM ' + st.bpm.toFixed(1)); } bpmIn.blur(); });
+  bpmIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') bpmIn.blur(); });
+  document.getElementById('b-midi').addEventListener('click', toggleMidi);
+  document.getElementById('b-full').addEventListener('click', fullscreen);
+  document.getElementById('b-help').addEventListener('click', function () { helpEl.classList.toggle('hidden'); });
+  document.getElementById('help-close').addEventListener('click', function () { helpEl.classList.add('hidden'); });
+  document.getElementById('b-hide').addEventListener('click', function () { toggleUI(); toast('controles escondidos · H para volver'); });
+  document.getElementById('b-ajustes').addEventListener('click', function () { ajustes.classList.toggle('hidden'); });
+  ajustes.innerHTML = '<h2 style="font:400 20px \'Major Mono Display\',monospace;margin:0 0 6px">ajustes</h2>' + PARAMS.map(function (p) {
+    return '<label>' + p[1] + '<input type="range" min="0" max="100" data-param="' + p[0] + '"></label>';
+  }).join('') + '<p style="font-size:11px;color:rgba(239,226,214,.55);margin:8px 0 0">También se mueven con los faders y perillas del K2.</p>';
+  ajustes.addEventListener('input', function (e) { var k = e.target.getAttribute('data-param'); if (k) P[k] = e.target.value / 100; });
+  var dotEls = document.querySelectorAll('#dots i'), uiTick = 0;
+  function hud(B) {
+    if (++uiTick % 3) return;
+    var beat = ((B.n % 4) + 4) % 4;
+    for (var i = 0; i < 4; i++) dotEls[i].className = i === beat ? 'on' : '';
+    if (document.activeElement !== bpmIn) bpmIn.value = st.bpm.toFixed(1);
+    document.getElementById('clock').textContent = now() - st.clockAt < 1 ? 'MIDI clock' : '';
+    var on = { scene1: st.scene === 0, scene2: st.scene === 1, scene3: st.scene === 2, scene4: st.scene === 3, scene5: st.scene === 4, blackout: st.blackout, logoToggle: st.logoOn, auto: st.auto, quality: !!st.lowres };
+    bar.querySelectorAll('[data-action]').forEach(function (b) { b.classList.toggle('on', !!on[b.getAttribute('data-action')]); });
+    document.getElementById('midi-dot').classList.toggle('ok', /XONE|K2|MIDI:\s\S/i.test(midiLabel) && !/sin |denegado|no soporta/.test(midiLabel));
+    document.getElementById('b-midi').title = midiLabel;
+    ajustes.querySelectorAll('input[data-param]').forEach(function (r) { if (document.activeElement !== r) r.value = Math.round(P[r.getAttribute('data-param')] * 100); });
+  }
 
   // ---------- arranque ----------
-  var wake = null;
-  function keepAwake() { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (w) { wake = w; }).catch(function () {}); }
+  var wakeLock = null;
+  function keepAwake() { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (w) { wakeLock = w; }).catch(function () {}); }
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') keepAwake(); });
   var resizeT;
   addEventListener('resize', function () { clearTimeout(resizeT); resizeT = setTimeout(build, 300); });
   var fonts = ['40px "Major Mono Display"', '700 20px "Space Mono"', '400 20px "Space Mono"'];
   Promise.all(fonts.map(function (f) { return document.fonts.load(f); })).catch(function () {}).then(function () {
     build();
-    document.getElementById('start').classList.add('hidden');
-    toast('H: ayuda · M: MIDI · Enter: pantalla completa');
-    keepAwake();
     window.SOLARIS = { setScene: setScene, P: P, st: st, drop: drop };   // para probar desde la consola
     requestAnimationFrame(frame);
+    var startEl = document.getElementById('start'), full = document.getElementById('go-full'), win = document.getElementById('go-window');
+    document.getElementById('start-msg').textContent = 'listo.';
+    full.disabled = win.disabled = false;
+    function begin(fs) {
+      startEl.classList.add('hidden'); bar.classList.remove('hidden');
+      if (fs) document.documentElement.requestFullscreen().catch(function () {});
+      initMidi(); keepAwake(); wake();
+      toast('mové el mouse para ver los controles · H los esconde');
+    }
+    full.addEventListener('click', function () { begin(true); });
+    win.addEventListener('click', function () { begin(false); });
   });
 })();
