@@ -5,7 +5,7 @@ function page_start(string $title, string $bodyClass = '', string $base = ''): v
 {
     start_session();  // antes de imprimir nada: los formularios necesitan la cookie de sesión
     $c = (array) cfg('brand.colors');
-    $desc = cfg('event.headline') . ' ' . cfg('event.date_label') . ' · ' . cfg('event.venue') . ' · ' . cfg('event.genres');
+    $desc = event_full() . ' · ' . cfg('event.date_label') . ' · ' . cfg('event.venue') . ' · ' . cfg('event.genres');
     header('Content-Type: text/html; charset=utf-8');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: same-origin');
@@ -18,13 +18,13 @@ function page_start(string $title, string $bodyClass = '', string $base = ''): v
 <meta name="description" content="<?= e($desc) ?>">
 <meta property="og:title" content="<?= e(cfg('event.title')) ?>">
 <meta property="og:description" content="<?= e($desc) ?>">
-<meta name="theme-color" content="<?= e($c['bg'] ?? '#0b0930') ?>">
+<meta name="theme-color" content="<?= e($c['bg'] ?? '#070202') ?>">
 <link rel="icon" href="<?= e($base . cfg('brand.logo')) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=1">
-<style>:root{--bg:<?= e($c['bg'] ?? '#0b0930') ?>;--glow:<?= e($c['glow'] ?? '#3a2cf0') ?>;--accent:<?= e($c['accent'] ?? '#9d8cff') ?>;--cream:<?= e($c['cream'] ?? '#f3e6cf') ?>}</style>
+<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=2">
+<style>:root{--bg:<?= e($c['bg'] ?? '#070202') ?>;--glow:<?= e($c['glow'] ?? '#6b0d07') ?>;--accent:<?= e($c['accent'] ?? '#d9482c') ?>;--cream:<?= e($c['cream'] ?? '#efe2d6') ?>}</style>
 </head>
 <body class="<?= e($bodyClass) ?>">
 <?php if (demo()): ?><div class="demo-bar">modo demo · los pagos se aprueban solos</div><?php endif; ?>

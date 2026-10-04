@@ -72,10 +72,10 @@
   window.Huella = { svg: svg, draw: drawOn, rings: rings };
 
   var css = getComputedStyle(document.documentElement);
-  var cream = (css.getPropertyValue('--cream') || '#f3e6cf').trim();
-  var accent = (css.getPropertyValue('--accent') || '#9d8cff').trim();
-  var bg = (css.getPropertyValue('--bg') || '#0b0930').trim();
-  var glow = (css.getPropertyValue('--glow') || '#3a2cf0').trim();
+  var cream = (css.getPropertyValue('--cream') || '#efe2d6').trim();
+  var accent = (css.getPropertyValue('--accent') || '#d9482c').trim();
+  var bg = (css.getPropertyValue('--bg') || '#070202').trim();
+  var glow = (css.getPropertyValue('--glow') || '#6b0d07').trim();
 
   // Huella en la entrada
   document.querySelectorAll('[data-huella]').forEach(function (el) {
@@ -91,17 +91,32 @@
       c.width = 1080; c.height = 1920;
       var ctx = c.getContext('2d');
       var draw = function () {
-        var g = ctx.createRadialGradient(540, 760, 40, 540, 760, 1100);
-        g.addColorStop(0, glow); g.addColorStop(0.55, bg); g.addColorStop(1, bg);
-        ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
-        drawOn(ctx, d.share, 540, 760, 400, cream, accent);
+        ctx.fillStyle = bg; ctx.fillRect(0, 0, 1080, 1920);
+        // Eclipse: corona roja, disco negro y la huella adentro del sol
+        var co = ctx.createRadialGradient(540, 760, 300, 540, 760, 620);
+        co.addColorStop(0, accent); co.addColorStop(0.12, glow); co.addColorStop(1, bg);
+        ctx.fillStyle = co; ctx.beginPath(); ctx.arc(540, 760, 620, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(540, 760, 300, 0, Math.PI * 2); ctx.fill();
+        drawOn(ctx, d.share, 540, 760, 240, cream, accent);
         ctx.fillStyle = cream; ctx.textAlign = 'center';
+        // Quién presenta: en una o dos líneas, según entre
         ctx.font = '600 30px "Space Mono", monospace';
-        ctx.fillText((d.kicker || '').toUpperCase().split('').join(' '), 540, 230);
-        ctx.font = 'italic 150px "Instrument Serif", Georgia, serif';
-        ctx.fillText(d.headline || '', 540, 1360);
-        ctx.font = 'italic 76px "Instrument Serif", Georgia, serif';
-        ctx.fillText(d.motto || '', 540, 1470);
+        var spaced = function (s) { return s.toUpperCase().split('').join(' '); };
+        var lines = [], line = '';
+        (d.kicker || '').split(' ').forEach(function (w) {
+          var t = line ? line + ' ' + w : w;
+          if (line && ctx.measureText(spaced(t)).width > 960) { lines.push(line); line = w; } else { line = t; }
+        });
+        if (line) lines.push(line);
+        lines.forEach(function (l, i) { ctx.fillText(spaced(l), 540, 210 + i * 50); });
+        ctx.font = '170px "Instrument Serif", Georgia, serif';
+        ctx.fillText(d.headline || '', 540, 1330);
+        ctx.fillStyle = accent;
+        ctx.font = '700 38px "Space Mono", monospace';
+        ctx.fillText((d.sub || '').toUpperCase().split('').join(' '), 540, 1410);
+        ctx.fillStyle = cream;
+        ctx.font = 'italic 70px "Instrument Serif", Georgia, serif';
+        ctx.fillText(d.motto || '', 540, 1510);
         ctx.font = '600 34px "Space Mono", monospace';
         ctx.fillText((d.when || '').toUpperCase(), 540, 1600);
         ctx.globalAlpha = 0.75;
@@ -109,13 +124,13 @@
         ctx.fillText(d.number ? 'SOMOS EL Nº ' + d.number : '', 540, 1700);
         ctx.globalAlpha = 1;
         c.toBlob(function (blob) {
-          var file = new File([blob], 'somos-uno.png', { type: 'image/png' });
+          var file = new File([blob], 'the-sun.png', { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({ files: [file] }).catch(function () {});
           } else {
             var a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'somos-uno.png';
+            a.download = 'the-sun.png';
             document.body.appendChild(a); a.click(); a.remove();
           }
         }, 'image/png');

@@ -24,14 +24,15 @@ return [
     // ---------------------------------------------------------------
     'brand' => [
         'name'          => 'Somos Uno',
-        'logo'          => 'assets/logo.svg',   // Reemplazalo por tu logo real (png o svg) y cambiá el nombre acá.
+        'logo'          => 'assets/logo.svg',
+        'partner_logo'  => 'assets/melt.webp',  // logo de Melt (aparece junto al de Somos Uno). '' = no mostrar.
         'instagram'     => 'somos.uno._',
         'contact_email' => 'evo.evomusic@gmail.com',
         'colors' => [
-            'bg'     => '#0b0930',  // fondo
-            'glow'   => '#3a2cf0',  // brillo azul del centro
-            'accent' => '#9d8cff',  // detalles
-            'cream'  => '#f3e6cf',  // texto principal
+            'bg'     => '#070202',  // fondo: negro eclipse
+            'glow'   => '#6b0d07',  // corona: rojo oscuro
+            'accent' => '#d9482c',  // detalles: rojo brasa
+            'cream'  => '#efe2d6',  // texto principal
         ],
     ],
 
@@ -39,9 +40,10 @@ return [
     //  EVENTO
     // ---------------------------------------------------------------
     'event' => [
-        'title'      => 'Somos Uno × Melt Underground',
-        'kicker'     => 'somos uno × melt underground',
-        'headline'   => 'bajo tierra.',
+        'title'      => 'Somos Uno × Melt Underground presentan THE SUN · release party',
+        'kicker'     => 'somos uno × melt underground presentan',
+        'headline'   => 'THE SUN',
+        'subhead'    => 'release party',
         'date_label' => 'domingo 11·10',
         'time_label' => '18:00 a 03:00',
         'starts_at'  => '2026-10-11 18:00',     // para la cuenta regresiva
@@ -51,9 +53,17 @@ return [
         'maps_url'   => 'https://maps.google.com/?q=Laprida+1423,+Buenos+Aires',
         'genres'     => 'minimal · house · techno',
         'lineup'     => ['EVO', 'ODA', 'Sandman'],
-        'motto'      => 'somos uno.',
+        'motto'      => 'todos bajo el mismo sol.',
         'age'        => '+18 con DNI',
         'door_price' => 10000,                  // precio en puerta (solo informativo)
+    ],
+
+    // Bloque del lanzamiento en la landing. '' en title = no mostrar.
+    'release' => [
+        'label' => 'el lanzamiento',
+        'title' => 'THE SUN',
+        'text'  => 'El nuevo álbum de EVO no sale de una vez: sale de a un single. Esa noche suena el primero, '
+                 . 'en vivo y por primera vez, en el sótano de Melt. El sol se pone afuera y sale adentro.',
     ],
 
     'pillars' => [
@@ -113,7 +123,8 @@ return [
     ],
 
     'faq' => [
-        ['¿hay dress code?', 'venir.'],
+        ['¿qué es THE SUN?', 'el nuevo álbum de EVO. sale de a un single y el primero se estrena esa noche.'],
+        ['¿hay dress code?', 'negro. venir.'],
         ['¿es en un sótano?', 'sí, y suena hermoso.'],
         ['¿es una secta?', 'no, es minimal.'],
         ['¿a qué hora termina?', 'a las 3:00.'],

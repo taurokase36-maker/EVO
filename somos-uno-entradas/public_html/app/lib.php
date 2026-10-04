@@ -24,6 +24,19 @@ function cfg(string $path, $default = null)
     return $v;
 }
 
+/** Nombre del evento: "THE SUN · release party". */
+function event_name(): string
+{
+    $sub = (string) cfg('event.subhead', '');
+    return (string) cfg('event.headline', '') . ($sub !== '' ? ' · ' . $sub : '');
+}
+
+/** Con quién lo presenta: "somos uno × melt underground presentan THE SUN · release party". */
+function event_full(): string
+{
+    return trim(cfg('event.kicker', '') . ' ' . event_name());
+}
+
 /** Modo demo: lo que diga el panel (si se tocó el interruptor) o, si no, config.php. */
 function demo(): bool
 {
@@ -564,7 +577,7 @@ function mail_template(string $title, string $intro, string $link, string $butto
     $c = (array) cfg('brand.colors');
     return '<div style="background:' . e($c['bg']) . ';padding:32px 16px;font-family:Arial,sans-serif;color:' . e($c['cream']) . '">'
         . '<div style="max-width:480px;margin:0 auto">'
-        . '<p style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:' . e($c['accent']) . '">' . e(cfg('event.kicker')) . '</p>'
+        . '<p style="font-size:12px;letter-spacing:3px;text-transform:uppercase;color:' . e($c['accent']) . '">' . e(event_full()) . '</p>'
         . '<h1 style="font-family:Georgia,serif;font-style:italic;font-weight:normal;font-size:30px;margin:8px 0 16px">' . e($title) . '</h1>'
         . '<p style="font-size:15px;line-height:1.6">' . $intro . '</p>'
         . '<p style="font-size:15px;line-height:1.6">' . e(cfg('event.date_label')) . ' · ' . e(cfg('event.time_label')) . '<br>'

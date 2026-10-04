@@ -52,7 +52,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
     <header class="ticket-head">
       <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="ticket-logo">
       <div>
-        <p class="kicker"><?= e(cfg('event.kicker')) ?></p>
+        <p class="kicker"><?= e(event_full()) ?></p>
         <h1><?= e($title) ?></h1>
       </div>
     </header>
@@ -75,6 +75,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
     <button class="btn btn-solid btn-block" type="button"
       data-share="<?= e($token) ?>"
       data-kicker="<?= e(cfg('event.kicker')) ?>"
+      data-sub="<?= e((string) cfg('event.subhead', '')) ?>"
       data-headline="<?= e(cfg('event.headline')) ?>"
       data-motto="<?= e(cfg('event.motto')) ?>"
       data-when="<?= e(cfg('event.date_label') . ' · ' . cfg('event.venue')) ?>"

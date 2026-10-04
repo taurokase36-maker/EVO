@@ -25,11 +25,20 @@ $wall = approved_messages(40);
 page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
 ?>
 <header class="hero">
-  <div class="hero-glow" aria-hidden="true"></div>
   <div class="wrap hero-inner">
-    <img src="<?= e(cfg('brand.logo')) ?>" alt="<?= e(cfg('brand.name')) ?>" class="hero-logo">
+    <div class="hero-logos">
+      <img src="<?= e(cfg('brand.logo')) ?>" alt="<?= e(cfg('brand.name')) ?>" class="hero-logo">
+      <?php if (cfg('brand.partner_logo')): ?>
+        <span class="hero-x" aria-hidden="true">×</span>
+        <img src="<?= e(cfg('brand.partner_logo')) ?>" alt="<?= e(cfg('event.venue')) ?>" class="hero-logo hero-logo-partner">
+      <?php endif; ?>
+    </div>
     <p class="kicker"><?= e(cfg('event.kicker')) ?></p>
-    <h1 class="display"><?= e(cfg('event.headline')) ?></h1>
+    <div class="eclipse">
+      <div class="eclipse-disc" aria-hidden="true"></div>
+      <h1 class="display"><?= e(cfg('event.headline')) ?></h1>
+    </div>
+    <?php if (cfg('event.subhead')): ?><p class="hero-sub"><?= e(cfg('event.subhead')) ?></p><?php endif; ?>
     <p class="hero-date"><?= e(cfg('event.date_label')) ?> · <?= e(cfg('event.venue')) ?></p>
     <p class="hero-motto"><?= e(cfg('event.motto')) ?></p>
     <div class="countdown" data-start="<?= e(date('c', (int) strtotime((string) cfg('event.starts_at')))) ?>" aria-live="polite"></div>
@@ -56,6 +65,14 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <ul><?php foreach ((array) cfg('event.lineup', []) as $dj): ?><li><?= e($dj) ?></li><?php endforeach; ?></ul>
   </section>
 
+  <?php if (cfg('release.title')): ?>
+  <section class="wrap release" aria-label="Lanzamiento">
+    <span class="label"><?= e(cfg('release.label')) ?></span>
+    <h2 class="release-title"><?= e(cfg('release.title')) ?></h2>
+    <p><?= e(cfg('release.text')) ?></p>
+  </section>
+  <?php endif; ?>
+
   <section class="wrap pillars" aria-label="Concepto">
     <?php foreach ((array) cfg('pillars', []) as $i => $p): ?>
       <div class="pillar"><span class="num">0<?= $i + 1 ?></span><h3><?= e($p[0]) ?></h3><p><?= e($p[1]) ?></p></div>
@@ -76,7 +93,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
         <p class="note-empty">todavía está en blanco. sacá tu entrada y sé el primero en escribir.</p>
       <?php endif; ?>
     </div>
-    <p class="fine">Cada persona con entrada deja un mensaje. Lo vas a ver proyectado bajo tierra.</p>
+    <p class="fine">Cada persona con entrada deja un mensaje. Lo vas a ver proyectado en Melt esa noche.</p>
   </section>
 
   <section class="wrap" id="entradas">

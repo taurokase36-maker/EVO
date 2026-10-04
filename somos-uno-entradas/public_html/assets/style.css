@@ -1,4 +1,5 @@
-/* Somos Uno · Entradas. Los colores se configuran en app/config.php (brand.colors). */
+/* Somos Uno · Entradas. Los colores se configuran en app/config.php (brand.colors).
+   Estética THE SUN: eclipse, negro con corona roja. */
 :root {
   --serif: 'Instrument Serif', Georgia, serif;
   --mono: 'Space Mono', ui-monospace, monospace;
@@ -42,17 +43,32 @@ img { max-width: 100%; display: block; }
 .btn-block { width: 100%; }
 button.link { background: none; border: 0; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; }
 
-/* Hero */
-.hero { position: relative; overflow: hidden; padding: 56px 0 64px; text-align: center; }
-.hero-glow {
-  position: absolute; inset: -20% -10% auto; height: 120%; pointer-events: none;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 70%, transparent), transparent);
-  filter: blur(20px); animation: breathe 7s ease-in-out infinite;
-}
+/* Hero: eclipse */
+.hero { position: relative; overflow: hidden; padding: 48px 0 64px; text-align: center; }
 @keyframes breathe { 50% { opacity: .55; transform: scale(1.06); } }
 .hero-inner { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.hero-logo { width: 84px; height: 84px; margin-bottom: 6px; }
+.hero-logos { display: flex; align-items: center; gap: 16px; margin-bottom: 6px; }
+.hero-logo { width: 64px; height: 64px; object-fit: contain; }
+.hero-logo-partner { width: 76px; height: 76px; mix-blend-mode: screen; }  /* el fondo negro del logo desaparece */
+.hero-x { font-family: var(--mono); color: var(--soft); font-size: 18px; }
 .display { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(56px, 16vw, 120px); line-height: .95; letter-spacing: -.01em; }
+.eclipse { position: relative; width: clamp(240px, 68vw, 360px); aspect-ratio: 1; display: grid; place-items: center; margin: 28px 0 22px; }
+.eclipse::before {
+  content: ''; position: absolute; inset: -30%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, transparent 60%, color-mix(in srgb, var(--accent) 85%, transparent) 63.5%,
+    color-mix(in srgb, var(--glow) 90%, transparent) 70%, color-mix(in srgb, var(--glow) 30%, transparent) 84%, transparent 100%);
+  filter: blur(5px); animation: breathe 7s ease-in-out infinite;
+}
+.eclipse-disc {
+  position: absolute; inset: 0; border-radius: 50%; background: var(--bg);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--accent) 70%, var(--cream)), 0 0 22px 3px var(--accent);
+}
+.eclipse-disc::after {  /* anillo de diamante */
+  content: ''; position: absolute; top: 10%; right: 11%; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--cream); box-shadow: 0 0 12px 4px var(--cream), 0 0 34px 10px var(--accent);
+}
+.eclipse .display { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-style: normal; letter-spacing: .03em; font-size: clamp(60px, 17vw, 128px); white-space: nowrap; text-shadow: 0 0 24px var(--bg); }
+.hero-sub { font-family: var(--mono); font-size: 14px; letter-spacing: .5em; text-transform: uppercase; color: var(--accent); margin-right: -.5em; }
 .hero-date { font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
 .hero-motto { font-family: var(--serif); font-style: italic; font-size: 30px; line-height: 1.1; }
 .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
@@ -70,6 +86,9 @@ button.link { background: none; border: 0; color: var(--accent); font: inherit; 
 .lineup { text-align: center; margin-bottom: 48px; }
 .lineup ul { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 28px; margin-top: 12px; }
 .lineup li { font-family: var(--serif); font-size: clamp(34px, 9vw, 56px); line-height: 1.1; }
+.release { text-align: center; max-width: 620px; margin-bottom: 56px; }
+.release-title { font-family: var(--serif); font-weight: 400; font-size: clamp(44px, 11vw, 72px); letter-spacing: .04em; line-height: 1.05; margin: 8px 0 12px; }
+.release p { color: var(--soft); font-size: 18px; }
 .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 64px; }
 .pillar { border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; background: var(--panel); }
 .pillar .num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: .2em; }
@@ -190,7 +209,7 @@ td { padding: 10px 8px 10px 0; border-bottom: 1px solid var(--line); vertical-al
   .info > div { padding-right: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-glow { animation: none; }
+  .eclipse::before { animation: none; }
   html { scroll-behavior: auto; }
 }
 

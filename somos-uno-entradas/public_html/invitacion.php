@@ -40,7 +40,7 @@ page_start('Invitación · ' . cfg('event.title'), 'page-msg');
 ?>
 <main class="wrap narrow msg">
   <img src="<?= e(cfg('brand.logo')) ?>" alt="<?= e(cfg('brand.name')) ?>" class="msg-logo-img">
-  <p class="kicker"><?= e(cfg('event.kicker')) ?></p>
+  <p class="kicker"><?= e(event_full()) ?></p>
   <h1>te invita <?= e($inv['owner']) ?></h1>
   <p class="lead"><?= e(cfg('event.date_label')) ?> · <?= e(cfg('event.venue')) ?></p>
   <p class="muted"><?= e(cfg('invitations.rules')) ?></p>
