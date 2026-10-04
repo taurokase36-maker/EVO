@@ -1,0 +1,188 @@
+<!doctype html>
+<!-- THE SUN · teaser para historias (1080x1920).
+     Abrilo en el navegador para verlo en loop. Para exportar el MP4: node render.js
+     ?t=6.5 muestra un solo cuadro; ?seed=otra cambia la forma de la huella. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE SUN · teaser</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; }
+  body { display: grid; place-items: center; }
+  canvas { height: 100vh; max-width: 100vw; aspect-ratio: 9 / 16; display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+(function () {
+  'use strict';
+  var W = 1080, H = 1920, DURATION = 12;
+  var CX = 540, CY = 880, R = 330;              // el sol: centro y radio. Abajo queda libre para el logo.
+  var C = { bg: '#070202', glow: '#6b0d07', accent: '#d9482c', cream: '#efe2d6' };
+  var params = new URLSearchParams(location.search);
+  var SEED = params.get('seed') || 'the-sun';
+
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+
+  // ---------- huella (mismo algoritmo que la web de entradas) ----------
+  function seedFrom(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function rings(key, count) {
+    var r = rng(seedFrom(key));
+    var lobes = 2 + Math.floor(r() * 5), twist = (r() - 0.5) * 1.6, amp = 0.05 + r() * 0.09;
+    var phase = r() * Math.PI * 2, wobble = 3 + Math.floor(r() * 6), out = [];
+    for (var k = 0; k < count; k++) {
+      var base = 0.12 + (k / (count - 1)) * 0.82, pts = [];
+      for (var i = 0; i <= 240; i++) {
+        var a = (i / 240) * Math.PI * 2;
+        var d = base * (1 + amp * Math.sin(lobes * a + phase + twist * k * 0.35) + amp * 0.45 * Math.sin(wobble * a - phase * 1.7 + k * 0.5));
+        pts.push([Math.cos(a) * d, Math.sin(a) * d]);
+      }
+      out.push(pts);
+    }
+    return out;
+  }
+  var RINGS = rings(SEED, 18);
+
+  // ---------- utilidades ----------
+  function clamp(x) { return Math.max(0, Math.min(1, x)); }
+  function prog(t, a, b) { return clamp((t - a) / (b - a)); }
+  function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
+  function easeInOut(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+  function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+
+  // Rayos de la corona: fijos, giran despacio
+  var RAYS = (function () { var r = rng(seedFrom('rays')), out = []; for (var i = 0; i < 140; i++) out.push({ a: r() * Math.PI * 2, len: 0.25 + r() * 0.9, w: 1 + r() * 3, o: 0.15 + r() * 0.5, sp: (r() - 0.5) * 0.04 }); return out; })();
+
+  // Grano: tres capas pre-calculadas que se alternan
+  var GRAIN = [0, 1, 2].map(function (s) {
+    var g = document.createElement('canvas'); g.width = 540; g.height = 960;
+    var gx = g.getContext('2d'), img = gx.createImageData(540, 960), r = rng(seedFrom('grain' + s));
+    for (var i = 0; i < img.data.length; i += 4) { var v = r() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+    gx.putImageData(img, 0, 0); return g;
+  });
+
+  // ---------- un cuadro ----------
+  function render(t) {
+    var breathe = Math.sin(t * 1.3) * 0.5 + 0.5;
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+
+    // 1. Resplandor ambiente
+    var amb = easeInOut(prog(t, 1.2, 6)) * (0.42 + 0.12 * breathe);
+    var g = ctx.createRadialGradient(CX, CY, R * 0.8, CX, CY, 1150);
+    g.addColorStop(0, rgba(C.glow, amb)); g.addColorStop(1, rgba(C.glow, 0));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    // 2. Rayos de la corona
+    var rayA = easeOut(prog(t, 2.2, 7));
+    if (rayA > 0) {
+      ctx.globalCompositeOperation = 'lighter';
+      RAYS.forEach(function (ray) {
+        var a = ray.a + t * ray.sp + t * 0.015;
+        var len = R * (1 + ray.len * rayA * (0.85 + 0.15 * Math.sin(t * 0.9 + ray.a * 5)));
+        var x1 = CX + Math.cos(a) * R, y1 = CY + Math.sin(a) * R, x2 = CX + Math.cos(a) * len, y2 = CY + Math.sin(a) * len;
+        var lg = ctx.createLinearGradient(x1, y1, x2, y2);
+        lg.addColorStop(0, rgba(C.accent, ray.o * rayA * 0.55)); lg.addColorStop(1, rgba(C.glow, 0));
+        ctx.strokeStyle = lg; ctx.lineWidth = ray.w; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      });
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // 3. Corona
+    var cor = easeOut(prog(t, 1.6, 5.5)) * (0.85 + 0.15 * breathe);
+    if (cor > 0) {
+      var cg = ctx.createRadialGradient(CX, CY, R * 0.97, CX, CY, R * (1.25 + 0.55 * cor));
+      cg.addColorStop(0, rgba(C.accent, 0.95 * cor)); cg.addColorStop(0.16, rgba(C.glow, 0.85 * cor)); cg.addColorStop(1, rgba(C.glow, 0));
+      ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(CX, CY, R * 2, 0, Math.PI * 2); ctx.fill();
+    }
+
+    // 4. Disco negro
+    ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(CX, CY, R, 0, Math.PI * 2); ctx.fill();
+
+    // 5. Borde: se dibuja en un giro y queda brillando
+    var rim = easeInOut(prog(t, 0.5, 2.6));
+    if (rim > 0) {
+      var start = -Math.PI / 2;
+      ctx.save();
+      ctx.shadowColor = C.accent; ctx.shadowBlur = 28;
+      ctx.strokeStyle = rgba(C.cream, 0.55 + 0.35 * rim); ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.arc(CX, CY, R, start, start + Math.PI * 2 * rim); ctx.stroke();
+      if (rim < 1) {   // cabeza de luz que va trazando el círculo
+        var hx = CX + Math.cos(start + Math.PI * 2 * rim) * R, hy = CY + Math.sin(start + Math.PI * 2 * rim) * R;
+        ctx.fillStyle = C.cream; ctx.shadowBlur = 40; ctx.beginPath(); ctx.arc(hx, hy, 4, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // 6. Huella: los anillos aparecen de a uno, del centro hacia afuera
+    var S = R * 0.78, rot = t * 0.045;
+    RINGS.forEach(function (pts, k) {
+      var t0 = 3.0 + k * 0.27, p = easeInOut(prog(t, t0, t0 + 1.1));
+      if (p <= 0) return;
+      var n = Math.max(2, Math.round(p * (pts.length - 1)));
+      var off = Math.floor((k * 37) % pts.length);     // cada anillo empieza a trazarse en otro ángulo
+      var s = S * (1 + 0.018 * Math.sin(t * 1.1 + k * 0.4));
+      var isAccent = k % 4 === 3;
+      ctx.save();
+      ctx.translate(CX, CY); ctx.rotate(rot * (1 + k * 0.04));   // giran juntos, apenas desfasados
+      ctx.beginPath();
+      for (var i = 0; i < n; i++) {
+        var q = pts[(off + i) % (pts.length - 1)];
+        i ? ctx.lineTo(q[0] * s, q[1] * s) : ctx.moveTo(q[0] * s, q[1] * s);
+      }
+      if (p >= 1) ctx.closePath();
+      ctx.globalAlpha = (0.3 + 0.7 * (k / RINGS.length)) * Math.min(1, p * 2.5);
+      ctx.strokeStyle = isAccent ? C.accent : C.cream;
+      ctx.lineWidth = isAccent ? 2.6 : 1.6;
+      if (isAccent) { ctx.shadowColor = C.accent; ctx.shadowBlur = 14; }
+      ctx.stroke();
+      ctx.restore();
+    });
+    ctx.globalAlpha = 1;
+
+    // 7. Anillo de diamante: destello arriba a la derecha
+    var fl = prog(t, 8.2, 8.6), fd = prog(t, 8.6, 10);
+    var flash = fl * (1 - fd * 0.75);
+    if (flash > 0) {
+      var fa = -Math.PI / 4.2, fx = CX + Math.cos(fa) * R, fy = CY + Math.sin(fa) * R;
+      var size = 30 + 230 * fl * (1 - fd * 0.6) + 10 * breathe;
+      ctx.globalCompositeOperation = 'lighter';
+      var fg = ctx.createRadialGradient(fx, fy, 0, fx, fy, size);
+      fg.addColorStop(0, rgba('#ffffff', flash)); fg.addColorStop(0.12, rgba(C.cream, 0.8 * flash));
+      fg.addColorStop(0.35, rgba(C.accent, 0.45 * flash)); fg.addColorStop(1, rgba(C.glow, 0));
+      ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(fx, fy, size, 0, Math.PI * 2); ctx.fill();
+      // destello horizontal tipo lente
+      var sw = 520 * flash;
+      var sg = ctx.createLinearGradient(fx - sw, fy, fx + sw, fy);
+      sg.addColorStop(0, rgba(C.accent, 0)); sg.addColorStop(0.5, rgba(C.cream, 0.7 * flash)); sg.addColorStop(1, rgba(C.accent, 0));
+      ctx.fillStyle = sg; ctx.fillRect(fx - sw, fy - 1.5, sw * 2, 3);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // 8. Viñeta
+    var vg = ctx.createRadialGradient(CX, CY, 500, CX, H / 2, 1250);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.75)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+
+    // 9. Fundido de entrada y grano
+    var fadeIn = prog(t, 0, 0.6);
+    if (fadeIn < 1) { ctx.fillStyle = 'rgba(0,0,0,' + (1 - fadeIn) + ')'; ctx.fillRect(0, 0, W, H); }
+    ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.045;
+    ctx.drawImage(GRAIN[Math.floor(t * 24) % 3], 0, 0, W, H);
+    ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  }
+
+  window.DURATION = DURATION;
+  window.renderFrame = render;
+
+  if (params.has('t')) { render(parseFloat(params.get('t'))); return; }
+  if (params.has('export')) return;     // render.js controla los cuadros
+  var t0 = performance.now();
+  (function loop(now) { render(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0);
+})();
+</script>
+</body>
+</html>
