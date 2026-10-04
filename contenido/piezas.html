@@ -23,6 +23,7 @@
   var M = Motor, C = M.C;
   var NAME = 'SOLARIS', SLOGAN = 'FOR THE SOLAR PEOPLE', SLOGAN_ES = 'para la gente del sol';
   var GUEST = 'DAMIAN SANTOS', GUEST_DETAIL = 'saxo en vivo sobre base electrónica';
+  var LINEUP = [['18:00', 'COCO'], ['19:30', 'GREMORA B2B SANDMAN'], ['21:00', 'ODA'], ['22:30', 'EVO + DAMIAN'], ['00:00', 'LUCILA'], ['01:30', 'RUF']];
   var RELEASE = 'y esa noche, el estreno del primer single de THE SUN';
   var italic = function (px) { return 'italic ' + px + 'px "Cormorant Garamond"'; };
   // textos chicos en Space Mono (acompaña al logo en Major Mono)
@@ -101,17 +102,18 @@
     }],
     '04-line-up-story': [STORY, function () {
       M.background();
-      M.wall({ top: 470, bot: 1230, blur: 6, people: [
-        { x: 260, y: 1200, h: 580, seed: 21 }, { x: 540, y: 1210, h: 660, seed: 22 }, { x: 820, y: 1200, h: 590, seed: 23 }] });
-      M.vignette(0.55);
-      M.text('LINE UP', 540, 280, cinzel(28, 600), C.accent, { spacing: 12 });
-      M.wordmark(NAME, 540, 385, 100, 800);
-      [['EVO', 260], ['ODA', 540], ['SANDMAN', 820]].forEach(function (d) { M.title(d[0], d[1], 1325, 56, 250, { spacing: 6 }); });
-      M.text('INVITADO ESPECIAL', 540, 1400, cinzel(22, 600), C.accent, { spacing: 8 });
-      M.title(GUEST, 540, 1460, 54, 800, { spacing: 5 });
-      M.text(GUEST_DETAIL, 540, 1505, italic(32), soft(0.75));
-      M.text('XI · X  ·  XVIII — III  ·  minimal · house · techno', 540, 1562, cinzel(22), soft(0.7), { spacing: 3 });
-      M.credits(1610, 22);
+      M.wall({ top: 400, bot: 1000, blur: 6, people: [
+        { x: 190, y: 980, h: 430, seed: 31 }, { x: 330, y: 990, h: 470, seed: 32 }, { x: 470, y: 985, h: 450, seed: 33 },
+        { x: 610, y: 990, h: 480, seed: 34 }, { x: 750, y: 985, h: 455, seed: 35 }, { x: 890, y: 980, h: 435, seed: 36 }] });
+      M.vignette(0.5);
+      M.text(NAME + '  ·  ' + SLOGAN, 540, 232, cinzel(22, 600), C.accent, { spacing: 6 });
+      M.title('line up', 540, 330, 92, 700);
+      LINEUP.forEach(function (l, i) {
+        var y = 1105 + i * 82;
+        M.text(l[0], 400, y, cinzel(26, 600), C.accent, { align: 'right', spacing: 2 });
+        M.title(l[1], 430, y + 4, 46, 600, { align: 'left', spacing: 2 });
+      });
+      M.text('domingo XI · X  ·  Melt Underground', 540, 1610, italic(36), soft(0.75));
     }],
     '10-invitado-story': [STORY, function () {
       M.background();

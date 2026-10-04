@@ -52,9 +52,17 @@ return [
         'address'    => 'Laprida 1423, Recoleta',
         'maps_url'   => 'https://maps.google.com/?q=Laprida+1423,+Buenos+Aires',
         'genres'     => 'minimal · house · techno',
-        'lineup'     => ['EVO', 'ODA', 'Sandman'],
+        // Line up oficial: [horario, artista]
+        'lineup'     => [
+            ['18:00 — 19:30', 'COCO'],
+            ['19:30 — 21:00', 'GREMORA B2B SANDMAN'],
+            ['21:00 — 22:30', 'ODA'],
+            ['22:30 — 00:00', 'EVO + DAMIAN'],
+            ['00:00 — 01:30', 'LUCILA'],
+            ['01:30 — 03:00', 'RUF'],
+        ],
         // Invitado especial: aparece debajo del line up. '' en name = no mostrar.
-        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica'],
+        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica, junto a EVO (22:30)'],
         'motto'      => 'para la gente del sol.',
         'age'        => '+18 con DNI',
         'door_price' => 10000,                  // precio en puerta (solo informativo)
@@ -131,6 +139,10 @@ return [
         'evo'     => 'EVO',
         'oda'     => 'ODA',
         'sandman' => 'Sandman',
+        'coco'    => 'COCO',
+        'gremora' => 'Gremora',
+        'lucila'  => 'Lucila',
+        'ruf'     => 'RUF',
     ],
 
     'faq' => [

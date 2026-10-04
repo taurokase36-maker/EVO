@@ -26,8 +26,8 @@ Historias 1080×1920 · posts 1080×1350. En las historias con entradas, sumá e
 > Domingo 11 de octubre, de 18:00 a 03:00, en el sótano de Melt Underground.
 > Entrás cuando el sol se está poniendo. Salís a las 3 con otra luz.
 >
-> Line up: EVO · ODA · Sandman
-> Invitado especial: Damian Santos, saxo en vivo sobre base electrónica.
+> Line up:
+> 18:00 COCO · 19:30 GREMORA b2b SANDMAN · 21:00 ODA · 22:30 EVO + DAMIAN (saxo en vivo) · 00:00 LUCILA · 01:30 RUF
 > Y un detalle: esa noche estreno el primer single de THE SUN.
 >
 > Early bird a $5.000 hasta el viernes. Link en la bio.
@@ -53,7 +53,7 @@ Texto opcional encima: *"adentro no se ve el sol. se escucha."*
 Texto: *"mañana a las 23:59 se tapa el sol"* + sticker de link.
 
 ## Vie 9 · line up (historia)
-Arrobar a ODA, Sandman y Damian Santos. Repost de la early bird con **cuenta regresiva** hasta las 23:59.
+Arrobar a COCO, Gremora, Sandman, ODA, Damian Santos, Lucila y RUF. Repost de la early bird con **cuenta regresiva** hasta las 23:59.
 
 ## Sáb 10 · luna nueva (historia)
 > Hoy hay luna nueva: la luna pasa entre la tierra y el sol.

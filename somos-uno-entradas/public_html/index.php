@@ -62,7 +62,9 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
 
   <section class="wrap lineup" aria-label="Line up">
     <span class="label">line up</span>
-    <ul><?php foreach ((array) cfg('event.lineup', []) as $dj): ?><li><?= e($dj) ?></li><?php endforeach; ?></ul>
+    <ul class="sets"><?php foreach ((array) cfg('event.lineup', []) as $dj): ?>
+      <?php if (is_array($dj)): ?><li><span class="set-time"><?= e($dj[0]) ?></span><?= e($dj[1]) ?></li><?php else: ?><li><?= e($dj) ?></li><?php endif; ?>
+    <?php endforeach; ?></ul>
     <?php if (cfg('event.guest.name')): ?>
       <div class="guest">
         <span class="label"><?= e(cfg('event.guest.label')) ?></span>

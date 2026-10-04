@@ -7,7 +7,8 @@
 - [ ] **Amigo de visuales:** mandarle el texto del concepto, el teaser y las láminas (`propuestas/caverna/`).
 - [ ] **Contenido de la semana:** publicar según el calendario de `contenido/copys.md` (piezas en `contenido/semana/`).
 - [ ] **Amigo de visuales:** pasarle también las piezas de la semana y avisarle del cambio de nombre a SOLARIS.
-- [ ] **Damian Santos:** confirmar cómo escribe su nombre (¿Damián con tilde?) y su usuario de Instagram para arrobarlo. Coordinar el momento del saxo dentro de tu set.
+- [ ] **Damian Santos:** confirmar cómo escribe su nombre (¿Damián con tilde?) y su usuario de Instagram para arrobarlo.
+- [ ] **Line up:** pedir los usuarios de Instagram de COCO, Gremora, Sandman, ODA, Lucila y RUF para arrobarlos. Mandarles su link de embajador (`tudominio.com/?ref=nombre`).
 
 ## Web de entradas (Hostinger) · paso a paso en `GUIA-WEB.md`
 - [ ] Crear los dos links de pago en Mercado Pago (early bird y general) y pegarlos en `config.php`.
