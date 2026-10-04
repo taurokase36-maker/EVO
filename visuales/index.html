@@ -49,7 +49,7 @@
   #bpm { width: 70px; background: transparent; color: var(--cream); border: 1px solid rgba(239,226,214,.35); border-radius: 8px; font: 700 15px 'Space Mono', monospace; text-align: center; padding: 5px 4px; }
   .dot-midi { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #555; margin-right: 6px; vertical-align: middle; }
   .dot-midi.ok { background: #4ade80; }
-  #ajustes { right: 12px; bottom: 150px; width: 300px; transition: opacity .35s, transform .35s; }
+  #ajustes { right: 12px; bottom: 190px; width: 320px; max-height: calc(100vh - 230px); overflow: auto; transition: opacity .35s, transform .35s; }
   #ajustes label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 6px 0; font-size: 12px; }
   #ajustes input[type=range] { width: 150px; accent-color: #d9482c; }
 </style>
@@ -98,6 +98,25 @@
     <button class="btn" id="b-help">?</button>
     <button class="btn" id="b-hide" title="esconder los controles (H para volver)">esconder</button>
   </div>
+  <div class="row">
+    <span class="lbl">textos</span>
+    <button class="btn" data-action="txtEvo">evo</button>
+    <button class="btn" data-action="txtOda">oda</button>
+    <button class="btn" data-action="txtSandman">sandman</button>
+    <button class="btn" data-action="txtDamian">damian santos</button>
+    <button class="btn" data-action="txtSun">the sun</button>
+    <button class="btn" data-action="txtSolar">for the solar people</button>
+    <span class="sp"></span>
+    <span class="lbl">fx</span>
+    <button class="btn" data-action="prev">◀</button>
+    <button class="btn" data-action="next">▶</button>
+    <button class="btn" data-action="mirror">espejo</button>
+    <button class="btn" data-action="freeze">congelar</button>
+    <button class="btn" data-action="half">pulso ½</button>
+    <button class="btn" data-action="double">pulso ×2</button>
+    <button class="btn" data-action="strobeHold" title="mantené apretado">strobe</button>
+    <button class="btn" data-action="resetFx">reset fx</button>
+  </div>
 </div>
 <div id="ajustes" class="panel hidden"></div>
 <div id="help" class="panel hidden">
@@ -110,18 +129,28 @@
   <p><kbd>F</kbd> flash · <kbd>B</kbd> blackout · <kbd>L</kbd> logo encima</p>
   <p><kbd>D</kbd> drop: en "tránsito" salta a la totalidad del eclipse</p>
   <p><kbd>A</kbd> automático: cambia de escena cada 16 compases</p>
+  <p><kbd>N</kbd><kbd>P</kbd> escena siguiente / anterior · <kbd>E</kbd> espejo · <kbd>C</kbd> congelar</p>
+  <p><kbd>X</kbd> strobe mientras lo mantenés · <kbd>R</kbd> reset de efectos</p>
+  <p><kbd>6</kbd>…<kbd>0</kbd> textos: evo · oda · sandman · damian santos · the sun · <kbd>O</kbd> for the solar people · <kbd>-</kbd> sacar texto</p>
   <p><kbd>Enter</kbd> pantalla completa · <kbd>H</kbd> esconder/mostrar controles · <kbd>M</kbd> mapeo MIDI</p>
   <p>Los controles de abajo se esconden solos cuando no movés el mouse. Movelo para que vuelvan.</p>
   <p><kbd>Q</kbd> calidad baja/alta (si la compu va lenta)</p>
-  <p style="margin-top:10px;color:rgba(239,226,214,.6)">K2 (de fábrica): faders 1–4 = brillo, pulso, fuego, logo · perillas de arriba = velocidad, grano, sombras, fundido. Los botones se asignan en <kbd>M</kbd>.</p>
+  <p style="margin-top:10px;color:rgba(239,226,214,.6)">K2 de fábrica: faders = brillo, pulso, fuego, logo · perillas fila 1 = velocidad, grano, sombras, fundido · fila 2 = zoom, color, estela, golpe · fila 3 = anillos, gente, glitch, strobe · encoders 1–3 = rotación, BPM fino, tamaño de corona. Los botones se asignan en <kbd>M</kbd>.</p>
 </div>
 <div id="midi" class="panel hidden">
   <h2>mapeo midi</h2>
   <p id="midi-status">buscando controladores…</p>
   <p style="color:rgba(239,226,214,.6)">Tocá <b>aprender</b> y mové el fader, la perilla o el botón del K2. Se guarda solo en este navegador.</p>
+  <div class="row" style="margin:6px 0 10px">
+    <button id="midi-seq">asignar todos los botones en orden</button>
+    <button id="midi-skip">saltear</button>
+    <span id="midi-seqinfo" style="color:#d9482c"></span>
+  </div>
   <table id="midi-table"></table>
   <div class="row">
-    <button id="midi-reset">volver a la configuración de fábrica</button>
+    <button id="midi-export">guardar mapeo en archivo</button>
+    <label class="btn" style="display:inline-block">cargar mapeo<input id="midi-import" type="file" accept=".json,application/json" hidden></label>
+    <button id="midi-reset">configuración de fábrica</button>
     <button id="midi-close">cerrar (M)</button>
   </div>
 </div>

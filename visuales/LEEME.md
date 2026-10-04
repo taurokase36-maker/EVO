@@ -23,46 +23,43 @@ Si cambiás el código, regeneralo con `python3 visuales/empaquetar.py` (actuali
 | 4 | **solaris** | El logo con la O eclipsada, "for the solar people" y el logo de Somos Uno |
 | 5 | **grabado** | Todo el cuadro como un grabado de líneas que respira con el beat |
 
-## Teclado
-| Tecla | Acción |
-|---|---|
-| `Espacio` | **tap tempo**: tocá 4 veces en el beat |
-| `S` | **sync**: el próximo golpe es el 1 del compás (apretalo en el 1) |
-| `↑` `↓` | BPM ±0,5 |
-| `D` | **drop**: salta al anillo de diamante y la totalidad (ideal para el drop del track) |
-| `F` | flash |
-| `B` | blackout (fundido a negro, de nuevo para volver) |
-| `L` | logo SOLARIS encima de cualquier escena |
-| `A` | automático: cambia de escena cada 16 compases |
-| `Q` | calidad baja o alta (si la compu va lenta) |
-| `H` | ayuda y estado (BPM, escena, MIDI) |
-| `M` | mapeo MIDI |
+## Controles
 
-**MIDI clock:** si tu software de DJ manda MIDI clock a esa compu, las visuales toman el BPM solas (el estado muestra "MIDI clock").
+Todo está en la **barra de abajo** (aparece al mover el mouse), en el teclado y en el K2.
+
+| Grupo | En la barra | Tecla |
+|---|---|---|
+| Escenas | 1 a 5, ◀ ▶ | `1`…`5`, `N` `P` |
+| Tempo | −, BPM (se puede escribir), +, tap, sync · 1 | `↑` `↓`, `Espacio`, `S` |
+| Efectos | drop, flash, blackout, logo, auto | `D` `F` `B` `L` `A` |
+| FX | espejo (2 o 4 lados), congelar, pulso ½, pulso ×2, strobe (mientras lo apretás), reset fx | `E` `C` · `X` (mantener) · `R` |
+| Textos | evo, oda, sandman, damian santos, the sun, for the solar people (un toque lo muestra, otro lo saca) | `6` `7` `8` `9` `0` `O` · `-` saca |
+| Sistema | ajustes (todos los sliders), midi, calidad baja, pantalla completa, ?, esconder | `M` `Q` `Enter` `H` |
+
+**Ajustes** (sliders, faders o perillas): brillo, pulso, fuego/corona, logo encima, velocidad, grano, sombras, fundido entre escenas, zoom, color (de carmesí a oro), estela, golpe de cámara en el beat, anillos de la huella, gente en la pared, glitch, strobe al tempo (negras, corcheas o semicorcheas), rotación y tamaño de la corona.
+
+**MIDI clock:** si tu software de DJ manda MIDI clock a esa compu, las visuales toman el BPM solas.
 
 ## Xone:K2
 
-**De fábrica ya funcionan los faders y la fila de perillas de arriba** (en la capa 1, la roja):
+**Configuración de fábrica** (capa 1, la roja; cualquier canal):
 
 | Control del K2 | Función |
 |---|---|
-| Fader 1 | brillo general (abajo = negro) |
-| Fader 2 | cuánto pulsa con el beat |
-| Fader 3 | fuego / corona |
-| Fader 4 | logo encima |
-| Perilla 1 (fila de arriba) | velocidad de giro y de baile |
-| Perilla 2 | grano |
-| Perilla 3 | sombras más suaves o más duras |
-| Perilla 4 | duración del fundido entre escenas |
+| Faders 1–4 | brillo · pulso · fuego/corona · logo encima |
+| Perillas, fila 1 | velocidad · grano · sombras · fundido |
+| Perillas, fila 2 | zoom · color · estela · golpe de cámara |
+| Perillas, fila 3 | anillos · gente en la pared · glitch · strobe |
+| Encoders de arriba 1–3 | rotación (sin tope) · BPM fino (±0,1 por paso) · tamaño de la corona |
 
-**Los botones se asignan una vez (2 minutos):**
-1. Tocá **midi** en la barra de abajo (o `M`). Arriba tiene que decir "conectado: XONE:K2", y en la barra el punto de midi se pone verde.
-2. En la fila de una función, tocá **aprender** y apretá el botón del K2 que quieras. Queda guardado en ese Chrome.
-3. Sugerencia: los 4 botones de una fila para las escenas 1 a 4, y otra fila para escena 5, **drop**, **flash** y **tap**. Si te sobra, **blackout** y **sync**.
+**Botones (2 minutos):** tocá **midi** → **asignar todos los botones en orden** y apretá los botones del K2 uno tras otro. El panel te dice qué función toca en cada paso; **saltear** pasa a la siguiente. Orden: escenas 1–5, tap, sync, flash, blackout, logo, drop, auto, BPM +, BPM −, calidad, siguiente, anterior, espejo, congelar, pulso ½, pulso ×2, strobe, reset fx, los seis textos y sacar texto. También podés asignar uno solo con **aprender**.
 
-Con las escenas asignadas a botones, **se prende la luz del botón de la escena activa**.
+- El **strobe** funciona mientras mantenés apretado el botón.
+- Con las escenas asignadas, **se prende la luz del botón de la escena activa**.
+- Cualquier función se puede pasar a otro control con **aprender**. En las perillas, el botón **perilla / encoder** cambia el modo: *encoder* es para las perillas sin fin, que mandan pasos en lugar de una posición.
+- **Guardar mapeo en archivo** baja un `.json`. Con **cargar mapeo** lo usás en otra compu (por ejemplo, la de tu amigo) sin volver a asignar todo.
 
-**Si algún fader o perilla no responde:** asignalo con *aprender* igual que los botones. Pasa si el K2 está en otra capa o se cambió su configuración. Los **encoders** (las perillas infinitas de arriba de todo) mandan valores relativos: mejor usá faders y perillas comunes.
+**Si algún control no responde:** asignalo con *aprender*. Pasa si el K2 está en otra capa o se cambió su configuración.
 
 **Si el K2 también controla tu software de DJ:** en Mac, Chrome y el software pueden usarlo a la vez. En **Windows** suele poder usarlo **un solo programa por vez**. Lo más simple es un K2 para las visuales enchufado a la compu del proyector.
 

@@ -131,7 +131,7 @@
   #bpm { width: 70px; background: transparent; color: var(--cream); border: 1px solid rgba(239,226,214,.35); border-radius: 8px; font: 700 15px 'Space Mono', monospace; text-align: center; padding: 5px 4px; }
   .dot-midi { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #555; margin-right: 6px; vertical-align: middle; }
   .dot-midi.ok { background: #4ade80; }
-  #ajustes { right: 12px; bottom: 150px; width: 300px; transition: opacity .35s, transform .35s; }
+  #ajustes { right: 12px; bottom: 190px; width: 320px; max-height: calc(100vh - 230px); overflow: auto; transition: opacity .35s, transform .35s; }
   #ajustes label { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 6px 0; font-size: 12px; }
   #ajustes input[type=range] { width: 150px; accent-color: #d9482c; }
 </style>
@@ -180,6 +180,25 @@
     <button class="btn" id="b-help">?</button>
     <button class="btn" id="b-hide" title="esconder los controles (H para volver)">esconder</button>
   </div>
+  <div class="row">
+    <span class="lbl">textos</span>
+    <button class="btn" data-action="txtEvo">evo</button>
+    <button class="btn" data-action="txtOda">oda</button>
+    <button class="btn" data-action="txtSandman">sandman</button>
+    <button class="btn" data-action="txtDamian">damian santos</button>
+    <button class="btn" data-action="txtSun">the sun</button>
+    <button class="btn" data-action="txtSolar">for the solar people</button>
+    <span class="sp"></span>
+    <span class="lbl">fx</span>
+    <button class="btn" data-action="prev">◀</button>
+    <button class="btn" data-action="next">▶</button>
+    <button class="btn" data-action="mirror">espejo</button>
+    <button class="btn" data-action="freeze">congelar</button>
+    <button class="btn" data-action="half">pulso ½</button>
+    <button class="btn" data-action="double">pulso ×2</button>
+    <button class="btn" data-action="strobeHold" title="mantené apretado">strobe</button>
+    <button class="btn" data-action="resetFx">reset fx</button>
+  </div>
 </div>
 <div id="ajustes" class="panel hidden"></div>
 <div id="help" class="panel hidden">
@@ -192,18 +211,28 @@
   <p><kbd>F</kbd> flash · <kbd>B</kbd> blackout · <kbd>L</kbd> logo encima</p>
   <p><kbd>D</kbd> drop: en "tránsito" salta a la totalidad del eclipse</p>
   <p><kbd>A</kbd> automático: cambia de escena cada 16 compases</p>
+  <p><kbd>N</kbd><kbd>P</kbd> escena siguiente / anterior · <kbd>E</kbd> espejo · <kbd>C</kbd> congelar</p>
+  <p><kbd>X</kbd> strobe mientras lo mantenés · <kbd>R</kbd> reset de efectos</p>
+  <p><kbd>6</kbd>…<kbd>0</kbd> textos: evo · oda · sandman · damian santos · the sun · <kbd>O</kbd> for the solar people · <kbd>-</kbd> sacar texto</p>
   <p><kbd>Enter</kbd> pantalla completa · <kbd>H</kbd> esconder/mostrar controles · <kbd>M</kbd> mapeo MIDI</p>
   <p>Los controles de abajo se esconden solos cuando no movés el mouse. Movelo para que vuelvan.</p>
   <p><kbd>Q</kbd> calidad baja/alta (si la compu va lenta)</p>
-  <p style="margin-top:10px;color:rgba(239,226,214,.6)">K2 (de fábrica): faders 1–4 = brillo, pulso, fuego, logo · perillas de arriba = velocidad, grano, sombras, fundido. Los botones se asignan en <kbd>M</kbd>.</p>
+  <p style="margin-top:10px;color:rgba(239,226,214,.6)">K2 de fábrica: faders = brillo, pulso, fuego, logo · perillas fila 1 = velocidad, grano, sombras, fundido · fila 2 = zoom, color, estela, golpe · fila 3 = anillos, gente, glitch, strobe · encoders 1–3 = rotación, BPM fino, tamaño de corona. Los botones se asignan en <kbd>M</kbd>.</p>
 </div>
 <div id="midi" class="panel hidden">
   <h2>mapeo midi</h2>
   <p id="midi-status">buscando controladores…</p>
   <p style="color:rgba(239,226,214,.6)">Tocá <b>aprender</b> y mové el fader, la perilla o el botón del K2. Se guarda solo en este navegador.</p>
+  <div class="row" style="margin:6px 0 10px">
+    <button id="midi-seq">asignar todos los botones en orden</button>
+    <button id="midi-skip">saltear</button>
+    <span id="midi-seqinfo" style="color:#d9482c"></span>
+  </div>
   <table id="midi-table"></table>
   <div class="row">
-    <button id="midi-reset">volver a la configuración de fábrica</button>
+    <button id="midi-export">guardar mapeo en archivo</button>
+    <label class="btn" style="display:inline-block">cargar mapeo<input id="midi-import" type="file" accept=".json,application/json" hidden></label>
+    <button id="midi-reset">configuración de fábrica</button>
     <button id="midi-close">cerrar (M)</button>
   </div>
 </div>
@@ -587,8 +616,12 @@
   // ---------- parámetros (0..1) que se controlan con faders y perillas ----------
   var PARAMS = [
     ['master', 'brillo', 1], ['pulse', 'pulso', 0.7], ['glow', 'fuego / corona', 0.7], ['logo', 'logo encima', 0],
-    ['speed', 'velocidad', 0.5], ['grain', 'grano', 0.3], ['shadow', 'sombras', 0.5], ['fade', 'fundido entre escenas', 0.3]
+    ['speed', 'velocidad', 0.5], ['grain', 'grano', 0.3], ['shadow', 'sombras', 0.5], ['fade', 'fundido entre escenas', 0.3],
+    ['zoom', 'zoom', 0.5], ['temp', 'color (rojo ↔ oro)', 0.5], ['trail', 'estela', 0], ['punch', 'golpe de cámara', 0.3],
+    ['rings', 'anillos de la huella', 1], ['crowd', 'gente en la pared', 0.6], ['glitch', 'glitch', 0], ['strobe', 'strobe (velocidad)', 0],
+    ['rotate', 'rotación', 0.5], ['corona', 'tamaño de la corona', 0.5]
   ];
+  var WRAP = { rotate: true };   // con encoder, la rotación da vueltas sin tope
   var P = {}; PARAMS.forEach(function (p) { P[p[0]] = p[2]; });
 
   var SCENES = [
@@ -601,13 +634,14 @@
 
   var st = {
     scene: 0, prev: -1, fadeStart: -10, bpm: 127, beat0: now(), flash: 0, blackout: false, black: 0, logoOn: false,
-    transitBeat: 0, auto: false, autoNext: 0, taps: [], clock: [], clockAt: 0
+    transitBeat: 0, auto: false, autoNext: 0, taps: [], clock: [], clockAt: 0,
+    mirror: 0, freeze: false, tempoMul: 1, strobeHold: false, text: null, textAt: 0
   };
   function now() { return performance.now() / 1000; }
 
   // ---------- tiempo musical ----------
   function beatInfo(t) {
-    var b = (t - st.beat0) * st.bpm / 60, n = Math.floor(b), ph = b - n;
+    var b = (t - st.beat0) * st.bpm / 60 * st.tempoMul, n = Math.floor(b), ph = b - n;
     var k = Math.exp(-ph * 5.5) * (((n % 4) + 4) % 4 === 0 ? 1 : 0.7) * P.pulse;
     var off = Math.exp(-((ph + 0.5) % 1) * 7) * 0.35 * P.pulse;   // contratiempo, como un hi-hat
     return { b: b, n: n, ph: ph, k: k, off: off, bar: Math.floor(n / 4) };
@@ -673,12 +707,13 @@
     c.fillStyle = gr; c.fillRect(0, 0, W, H);
   }
   function corona(c, x, y, scale, rot, alpha) {
-    c.save(); c.globalAlpha = alpha === undefined ? 1 : alpha; c.translate(x, y); c.rotate(rot); c.scale(scale, scale);
+    c.save(); c.globalAlpha = alpha === undefined ? 1 : alpha; c.translate(x, y); c.rotate(rot + (P.rotate - 0.5) * Math.PI * 2); c.scale(scale, scale);
     c.drawImage(TX.corona, -TX.corona.width / 2, -TX.corona.height / 2); c.restore();
   }
   function huella(c, x, y, size, t, B, alpha) {
-    var rot = t * 0.06 * (0.3 + P.speed * 1.4);
+    var rot = t * 0.06 * (0.3 + P.speed * 1.4) + (P.rotate - 0.5) * Math.PI * 2, nr = Math.round(4 + P.rings * 14);
     RINGS.forEach(function (pts, i) {
+      if (i >= nr) return;
       var wave = Math.exp(-(((B.b - i * 0.03) % 1 + 1) % 1) * 5.5) * P.pulse;
       var s = size * (1 + 0.012 * Math.sin(t * 1.1 + i * 0.4) + 0.05 * wave);
       var acc = i % 4 === 3;
@@ -691,6 +726,11 @@
       if (acc) { c.shadowColor = C.accent; c.shadowBlur = 12 + 20 * wave; }
       c.stroke(); c.restore();
     });
+  }
+  function eclipseCore(c, x, y, t, B, extra) {
+    corona(c, x, y, (0.7 + P.corona * 0.6) * (1 + (extra || 0.07) * B.k * (0.5 + P.glow)), t * 0.02 * (0.3 + P.speed), 0.75 + 0.25 * P.glow);
+    c.fillStyle = C.bg; c.beginPath(); c.arc(x, y, R, 0, Math.PI * 2); c.fill();
+    rim(c, x, y, R, B.k);
   }
   function rim(c, x, y, r, k) {
     c.save(); c.shadowColor = C.accent; c.shadowBlur = 24 + 40 * k; c.strokeStyle = rgba(C.cream, 0.75 + 0.25 * k);
@@ -752,8 +792,7 @@
   function sceneEclipse(c, t, B) {
     bg(c);
     ambient(c, CX, CY, (0.25 + 0.3 * B.k) * P.glow);
-    corona(c, CX, CY, 1 + 0.07 * B.k * (0.5 + P.glow), t * 0.02 * (0.3 + P.speed), 0.75 + 0.25 * P.glow);
-    rim(c, CX, CY, R, B.k);
+    eclipseCore(c, CX, CY, t, B);
     huella(c, CX, CY, R * 0.8, t, B, 1);
     var bar16 = ((B.n % 16) + 16) % 16;   // destello del anillo de diamante cada 4 compases
     glint(c, CX + Math.cos(-0.75) * R, CY + Math.sin(-0.75) * R, R * (0.12 + 0.5 * (bar16 === 0 ? Math.exp(-B.ph * 2.5) : 0) + 0.08 * B.k), 0.5 + 0.5 * (bar16 === 0 ? 1 - B.ph : 0));
@@ -795,9 +834,9 @@
     var grow = 1 + 0.05 * flick + 0.02 * B.k;
     s.setTransform(q * grow, 0, 0, q * grow, (1 - grow) * sh.width / 2, (1 - grow) * sh.height);
     s.strokeStyle = s.fillStyle = C.bg; s.lineCap = 'round'; s.lineJoin = 'round';
-    var n = 7;
+    var n = Math.round(2 + P.crowd * 8);
     for (var i = 0; i < n; i++) {
-      var x = W * (0.13 + i * (0.74 / (n - 1))), hh = H * (0.5 + 0.12 * ((i * 37) % 5) / 4);
+      var x = W * (n === 1 ? 0.5 : 0.13 + i * (0.74 / (n - 1))), hh = H * (0.5 + 0.12 * ((i * 37) % 5) / 4);
       dancer(s, x, H * (0.9 + 0.02 * (i % 2)), hh, t, B, i);
     }
     c.save(); c.globalAlpha = 0.6 + 0.35 * P.shadow; c.imageSmoothingQuality = 'high'; c.drawImage(sh, 0, 0, W, H); c.restore();
@@ -825,8 +864,7 @@
     var total = d < mr - R + R * 0.01;
     ambient(c, CX, CY, (0.15 + 0.5 * visible + 0.25 * B.k) * P.glow);
     if (total) {
-      corona(c, CX, CY, 1 + 0.08 * B.k, t * 0.02 * (0.3 + P.speed), 1);
-      rim(c, CX, CY, R, B.k);
+      eclipseCore(c, CX, CY, t, B, 0.08);
       huella(c, CX, CY, R * 0.8, t, B, 0.9);
     } else {
       c.save(); c.globalAlpha = 0.85 + 0.15 * B.k; c.drawImage(TX.sun, CX - TX.sun.width / 2, CY - TX.sun.height / 2); c.restore();
@@ -904,6 +942,13 @@
       wordmark(c, CX, H - size * 1.25, size, B.k * 0.5, la);
       slogan(c, CX, H - size * 0.45, Math.max(11, size * 0.2), la * 0.9);
     }
+    if (st.text) {   // nombres y frases en pantalla
+      var ta = Math.min(1, (t - st.textAt) / 0.6), ts = Math.min(W * 0.075, H * 0.13);
+      c.save(); c.globalAlpha = ta; c.font = ts + 'px ' + BRAND; c.textAlign = 'center'; c.letterSpacing = ts * 0.06 + 'px';
+      c.shadowColor = C.accent; c.shadowBlur = 24 + 30 * B.k; c.fillStyle = C.cream;
+      var ty = st.scene === 3 ? H * 0.2 : H * 0.8;
+      c.fillText(st.text.toLowerCase(), CX, ty); c.restore();
+    }
     if (st.flash > 0.01) {
       c.save(); c.globalCompositeOperation = 'lighter';
       var fg = c.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H) * 0.8);
@@ -918,6 +963,12 @@
       var ox = Math.floor(Math.random() * 256), oy = Math.floor(Math.random() * 256);
       c.fillStyle = c.createPattern(TX.grain, 'repeat'); c.translate(-ox, -oy); c.fillRect(ox, oy, W, H); c.restore();
     }
+    var sr = st.strobeHold ? 1 : P.strobe;
+    if (sr > 0.05) {   // strobe al tempo: negras, corcheas o semicorcheas
+      var sub = sr < 0.34 ? 1 : sr < 0.67 ? 2 : 4;
+      if (Math.floor(B.b * sub * 2) % 2) { c.fillStyle = 'rgba(0,0,0,0.92)'; c.fillRect(0, 0, W, H); }
+      else if (st.strobeHold) { c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = rgba(C.cream, 0.25); c.fillRect(0, 0, W, H); c.restore(); }
+    }
     var dark = Math.max(st.black, 1 - P.master);
     if (dark > 0.001) { c.fillStyle = 'rgba(0,0,0,' + Math.min(1, dark) + ')'; c.fillRect(0, 0, W, H); }
   }
@@ -930,16 +981,37 @@
     st.flash *= Math.exp(-dt * 6);
     st.black += ((st.blackout ? 1 : 0) - st.black) * Math.min(1, dt * 5);
     if (st.auto && B.bar >= st.autoNext) { st.autoNext = B.bar + 16; setScene((st.scene + 1) % SCENES.length, true); }
+    if (st.freeze) { hud(B); requestAnimationFrame(frame); return; }   // congelado: queda la última imagen
     var fadeDur = 0.2 + P.fade * 1.8, f = (t - st.fadeStart) / fadeDur;
-    var a = TX.buf[0].getContext('2d');
+    var a = TX.buf[0].getContext('2d'), comp = TX.buf[0];
     SCENES[st.scene].draw(a, t, B);
     if (f < 1 && st.prev >= 0) {
       var b = TX.buf[1].getContext('2d');
       SCENES[st.prev].draw(b, t, B);
-      g.globalAlpha = 1; g.drawImage(TX.buf[1], 0, 0);
-      g.globalAlpha = f * f * (3 - 2 * f); g.drawImage(TX.buf[0], 0, 0); g.globalAlpha = 1;
-    } else {
-      g.drawImage(TX.buf[0], 0, 0);
+      b.globalAlpha = f * f * (3 - 2 * f); b.drawImage(TX.buf[0], 0, 0); b.globalAlpha = 1;
+      comp = TX.buf[1];
+    }
+    // cámara: zoom + golpe en el beat; estela = el cuadro anterior se desvanece de a poco
+    var z = (0.6 + P.zoom * 0.8) * (1 + P.punch * 0.07 * B.k), alpha = 1 - P.trail * 0.88;
+    g.globalAlpha = alpha;
+    if (z < 1) { g.fillStyle = C.bg; g.fillRect(0, 0, W, H); }
+    g.setTransform(z, 0, 0, z, (1 - z) * CX, (1 - z) * CY); g.drawImage(comp, 0, 0);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+    if (st.mirror) {   // espejo: izquierda → derecha (y arriba → abajo en el modo 2)
+      g.save(); g.translate(W, 0); g.scale(-1, 1); g.drawImage(cv, 0, 0, W / 2, H, 0, 0, W / 2, H); g.restore();
+      if (st.mirror === 2) { g.save(); g.translate(0, H); g.scale(1, -1); g.drawImage(cv, 0, 0, W, H / 2, 0, 0, W, H / 2); g.restore(); }
+    }
+    var gl = P.glitch * B.k;
+    if (gl > 0.04) {   // glitch: franjas que se corren en cada golpe
+      for (var gi = 0; gi < 7; gi++) {
+        var sy = Math.random() * H, sh = H * (0.02 + Math.random() * 0.08), sx = (Math.random() - 0.5) * W * 0.12 * gl;
+        g.drawImage(cv, 0, sy, W, sh, sx, sy, W, sh);
+      }
+    }
+    var tp = P.temp - 0.5;
+    if (Math.abs(tp) > 0.04) {   // color: hacia carmesí o hacia oro
+      g.save(); g.globalCompositeOperation = 'color'; g.globalAlpha = Math.min(1, Math.abs(tp) * 1.8);
+      g.fillStyle = tp < 0 ? '#9b0d1f' : '#e9a23b'; g.fillRect(0, 0, W, H); g.restore();
     }
     overlays(g, t, B);
     hud(B);
@@ -978,16 +1050,36 @@
     bpmDown: ['BPM −0,5', function () { nudgeBpm(-0.5); }]
   };
   ACTIONS.quality = ['calidad (baja/alta)', function () { st.lowres = !st.lowres; build(); toast(st.lowres ? 'calidad baja: más fluido' : 'calidad alta'); }];
-  var KEYS = { q: 'quality', '1': 'scene1', '2': 'scene2', '3': 'scene3', '4': 'scene4', '5': 'scene5', ' ': 'tap', s: 'sync', f: 'flash', b: 'blackout', l: 'logoToggle', d: 'drop', a: 'auto', ArrowUp: 'bpmUp', ArrowDown: 'bpmDown' };
+  ACTIONS.next = ['escena siguiente', function () { setScene((st.scene + 1) % SCENES.length); }];
+  ACTIONS.prev = ['escena anterior', function () { setScene((st.scene + SCENES.length - 1) % SCENES.length); }];
+  ACTIONS.mirror = ['espejo (no · 2 · 4)', function () { st.mirror = (st.mirror + 1) % 3; toast(['espejo: no', 'espejo: 2 lados', 'espejo: 4 lados'][st.mirror]); }];
+  ACTIONS.freeze = ['congelar imagen', function () { st.freeze = !st.freeze; toast(st.freeze ? 'congelado' : 'en vivo'); }];
+  ACTIONS.half = ['pulso a la mitad', function () { st.tempoMul = st.tempoMul === 0.5 ? 1 : 0.5; toast(st.tempoMul === 0.5 ? 'pulso ½' : 'pulso normal'); }];
+  ACTIONS.double = ['pulso al doble', function () { st.tempoMul = st.tempoMul === 2 ? 1 : 2; toast(st.tempoMul === 2 ? 'pulso ×2' : 'pulso normal'); }];
+  ACTIONS.strobeHold = ['strobe (mientras apretás)', function () { st.strobeHold = true; }, function () { st.strobeHold = false; }];
+  ACTIONS.resetFx = ['reset de efectos', function () {
+    PARAMS.forEach(function (p) { if (['master', 'pulse', 'glow', 'logo', 'speed', 'grain', 'shadow', 'fade'].indexOf(p[0]) < 0) P[p[0]] = p[2]; });
+    st.mirror = 0; st.freeze = false; st.tempoMul = 1; st.text = null; toast('efectos en cero');
+  }];
+  // Textos en pantalla: un toque lo muestra, otro toque lo saca
+  var TEXTS = [['txtEvo', 'EVO'], ['txtOda', 'ODA'], ['txtSandman', 'SANDMAN'], ['txtDamian', 'DAMIAN SANTOS'], ['txtSun', 'THE SUN'], ['txtSolar', 'FOR THE SOLAR PEOPLE']];
+  TEXTS.forEach(function (tx) {
+    ACTIONS[tx[0]] = ['texto: ' + tx[1].toLowerCase(), function () { st.text = st.text === tx[1] ? null : tx[1]; st.textAt = now(); }];
+  });
+  ACTIONS.txtOff = ['texto: sacar', function () { st.text = null; }];
+  ACTIONS.bpmKnob = ['BPM fino (encoder)', function () {}];
+  var KEYS = { n: 'next', p: 'prev', e: 'mirror', c: 'freeze', '6': 'txtEvo', '7': 'txtOda', '8': 'txtSandman', '9': 'txtDamian', '0': 'txtSun', o: 'txtSolar', '-': 'txtOff', r: 'resetFx', q: 'quality', '1': 'scene1', '2': 'scene2', '3': 'scene3', '4': 'scene4', '5': 'scene5', ' ': 'tap', s: 'sync', f: 'flash', b: 'blackout', l: 'logoToggle', d: 'drop', a: 'auto', ArrowUp: 'bpmUp', ArrowDown: 'bpmDown' };
   addEventListener('keydown', function (e) {
     if (e.target.tagName === 'INPUT') return;
     var k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-    if (KEYS[k]) { e.preventDefault(); ACTIONS[KEYS[k]][1](); return; }
+    if (k === 'x') { if (!e.repeat) ACTIONS.strobeHold[1](); return; }
+    if (KEYS[k]) { e.preventDefault(); if (!e.repeat || KEYS[k] === 'bpmUp' || KEYS[k] === 'bpmDown') ACTIONS[KEYS[k]][1](); return; }
     if (k === 'h') toggleUI();
     if (k === 'm') toggleMidi();
     if (k === 'Enter') fullscreen();
   });
-  addEventListener('dblclick', fullscreen);
+  addEventListener('keyup', function (e) { if (e.key.toLowerCase() === 'x') ACTIONS.strobeHold[2](); });
+  addEventListener('dblclick', function (e) { if (!e.target.closest('.panel')) fullscreen(); });
   function fullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen(); }
   // Controles en pantalla: se esconden solos a los 3 s sin mover el mouse (salvo que el mouse esté encima)
   var idleT, overUI = false;
@@ -1002,12 +1094,15 @@
   // Mapeo de fábrica pensado para el Xone:K2 (capa 1): faders = CC 16–19, fila de perillas de arriba = CC 4–7. Cualquier canal.
   var DEFAULT_MAP = {
     master: { type: 'cc', num: 16 }, pulse: { type: 'cc', num: 17 }, glow: { type: 'cc', num: 18 }, logo: { type: 'cc', num: 19 },
-    speed: { type: 'cc', num: 4 }, grain: { type: 'cc', num: 5 }, shadow: { type: 'cc', num: 6 }, fade: { type: 'cc', num: 7 }
+    speed: { type: 'cc', num: 4 }, grain: { type: 'cc', num: 5 }, shadow: { type: 'cc', num: 6 }, fade: { type: 'cc', num: 7 },
+    zoom: { type: 'cc', num: 8 }, temp: { type: 'cc', num: 9 }, trail: { type: 'cc', num: 10 }, punch: { type: 'cc', num: 11 },
+    rings: { type: 'cc', num: 12 }, crowd: { type: 'cc', num: 13 }, glitch: { type: 'cc', num: 14 }, strobe: { type: 'cc', num: 15 },
+    rotate: { type: 'cc', num: 0, rel: true }, bpmKnob: { type: 'cc', num: 1, rel: true }, corona: { type: 'cc', num: 2, rel: true }
   };
   var STORE = 'solaris-midi-v1', map = load();
   function load() { try { var m = JSON.parse(localStorage.getItem(STORE)); if (m && typeof m === 'object') return m; } catch (e) {} return JSON.parse(JSON.stringify(DEFAULT_MAP)); }
   function save() { try { localStorage.setItem(STORE, JSON.stringify(map)); } catch (e) {} }
-  var midi = null, learning = null, ccState = {}, midiLabel = 'MIDI: sin conectar';
+  var midi = null, learning = null, queue = [], ccState = {}, midiLabel = 'MIDI: sin conectar';
   function matches(b, type, ch, num) { return b && b.type === type && b.num === num && (b.ch === undefined || b.ch === null || b.ch === ch); }
   function onMidi(ev) {
     var d = ev.data, s = d[0];
@@ -1015,20 +1110,37 @@
     if (s === 0xFA || s === 0xFB) { st.beat0 = now(); st.clock = []; return; }
     if (s >= 0xF0) return;
     var type = s & 0xF0, ch = s & 0x0F, num = d[1], val = d[2];
-    var kind = type === 0xB0 ? 'cc' : (type === 0x90 && val > 0) ? 'note' : null;
+    var kind = type === 0xB0 ? 'cc' : (type === 0x90 && val > 0) ? 'note' : (type === 0x80 || type === 0x90) ? 'off' : null;
     if (!kind) return;
     if (learning) {
+      if (kind === 'off') return;
       Object.keys(map).forEach(function (k) { if (matches(map[k], kind, ch, num)) delete map[k]; });   // un control, una función
-      map[learning] = { type: kind, ch: ch, num: num }; save();
+      var wasRel = map[learning] && map[learning].rel;
+      map[learning] = { type: kind, ch: ch, num: num }; if (kind === 'cc' && (wasRel || learning === 'bpmKnob')) map[learning].rel = true; save();
       toast('asignado: ' + labelOf(learning) + ' → ' + bindLabel(map[learning]));
-      learning = null; renderMidi(); ledFeedback(); return;
+      if (queue.length) { queue.shift(); learning = queue[0] || null; if (!learning) toast('listo: botones asignados'); }
+      else learning = null;
+      renderMidi(); ledFeedback(); return;
     }
     Object.keys(map).forEach(function (k) {
-      if (!matches(map[k], kind, ch, num)) return;
+      var bnd = map[k];
+      if (kind === 'off') { if (matches(bnd, 'note', ch, num) && ACTIONS[k] && ACTIONS[k][2]) ACTIONS[k][2](); return; }
+      if (!matches(bnd, kind, ch, num)) return;
+      if (kind === 'cc' && bnd.rel) {   // encoder: 1 = un paso a la derecha, 127 = un paso a la izquierda
+        var delta = val < 64 ? val : val - 128;
+        if (k === 'bpmKnob') { st.bpm = Math.round(Math.max(60, Math.min(200, st.bpm + delta * 0.1)) * 10) / 10; toast('BPM ' + st.bpm.toFixed(1)); return; }
+        if (P.hasOwnProperty(k)) { var v = P[k] + delta / 64; P[k] = WRAP[k] ? ((v % 1) + 1) % 1 : Math.max(0, Math.min(1, v)); }
+        return;
+      }
       if (P.hasOwnProperty(k)) { if (kind === 'cc') P[k] = val / 127; else P[k] = P[k] > 0.5 ? 0 : 1; }
       else if (ACTIONS[k]) {
         if (kind === 'note') ACTIONS[k][1]();
-        else { var key = ch + ':' + num, was = ccState[key] || 0; if (val >= 64 && was < 64) ACTIONS[k][1](); ccState[key] = val; }
+        else {
+          var key = ch + ':' + num, was = ccState[key] || 0;
+          if (val >= 64 && was < 64) ACTIONS[k][1]();
+          if (val < 64 && was >= 64 && ACTIONS[k][2]) ACTIONS[k][2]();
+          ccState[key] = val;
+        }
       }
     });
   }
@@ -1066,31 +1178,52 @@
   // Panel de mapeo
   var midiEl = document.getElementById('midi'), table = document.getElementById('midi-table');
   function labelOf(k) { var p = PARAMS.filter(function (x) { return x[0] === k; })[0]; return p ? p[1] : ACTIONS[k][0]; }
-  function bindLabel(b) { return b ? (b.type === 'cc' ? 'CC ' : 'nota ') + b.num + (b.ch !== undefined && b.ch !== null ? ' · canal ' + (b.ch + 1) : '') : '—'; }
+  function bindLabel(b) { return b ? (b.type === 'cc' ? 'CC ' : 'nota ') + b.num + (b.ch !== undefined && b.ch !== null ? ' · canal ' + (b.ch + 1) : '') + (b.rel ? ' · encoder' : '') : '—'; }
   function renderMidi() {
+    document.getElementById('midi-seqinfo').textContent = queue.length ? 'asignando en orden: apretá el botón para «' + labelOf(queue[0]) + '» (' + (Object.keys(ACTIONS).length - 1 - queue.length + 1) + ' de ' + (Object.keys(ACTIONS).length - 1) + ')' : '';
     var rows = PARAMS.map(function (p) { return p[0]; }).concat(Object.keys(ACTIONS));
     table.innerHTML = rows.map(function (k) {
       return '<tr><td>' + labelOf(k) + '</td><td>' + bindLabel(map[k]) + '</td><td style="text-align:right">' +
+        (map[k] && map[k].type === 'cc' ? '<button data-rel="' + k + '" title="perilla común o encoder sin fin">' + (map[k].rel ? 'encoder' : 'perilla') + '</button> ' : '') +
         '<button data-learn="' + k + '" class="' + (learning === k ? 'learning' : '') + '">' + (learning === k ? 'mové un control…' : 'aprender') + '</button> ' +
         (map[k] ? '<button data-clear="' + k + '">×</button>' : '') + '</td></tr>';
     }).join('');
   }
   table.addEventListener('click', function (e) {
     var l = e.target.getAttribute('data-learn'), c = e.target.getAttribute('data-clear');
-    if (l) { learning = learning === l ? null : l; renderMidi(); }
+    var rl = e.target.getAttribute('data-rel');
+    if (l) { queue = []; learning = learning === l ? null : l; renderMidi(); }
     if (c) { delete map[c]; save(); renderMidi(); }
+    if (rl && map[rl]) { map[rl].rel = !map[rl].rel; save(); renderMidi(); }
   });
   document.getElementById('midi-reset').addEventListener('click', function () { map = JSON.parse(JSON.stringify(DEFAULT_MAP)); save(); renderMidi(); toast('mapeo de fábrica'); });
   document.getElementById('midi-close').addEventListener('click', toggleMidi);
-  function toggleMidi() { initMidi(); learning = null; midiEl.classList.toggle('hidden'); renderMidi(); }
+  document.getElementById('midi-seq').addEventListener('click', function () {   // asignar todos los botones seguidos
+    queue = Object.keys(ACTIONS).filter(function (k) { return k !== 'bpmKnob'; });
+    learning = queue[0]; renderMidi(); toast('apretá los botones del K2 en orden · "saltear" pasa al siguiente');
+  });
+  document.getElementById('midi-skip').addEventListener('click', function () { if (!queue.length) return; queue.shift(); learning = queue[0] || null; renderMidi(); });
+  document.getElementById('midi-export').addEventListener('click', function () {
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(map, null, 1)], { type: 'application/json' }));
+    a.download = 'solaris-mapeo-midi.json'; document.body.appendChild(a); a.click(); a.remove();
+  });
+  document.getElementById('midi-import').addEventListener('change', function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    f.text().then(function (txt) { var m = JSON.parse(txt); if (m && typeof m === 'object') { map = m; save(); renderMidi(); ledFeedback(); toast('mapeo cargado'); } }).catch(function () { toast('ese archivo no es un mapeo'); });
+    e.target.value = '';
+  });
+  function toggleMidi() { initMidi(); learning = null; queue = []; midiEl.classList.toggle('hidden'); renderMidi(); }
 
   // ---------- barra de controles ----------
   var bar = document.getElementById('bar'), bpmIn = document.getElementById('bpm'), ajustes = document.getElementById('ajustes'), helpEl = document.getElementById('help');
   bar.addEventListener('mouseenter', function () { overUI = true; }); bar.addEventListener('mouseleave', function () { overUI = false; wake(); });
   ajustes.addEventListener('mouseenter', function () { overUI = true; }); ajustes.addEventListener('mouseleave', function () { overUI = false; wake(); });
   bar.addEventListener('click', function (e) {
-    var b = e.target.closest('[data-action]'); if (b && ACTIONS[b.getAttribute('data-action')]) { ACTIONS[b.getAttribute('data-action')][1](); b.blur(); }
+    var b = e.target.closest('[data-action]'), k = b && b.getAttribute('data-action');
+    if (k && ACTIONS[k] && !ACTIONS[k][2]) { ACTIONS[k][1](); b.blur(); }
   });
+  bar.addEventListener('pointerdown', function (e) { var b = e.target.closest('[data-action]'), k = b && b.getAttribute('data-action'); if (k && ACTIONS[k] && ACTIONS[k][2]) ACTIONS[k][1](); });
+  addEventListener('pointerup', function () { ACTIONS.strobeHold[2](); });
   bpmIn.addEventListener('change', function () { var v = parseFloat(bpmIn.value); if (v >= 60 && v <= 200) { st.bpm = Math.round(v * 10) / 10; toast('BPM ' + st.bpm.toFixed(1)); } bpmIn.blur(); });
   bpmIn.addEventListener('keydown', function (e) { if (e.key === 'Enter') bpmIn.blur(); });
   document.getElementById('b-midi').addEventListener('click', toggleMidi);
@@ -1110,7 +1243,9 @@
     for (var i = 0; i < 4; i++) dotEls[i].className = i === beat ? 'on' : '';
     if (document.activeElement !== bpmIn) bpmIn.value = st.bpm.toFixed(1);
     document.getElementById('clock').textContent = now() - st.clockAt < 1 ? 'MIDI clock' : '';
-    var on = { scene1: st.scene === 0, scene2: st.scene === 1, scene3: st.scene === 2, scene4: st.scene === 3, scene5: st.scene === 4, blackout: st.blackout, logoToggle: st.logoOn, auto: st.auto, quality: !!st.lowres };
+    var on = { scene1: st.scene === 0, scene2: st.scene === 1, scene3: st.scene === 2, scene4: st.scene === 3, scene5: st.scene === 4, blackout: st.blackout, logoToggle: st.logoOn, auto: st.auto, quality: !!st.lowres,
+      mirror: st.mirror > 0, freeze: st.freeze, half: st.tempoMul === 0.5, double: st.tempoMul === 2, strobeHold: st.strobeHold };
+    TEXTS.forEach(function (tx) { on[tx[0]] = st.text === tx[1]; });
     bar.querySelectorAll('[data-action]').forEach(function (b) { b.classList.toggle('on', !!on[b.getAttribute('data-action')]); });
     document.getElementById('midi-dot').classList.toggle('ok', /XONE|K2|MIDI:\s\S/i.test(midiLabel) && !/sin |denegado|no soporta/.test(midiLabel));
     document.getElementById('b-midi').title = midiLabel;
@@ -1126,7 +1261,7 @@
   var fonts = ['40px "Major Mono Display"', '700 20px "Space Mono"', '400 20px "Space Mono"'];
   Promise.all(fonts.map(function (f) { return document.fonts.load(f); })).catch(function () {}).then(function () {
     build();
-    window.SOLARIS = { setScene: setScene, P: P, st: st, drop: drop };   // para probar desde la consola
+    window.SOLARIS = { setScene: setScene, P: P, st: st, drop: drop, midi: function (d) { onMidi({ data: d }); }, map: function () { return map; } };   // para probar desde la consola
     requestAnimationFrame(frame);
     var startEl = document.getElementById('start'), full = document.getElementById('go-full'), win = document.getElementById('go-window');
     document.getElementById('start-msg').textContent = 'listo.';
