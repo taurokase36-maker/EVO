@@ -63,13 +63,20 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
   <section class="wrap lineup" aria-label="Line up">
     <span class="label">line up</span>
     <ul><?php foreach ((array) cfg('event.lineup', []) as $dj): ?><li><?= e($dj) ?></li><?php endforeach; ?></ul>
+    <?php if (cfg('event.guest.name')): ?>
+      <div class="guest">
+        <span class="label"><?= e(cfg('event.guest.label')) ?></span>
+        <p class="guest-name"><?= e(cfg('event.guest.name')) ?></p>
+        <p class="guest-detail"><?= e(cfg('event.guest.detail')) ?></p>
+      </div>
+    <?php endif; ?>
   </section>
 
-  <?php if (cfg('release.title')): ?>
-  <section class="wrap release" aria-label="Lanzamiento">
-    <span class="label"><?= e(cfg('release.label')) ?></span>
-    <h2 class="release-title"><?= e(cfg('release.title')) ?></h2>
-    <p><?= e(cfg('release.text')) ?></p>
+  <?php if (cfg('about.text')): ?>
+  <section class="wrap release" aria-label="Qué es SOLARIS">
+    <span class="label"><?= e(cfg('about.label')) ?></span>
+    <p><?= e(cfg('about.text')) ?></p>
+    <?php if (cfg('release.text')): ?><p class="release-note"><?= e(cfg('release.text')) ?></p><?php endif; ?>
   </section>
   <?php endif; ?>
 

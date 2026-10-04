@@ -40,10 +40,10 @@ return [
     //  EVENTO
     // ---------------------------------------------------------------
     'event' => [
-        'title'      => 'Somos Uno × Melt Underground presentan THE ECLIPSE · release party de THE SUN',
+        'title'      => 'Somos Uno × Melt Underground presentan SOLARIS · for the solar people',
         'kicker'     => 'somos uno × melt underground presentan',
-        'headline'   => 'THE ECLIPSE',
-        'subhead'    => 'release party de THE SUN',
+        'headline'   => 'SOLARIS',
+        'subhead'    => 'for the solar people',
         'date_label' => 'domingo 11·10',
         'time_label' => '18:00 a 03:00',
         'starts_at'  => '2026-10-11 18:00',     // para la cuenta regresiva
@@ -53,17 +53,23 @@ return [
         'maps_url'   => 'https://maps.google.com/?q=Laprida+1423,+Buenos+Aires',
         'genres'     => 'minimal · house · techno',
         'lineup'     => ['EVO', 'ODA', 'Sandman'],
-        'motto'      => 'todos bajo el mismo sol.',
+        // Invitado especial: aparece debajo del line up. '' en name = no mostrar.
+        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica'],
+        'motto'      => 'para la gente del sol.',
         'age'        => '+18 con DNI',
         'door_price' => 10000,                  // precio en puerta (solo informativo)
     ],
 
-    // Bloque del lanzamiento en la landing. '' en title = no mostrar.
+    // Nota chica debajo del line up (un detalle extra, no el foco). '' = no mostrar.
     'release' => [
-        'label' => 'el lanzamiento',
-        'title' => 'THE SUN',
-        'text'  => 'El nuevo álbum de EVO no sale de una vez: sale de a un single. La corona del sol solo se ve '
-                 . 'durante un eclipse: esa noche, en el sótano de Melt, suena el primero. Entrás con el ocaso y salís con otra luz.',
+        'text' => 'Y un detalle: esa noche EVO estrena el primer single de THE SUN, su nuevo álbum.',
+    ],
+
+    // Qué es SOLARIS (bloque debajo del line up)
+    'about' => [
+        'label' => 'for the solar people',
+        'text'  => 'SOLARIS es la nueva fiesta de Somos Uno, para la gente del sol. Bajás con el ocaso, '
+                 . 'te quedás en la oscuridad del sótano y salís a las 3 con otra luz.',
     ],
 
     'pillars' => [
@@ -123,8 +129,9 @@ return [
     ],
 
     'faq' => [
-        ['¿qué es THE SUN?', 'el nuevo álbum de EVO. sale de a un single y el primero se estrena esa noche.'],
-        ['¿por qué THE ECLIPSE?', 'el 10 hay luna nueva: la luna pasa entre la tierra y el sol. el 11 se esconde a las 20:26 y queda la noche más oscura del mes. adentro, sale el sol.'],
+        ['¿qué es SOLARIS?', 'la nueva fiesta de somos uno. for the solar people: para la gente del sol. y va a volver.'],
+        ['¿hay show en vivo?', 'sí: damian santos toca saxo en vivo sobre base electrónica.'],
+        ['¿por qué ese día?', 'el 10 hay luna nueva. el 11 la luna se esconde a las 20:26, detrás del sol, y queda la noche más oscura del mes. adentro, sale el sol.'],
         ['¿hay dress code?', 'negro. venir.'],
         ['¿es en un sótano?', 'sí, y suena hermoso.'],
         ['¿es una secta?', 'no, es minimal.'],

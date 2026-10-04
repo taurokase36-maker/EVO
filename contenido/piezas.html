@@ -1,10 +1,10 @@
 <!doctype html>
-<!-- THE ECLIPSE · piezas de la semana. ?p=01-anuncio-story (ver la lista PIEZAS abajo).
+<!-- SOLARIS · piezas de la semana. ?p=01-anuncio-story (ver la lista PIEZAS abajo).
      Para exportar todas a PNG: node render.js -->
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>THE ECLIPSE · piezas</title>
+<title>SOLARIS · piezas</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=GFS+Didot&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=block" rel="stylesheet">
 <style>
   html, body { margin: 0; background: #000; color: #efe2d6; font: 14px system-ui; }
@@ -21,37 +21,67 @@
 (function () {
   'use strict';
   var M = Motor, C = M.C;
-  var NAME = 'THE ECLIPSE', ALBUM = 'THE SUN';
+  var NAME = 'SOLARIS', SLOGAN = 'FOR THE SOLAR PEOPLE', SLOGAN_ES = 'para la gente del sol';
+  var GUEST = 'DAMIAN SANTOS', GUEST_DETAIL = 'saxo en vivo sobre base electrónica';
+  var RELEASE = 'y esa noche, el estreno del primer single de THE SUN';
   var italic = function (px) { return 'italic ' + px + 'px "Cormorant Garamond"'; };
   var cinzel = function (px, w) { return (w || 400) + ' ' + px + 'px Cinzel'; };
   var soft = function (a) { return M.rgba(C.cream, a); };
+  var slogan = function (y, px) { M.text(SLOGAN, 540, y, cinzel(px || 28, 600), C.accent, { spacing: (px || 28) * 0.32 }); };
 
   var STORY = [1080, 1920], POST = [1080, 1350];
+
+  // Sombra de un saxofonista (para la pared)
+  function saxShadow(x, feet, h, blur) {
+    var l = M.layer(), g = l.getContext('2d');
+    g.filter = 'blur(' + blur + 'px)'; g.strokeStyle = g.fillStyle = '#fff'; g.lineCap = 'round'; g.lineJoin = 'round';
+    var hipY = feet - h * 0.47, neckY = feet - h * 0.82, hip = [x, hipY], neck = [x + h * 0.02, neckY];
+    g.lineWidth = h * 0.075;
+    g.beginPath(); g.moveTo(hip[0], hip[1]); g.lineTo(x - h * 0.05, feet - h * 0.24); g.lineTo(x - h * 0.07, feet); g.stroke();
+    g.beginPath(); g.moveTo(hip[0], hip[1]); g.lineTo(x + h * 0.06, feet - h * 0.24); g.lineTo(x + h * 0.08, feet); g.stroke();
+    g.lineWidth = h * 0.13; g.beginPath(); g.moveTo(hip[0], hip[1]); g.lineTo(neck[0], neck[1]); g.stroke();
+    g.beginPath(); g.arc(neck[0] + h * 0.015, neckY - h * 0.085, h * 0.072, 0, Math.PI * 2); g.fill();
+    // saxo: boquilla, cuerpo, curva y campana
+    var mx = neck[0] + h * 0.08, my = neckY - h * 0.075;
+    g.lineWidth = h * 0.022; g.beginPath(); g.moveTo(mx, my); g.quadraticCurveTo(mx + h * 0.07, my - h * 0.01, mx + h * 0.08, neckY + h * 0.03); g.stroke();
+    g.lineWidth = h * 0.045; g.beginPath(); g.moveTo(mx + h * 0.08, neckY + h * 0.03); g.lineTo(mx + h * 0.1, hipY + h * 0.02);
+    g.quadraticCurveTo(mx + h * 0.11, hipY + h * 0.12, mx + h * 0.17, hipY + h * 0.06); g.lineTo(mx + h * 0.2, hipY - h * 0.04); g.stroke();
+    g.beginPath(); g.moveTo(mx + h * 0.16, hipY - h * 0.02); g.lineTo(mx + h * 0.26, hipY - h * 0.12); g.lineTo(mx + h * 0.27, hipY - h * 0.02); g.closePath(); g.fill();
+    // brazos tocando
+    g.lineWidth = h * 0.06;
+    g.beginPath(); g.moveTo(neck[0] - h * 0.02, neckY + h * 0.03); g.lineTo(neck[0] + h * 0.03, neckY + h * 0.17); g.lineTo(mx + h * 0.08, neckY + h * 0.1); g.stroke();
+    g.beginPath(); g.moveTo(neck[0] + h * 0.04, neckY + h * 0.03); g.lineTo(neck[0] + h * 0.06, hipY - h * 0.06); g.lineTo(mx + h * 0.1, hipY - h * 0.03); g.stroke();
+    return l;
+  }
 
   var PIEZAS = {
     // ---------------- LÁMINA 2 · el sol grabado ----------------
     '01-anuncio-story': [STORY, function () {
       M.background(); M.marble(42);
-      M.engravedSun(540, 840, 250, { rays: 1100, spread: 1.0, seed: 'grabado' });
-      M.huella(540, 840, 200, 'the-sun', 16, 0.9);
-      M.clock(540, 840, 440, { inscription: 'ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ' });
+      M.engravedSun(540, 790, 250, { rays: 1100, spread: 1.0, seed: 'grabado' });
+      M.huella(540, 790, 200, 'the-sun', 16, 0.9);
+      M.clock(540, 790, 440, { inscription: 'ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ' });
       M.vignette(0.55);
-      M.text('SOMOS UNO  ×  MELT UNDERGROUND  PRESENTAN', 540, 262, cinzel(22, 600), soft(0.7), { spacing: 5 });
-      M.title(NAME, 540, 1440, 132, 960);
-      M.text('release party de ' + ALBUM + ' · el nuevo álbum de EVO', 540, 1505, italic(40), soft(0.88));
-      M.text('XI · X · MMXXVI   ·   XVIII — III', 540, 1565, cinzel(30), C.accent, { spacing: 6 });
-      M.text('Melt Underground · Laprida 1423', 540, 1615, italic(32), soft(0.6));
+      M.text('SOMOS UNO  ×  MELT UNDERGROUND  PRESENTAN', 540, 252, cinzel(22, 600), soft(0.7), { spacing: 5 });
+      M.title(NAME, 540, 1390, 140, 900);
+      slogan(1448, 28);
+      M.text(SLOGAN_ES, 540, 1492, italic(36), soft(0.75));
+      M.text('XI · X · MMXXVI  ·  XVIII — III  ·  MELT UNDERGROUND', 540, 1548, cinzel(24), C.cream, { spacing: 4 });
+      M.text('invitado especial: Damian Santos · ' + GUEST_DETAIL, 540, 1594, italic(30), soft(0.85));
+      M.text(RELEASE, 540, 1632, italic(26), soft(0.5));
     }],
     '02-anuncio-post': [POST, function () {
       M.background(); M.marble(43);
-      M.engravedSun(540, 530, 190, { rays: 1000, spread: 1.0, seed: 'grabado' });
-      M.huella(540, 530, 152, 'the-sun', 16, 0.9);
-      M.clock(540, 530, 335, { inscription: 'ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ' });
+      M.engravedSun(540, 510, 185, { rays: 1000, spread: 1.0, seed: 'grabado' });
+      M.huella(540, 510, 148, 'the-sun', 16, 0.9);
+      M.clock(540, 510, 325, { inscription: 'ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ' });
       M.vignette(0.5);
-      M.title(NAME, 540, 1040, 112, 940);
-      M.text('release party de ' + ALBUM + ' · el nuevo álbum de EVO', 540, 1098, italic(36), soft(0.88));
-      M.text('XI · X · MMXXVI   ·   XVIII — III', 540, 1150, cinzel(28), C.accent, { spacing: 6 });
-      M.credits(1240, 22);
+      M.title(NAME, 540, 1000, 120, 860);
+      slogan(1050, 24);
+      M.text('XI · X · MMXXVI  ·  XVIII — III  ·  MELT UNDERGROUND', 540, 1100, cinzel(22), C.cream, { spacing: 4 });
+      M.text('invitado especial: Damian Santos · ' + GUEST_DETAIL, 540, 1145, italic(28), soft(0.85));
+      M.text(RELEASE, 540, 1182, italic(24), soft(0.5));
+      M.credits(1255, 20);
     }],
 
     // ---------------- LÁMINA 1 · la pared ----------------
@@ -63,22 +93,37 @@
       M.engravedSun(540, 330, 82, { rays: 520, spread: 0.9, seed: 'pared' });
       M.huella(540, 330, 62, 'the-sun', 9, 0.8);
       M.vignette(0.6);
-      M.title(NAME, 540, 1430, 120, 940);
+      M.title(NAME, 540, 1430, 128, 900);
       M.text('entrás con el ocaso  ·  salís con otra luz', 540, 1495, italic(42), soft(0.88));
-      M.text('XVIII — III', 540, 1555, cinzel(32), C.accent, { spacing: 8 });
+      slogan(1555, 26);
       M.credits(1610, 24);
     }],
     '04-line-up-story': [STORY, function () {
       M.background();
-      M.wall({ top: 520, bot: 1320, blur: 6, people: [
-        { x: 260, y: 1290, h: 600, seed: 21 }, { x: 540, y: 1300, h: 690, seed: 22 }, { x: 820, y: 1290, h: 610, seed: 23 }] });
+      M.wall({ top: 470, bot: 1230, blur: 6, people: [
+        { x: 260, y: 1200, h: 580, seed: 21 }, { x: 540, y: 1210, h: 660, seed: 22 }, { x: 820, y: 1200, h: 590, seed: 23 }] });
       M.vignette(0.55);
-      M.text('LINE UP', 540, 300, cinzel(28, 600), C.accent, { spacing: 12 });
-      M.title(NAME, 540, 410, 96, 900);
-      [['EVO', 260], ['ODA', 540], ['SANDMAN', 820]].forEach(function (d) { M.title(d[0], d[1], 1415, 56, 250, { spacing: 6 }); });
-      M.text('XI · X   ·   XVIII — III', 540, 1500, cinzel(30), C.accent, { spacing: 6 });
-      M.text('minimal · house · techno', 540, 1552, italic(36), soft(0.7));
-      M.credits(1605, 24);
+      M.text('LINE UP', 540, 280, cinzel(28, 600), C.accent, { spacing: 12 });
+      M.title(NAME, 540, 385, 100, 800);
+      [['EVO', 260], ['ODA', 540], ['SANDMAN', 820]].forEach(function (d) { M.title(d[0], d[1], 1325, 56, 250, { spacing: 6 }); });
+      M.text('INVITADO ESPECIAL', 540, 1400, cinzel(22, 600), C.accent, { spacing: 8 });
+      M.title(GUEST, 540, 1460, 54, 800, { spacing: 5 });
+      M.text(GUEST_DETAIL, 540, 1505, italic(32), soft(0.75));
+      M.text('XI · X  ·  XVIII — III  ·  minimal · house · techno', 540, 1562, cinzel(22), soft(0.7), { spacing: 3 });
+      M.credits(1610, 22);
+    }],
+    '10-invitado-story': [STORY, function () {
+      M.background();
+      M.wall({ top: 500, bot: 1260, shadow: saxShadow(470, 1235, 720, 6) });
+      M.engravedSun(800, 330, 70, { rays: 460, spread: 0.9, seed: 'invitado' });
+      M.huella(800, 330, 52, 'the-sun', 8, 0.8);
+      M.vignette(0.55);
+      M.text(NAME + '  ·  ' + SLOGAN, 400, 300, cinzel(20, 600), C.accent, { spacing: 5 });
+      M.text('INVITADO ESPECIAL', 540, 1360, cinzel(26, 600), C.accent, { spacing: 10 });
+      M.title(GUEST, 540, 1445, 92, 940, { spacing: 6 });
+      M.text(GUEST_DETAIL, 540, 1505, italic(42), soft(0.88));
+      M.text('XI · X  ·  XVIII — III  ·  MELT UNDERGROUND', 540, 1565, cinzel(24), soft(0.7), { spacing: 4 });
+      M.credits(1612, 22);
     }],
 
     // ---------------- LÁMINA 3 · la lámina ----------------
@@ -88,10 +133,10 @@
       M.ctx.drawImage(fig, 0, 500, 1080, 1020, 97, 205, 886, 837);
       M.ctx.strokeStyle = soft(0.6); M.ctx.lineWidth = 2; M.ctx.strokeRect(48, 40, 984, 1270);
       M.ctx.lineWidth = 0.8; M.ctx.strokeRect(58, 50, 964, 1250);
-      M.title(NAME, 540, 150, 84, 800);
+      M.title(NAME, 540, 150, 88, 800);
       M.text('FIG. I', 120, 196, cinzel(18), soft(0.6), { align: 'left', spacing: 5 });
       M.text('ΣΠΗΛΑΙΟΝ', 960, 196, '18px "GFS Didot"', soft(0.6), { align: 'right', spacing: 7 });
-      [['α', 'XVIII · el ocaso: entrás'], ['β', 'el descenso'], ['γ', 'XXIV · el fuego: suena ' + ALBUM], ['ε', 'las sombras: nosotros'], ['δ', 'III · la salida, con otra luz']].forEach(function (l, i) {
+      [['α', 'XVIII · el ocaso: entrás'], ['β', 'el descenso'], ['γ', 'el fuego: saxo en vivo y un estreno'], ['ε', 'las sombras: la solar people'], ['δ', 'III · la salida, con otra luz']].forEach(function (l, i) {
         var y = 1092 + i * 38;
         M.text(l[0], 250, y, 'italic 30px "GFS Didot"', C.accent, { align: 'left' });
         M.text(l[1], 292, y, italic(31), soft(0.88), { align: 'left' });
@@ -103,7 +148,7 @@
       M.caveSection({ G: 800, frame: [76, 470, 928, 1000] });
       M.ctx.strokeStyle = soft(0.6); M.ctx.lineWidth = 2; M.ctx.strokeRect(64, 458, 952, 1024);
       M.vignette(0.4);
-      M.text(NAME, 540, 240, cinzel(30, 600), C.accent, { spacing: 10 });
+      M.text(NAME + '  ·  ' + SLOGAN, 540, 240, cinzel(24, 600), C.accent, { spacing: 7 });
       M.title('HOY', 540, 345, 112, 600);
       M.text('XVIII — III  ·  MELT UNDERGROUND', 540, 410, cinzel(24), soft(0.75), { spacing: 5 });
       M.text('el sol se pone a las 19:08.', 540, 1550, italic(44), soft(0.9));
@@ -114,8 +159,8 @@
       M.caveSection({ G: 820, frame: [76, 470, 928, 1000], rising: true, sunX: 790, sunR: 120, labels: false });
       M.ctx.strokeStyle = soft(0.6); M.ctx.lineWidth = 2; M.ctx.strokeRect(64, 458, 952, 1024);
       M.vignette(0.4);
-      M.text(NAME + '  →  ' + ALBUM, 540, 250, cinzel(28, 600), C.accent, { spacing: 8 });
-      M.title('GRACIAS POR BAJAR', 540, 360, 76, 900);
+      M.text(NAME, 540, 250, cinzel(28, 600), C.accent, { spacing: 10 });
+      M.title('GRACIAS, SOLAR PEOPLE', 540, 360, 72, 940);
       M.text('salimos con otra luz.', 540, 1555, italic(46), C.cream);
       M.text('lo que escuchaste adentro, pronto afuera.', 540, 1608, italic(34), soft(0.7));
     }],
@@ -125,7 +170,6 @@
       M.background(); M.marble(44);
       var sun = [540, 520], mo = [562, 960], earth = [540, 1250];
       M.sunDisk(sun[0], sun[1], 150);
-      // líneas de la alineación: tierra → sol y tierra → luna (3,8° de diferencia)
       var g = M.ctx;
       g.save(); g.setLineDash([4, 10]); g.strokeStyle = soft(0.55); g.lineWidth = 1.6;
       g.beginPath(); g.moveTo(earth[0], earth[1] - 62); g.lineTo(sun[0], sun[1] + 160); g.stroke();
@@ -134,13 +178,12 @@
       g.save(); g.strokeStyle = C.accent; g.lineWidth = 1.4; g.beginPath(); g.arc(earth[0], earth[1] - 62, 120, -Math.PI / 2, -Math.PI / 2 + 0.0663); g.stroke(); g.restore();
       M.text('3,8°', earth[0] + 16, earth[1] - 196, 'italic 26px "GFS Didot"', C.accent, { align: 'left' });
       M.moon(mo[0], mo[1], 50, { lit: 0.03, angle: -Math.PI / 2, rim: 0.5 });
-      // la tierra, grabada
       var l = M.layer(), lg = l.getContext('2d');
       M.engrave(lg, { angle: Math.PI / 4, spacing: 5, maxW: 1.6, wobble: 0.3, light: function (x, y) { var d = Math.hypot(x - earth[0], y - earth[1]) / 62; return d > 1 ? 0 : 0.3 + 0.7 * (1 - d * 0.6) * (y < earth[1] ? 1 : 0.6); } });
       g.drawImage(l, 0, 0);
       g.strokeStyle = soft(0.8); g.lineWidth = 1.6; g.beginPath(); g.arc(earth[0], earth[1], 62, 0, Math.PI * 2); g.stroke();
       g.fillStyle = C.accent; g.beginPath(); g.arc(earth[0] + 18, earth[1] - 30, 5, 0, Math.PI * 2); g.fill();
-      [['ΗΛΙΟΣ', 'el sol', sun[0] + 200, sun[1] + 8], ['ΣΕΛΗΝΗ', 'la luna, nueva', mo[0] + 90, mo[1] + 8], ['ΓΗ', 'nosotros', earth[0] + 100, earth[1] + 8]].forEach(function (t) {
+      [['ΗΛΙΟΣ', 'el sol', sun[0] + 200, sun[1] + 8], ['ΣΕΛΗΝΗ', 'la luna, nueva', mo[0] + 90, mo[1] + 8], ['ΓΗ', 'la solar people', earth[0] + 100, earth[1] + 8]].forEach(function (t) {
         M.text(t[0], t[2], t[3] - 14, '24px "GFS Didot"', soft(0.75), { align: 'left', spacing: 5 });
         M.text(t[1], t[2], t[3] + 22, italic(30), soft(0.6), { align: 'left' });
       });
@@ -166,7 +209,7 @@
         M.text(['I', 'II', 'III', 'IV'][k], x, y + R + 52, cinzel(20), soft(0.5), { spacing: 3 });
       });
       M.vignette(0.5);
-      M.text(NAME, 540, 262, cinzel(26, 600), C.accent, { spacing: 10 });
+      M.text(NAME + '  ·  ' + SLOGAN, 540, 262, cinzel(22, 600), C.accent, { spacing: 6 });
       M.title('EARLY BIRD', 540, 470, 104, 900);
       M.text('se apaga el viernes IX · 23:59', 540, 1355, italic(46), C.cream);
       M.title('$5.000', 540, 1450, 64, 600, { spacing: 4 });

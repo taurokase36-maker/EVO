@@ -1,4 +1,4 @@
-/* THE ECLIPSE · motor de dibujo "grabado" para las piezas de redes.
+/* SOLARIS · motor de dibujo "grabado" para las piezas de redes.
    Las tres láminas de propuestas/caverna, convertidas en funciones reutilizables. */
 (function () {
   'use strict';
@@ -225,7 +225,7 @@
   function rule(y, w) { ctx.save(); ctx.strokeStyle = rgba(C.accent, 0.7); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(W / 2 - w / 2, y); ctx.lineTo(W / 2 + w / 2, y); ctx.stroke(); ctx.restore(); }
 
   // ---------- escena: la pared de la caverna con sombras y fuego ----------
-  // o: { top, bot, left, right, people: [...], sunY, sunR, fireY }
+  // o: { top, bot, left, right, people: [...] o shadow: capa propia, fireY }
   function wall(o) {
     var top = o.top, bot = o.bot, left = o.left || 70, right = o.right || W - 70, wallP = new Path2D(), pts = [], i, t;
     for (i = 0; i <= 60; i++) { t = i / 60; pts.push([left + (right - left) * t, top - 40 * Math.sin(t * Math.PI) + (smooth(t * 9, 11) - 0.5) * 70]); }
@@ -233,7 +233,7 @@
     for (i = 60; i >= 0; i--) { t = i / 60; pts.push([left + (right - left) * t, bot + (smooth(t * 8, 13) - 0.5) * 50]); }
     for (i = 30; i >= 0; i--) { t = i / 30; pts.push([left + (smooth(t * 7, 14) - 0.5) * 60, top + (bot - top) * t]); }
     pts.forEach(function (p, i) { i ? wallP.lineTo(p[0], p[1]) : wallP.moveTo(p[0], p[1]); }); wallP.closePath();
-    var M = maskOf(dancers(o.people, o.blur === undefined ? 7 : o.blur));
+    var M = maskOf(o.shadow || dancers(o.people, o.blur === undefined ? 7 : o.blur));
     var rock = layer(), rg = rock.getContext('2d');
     engrave(rg, { angle: 0.6, spacing: 9, maxW: 1.4, light: function (x, y) { return 0.25 + 0.35 * smooth(x * 0.01 + y * 0.004, 21) - Math.abs(y - (top + bot) / 2) / 3000; } });
     engrave(rg, { angle: -0.9, spacing: 11, maxW: 1.1, light: function (x, y) { return 0.15 + 0.3 * smooth(y * 0.01, 22); } });

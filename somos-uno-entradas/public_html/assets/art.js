@@ -123,16 +123,16 @@
         ctx.fillText((d.when || '').toUpperCase(), 540, 1600);
         ctx.globalAlpha = 0.75;
         ctx.font = '400 30px "Space Mono", monospace';
-        ctx.fillText(d.number ? 'SOMOS EL Nº ' + d.number : '', 540, 1700);
+        ctx.fillText(d.number ? 'SOLAR PEOPLE Nº ' + d.number : '', 540, 1700);
         ctx.globalAlpha = 1;
         c.toBlob(function (blob) {
-          var file = new File([blob], 'the-sun.png', { type: 'image/png' });
+          var file = new File([blob], 'solaris.png', { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             navigator.share({ files: [file] }).catch(function () {});
           } else {
             var a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'the-sun.png';
+            a.download = 'solaris.png';
             document.body.appendChild(a); a.click(); a.remove();
           }
         }, 'image/png');

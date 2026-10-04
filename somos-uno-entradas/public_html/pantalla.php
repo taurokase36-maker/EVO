@@ -76,7 +76,7 @@ header('X-Robots-Tag: noindex');
       messages = d.messages || [];
       seeds = ['somos-uno'].concat(messages.map(function (m) { return m.author + m.body; }));
       document.getElementById('count').textContent = d.inside > 0 ? 'somos ' + d.inside : 'somos uno.';
-      document.getElementById('count-sub').textContent = d.inside > 0 && d.capacity ? 'de ' + d.capacity + ' bajo el mismo sol' : '';
+      document.getElementById('count-sub').textContent = d.inside > 0 && d.capacity ? 'solar people · de ' + d.capacity : '';
     }).catch(function () {});
   }
   load(); setInterval(load, 20000);

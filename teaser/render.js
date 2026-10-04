@@ -7,7 +7,7 @@ let pw;
 try { pw = require('playwright'); } catch { pw = require(execSync('npm root -g').toString().trim() + '/playwright'); }
 
 const FPS = 30;
-const out = process.argv[2] || path.join(__dirname, 'the-sun-teaser.mp4');
+const out = process.argv[2] || path.join(__dirname, 'solaris-teaser.mp4');
 const seed = process.argv[3] || 'the-sun';
 
 (async () => {

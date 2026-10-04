@@ -57,7 +57,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
       </div>
     </header>
     <div class="huella" data-huella="<?= e($token) ?>" data-color="<?= e(cfg('brand.colors.bg')) ?>"></div>
-    <p class="huella-label">tu huella · somos el nº <?= $number ?></p>
+    <p class="huella-label">tu huella · solar people nº <?= $number ?></p>
     <div class="qr" data-qr="<?= e(url('ticket.php?t=' . $token)) ?>" role="img" aria-label="Código QR de ingreso"></div>
     <p class="ticket-code"><?= e($code) ?></p>
     <?php if ($done): ?><p class="badge badge-off">ya ingresó</p><?php elseif ($expired): ?><p class="badge badge-off">vencida</p><?php endif; ?>
@@ -90,7 +90,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
       <p class="chalk">“<?= e($myMessage['body']) ?>”</p>
       <p class="muted"><?= ['pending' => 'en revisión', 'approved' => 'publicado en la pizarra', 'rejected' => 'no publicado'][$myMessage['status']] ?? '' ?></p>
     <?php else: ?>
-      <p class="muted">Dejá un mensaje corto para la pizarra de Somos Uno. Se ve en la página y se proyecta en la fiesta.</p>
+      <p class="muted">Dejá un mensaje corto para la solar people. Se ve en la pizarra de la página y se proyecta en la fiesta.</p>
       <form method="post" action="mensaje.php" class="buy">
         <?= csrf_field() ?>
         <input type="hidden" name="t" value="<?= e($token) ?>">
