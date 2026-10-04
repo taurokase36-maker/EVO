@@ -1,0 +1,7 @@
+# graphify own skill/config files, not project content
+.claude/
+CLAUDE.md
+graphify-out/
+# vendored third-party QR libraries
+somos-uno-entradas/public_html/assets/jsQR.js
+somos-uno-entradas/public_html/assets/qrcode.js

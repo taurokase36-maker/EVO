@@ -15,7 +15,16 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
   echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$CLAUDE_ENV_FILE"
 fi
 
-if command -v graphify >/dev/null 2>&1 && graphify --version 2>/dev/null | grep -q "$GRAPHIFY_VERSION"; then
+graphify_ready() {
+  command -v graphify >/dev/null 2>&1 || return 1
+  graphify --version 2>/dev/null | grep -q "$GRAPHIFY_VERSION" || return 1
+  # pdf/office extras let graphify read the PDFs and .xlsx files in this repo
+  local py
+  py=$(head -1 "$(command -v graphify)" | tr -d '#!')
+  "$py" -c "import pypdf, openpyxl, docx" 2>/dev/null
+}
+
+if graphify_ready; then
   exit 0
 fi
 
@@ -23,4 +32,4 @@ if ! command -v uv >/dev/null 2>&1; then
   pip install --quiet uv
 fi
 
-uv tool install --force "git+https://github.com/Graphify-Labs/graphify.git@v${GRAPHIFY_VERSION}"
+uv tool install --force "graphifyy[pdf,office] @ git+https://github.com/Graphify-Labs/graphify.git@v${GRAPHIFY_VERSION}"
