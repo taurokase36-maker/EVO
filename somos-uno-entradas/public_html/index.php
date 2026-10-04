@@ -122,7 +122,9 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
             <?php if (!empty($t['anchor']) && (int) $t['anchor'] > (int) $t['price']): ?><s><?= money((int) $t['anchor']) ?></s><?php endif; ?>
             <?= money((int) $t['price']) ?>
           </p>
-          <?php if ($s['open']): ?>
+          <?php if ($s['open'] && tier_link($t) !== ''): ?>
+            <a class="btn btn-solid btn-block" href="<?= e(tier_link($t)) ?>" rel="noopener">comprar en mercado pago</a>
+          <?php elseif ($s['open']): ?>
             <form method="post" action="checkout.php" class="buy">
               <?= csrf_field() ?>
               <input type="hidden" name="tier" value="<?= e($id) ?>">
@@ -142,6 +144,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
       <?php endforeach; ?>
     </div>
     <p class="fine">En puerta: <?= money((int) cfg('event.door_price', 0)) ?>. Pagás con tarjeta, débito o dinero en cuenta de Mercado Pago.</p>
+    <?php if (!uses_checkout() && cfg('link_note')): ?><p class="fine"><?= e(cfg('link_note')) ?></p><?php endif; ?>
   </section>
 
   <?php if (cfg('lista.enabled', false)): ?>

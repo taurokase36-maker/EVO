@@ -312,6 +312,24 @@ function tiers(): array
     return $out;
 }
 
+/** Link de pago de Mercado Pago de una entrada (modo simple), o '' si se compra dentro de la web. */
+function tier_link(array $t): string
+{
+    $l = trim((string) ($t['link'] ?? ''));
+    return preg_match('~^https://~', $l) ? $l : '';
+}
+
+/** ¿Alguna entrada se compra dentro de la web? (si todas usan link, el modo demo no aplica) */
+function uses_checkout(): bool
+{
+    foreach (tiers() as $t) {
+        if (tier_link($t) === '') {
+            return true;
+        }
+    }
+    return false;
+}
+
 function tier_taken(string $tierId): int
 {
     $cut = date('Y-m-d H:i:s', time() - 60 * (int) cfg('reserve_minutes', 30));

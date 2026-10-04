@@ -58,6 +58,10 @@ Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pag
 
 Mercado Pago descuenta unos $42.480 de lo online. **Neto: entre $1.037.520 y $1.157.520.**
 
+## Modo simple: links de pago
+
+Si en `tickets` cargás un `link` (un link de pago de Mercado Pago, empieza con `https://`), el botón de esa entrada lleva directo al link y no se usa la compra dentro de la web. Con todas las entradas en modo link, la franja de "modo demo" no aparece. La lista y las invitaciones siguen funcionando con QR. Paso a paso en `GUIA-WEB.md`, en la raíz del repo.
+
 ## 3. Conectar Mercado Pago y cobrar de verdad (10 minutos)
 
 > Hostinger no tiene pasarela de pagos para sitios propios. El cobro lo hace **Mercado Pago**, que ya está programado: solo falta conectar tu cuenta.

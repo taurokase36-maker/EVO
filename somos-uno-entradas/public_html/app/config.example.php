@@ -84,11 +84,16 @@ return [
     //  anchor = precio tachado de referencia (0 = no mostrar)
     //  stock  = cuántas hay
     //  until  = hasta cuándo se vende ('AAAA-MM-DD HH:MM') o null
+    //  link   = MODO SIMPLE: pegá acá el "link de pago" de Mercado Pago de esa entrada.
+    //           Con link, el botón lleva directo a Mercado Pago (sin QR ni mail automático).
+    //           Vacío ('') = compra completa dentro de la web, con QR (necesita el Access Token).
     // ---------------------------------------------------------------
     'tickets' => [
-        ['id' => 'early',   'name' => 'Early bird', 'price' => 5000,  'anchor' => 10000, 'stock' => 30,  'until' => '2026-10-09 23:59', 'note' => 'cupo limitado'],
-        ['id' => 'general', 'name' => 'General',    'price' => 10000, 'anchor' => 0,     'stock' => 65,  'until' => null,               'note' => 'mismo precio que en puerta'],
+        ['id' => 'early',   'name' => 'Early bird', 'price' => 5000,  'anchor' => 10000, 'stock' => 30,  'until' => '2026-10-09 23:59', 'note' => 'cupo limitado',              'link' => ''],
+        ['id' => 'general', 'name' => 'General',    'price' => 10000, 'anchor' => 0,     'stock' => 65,  'until' => null,               'note' => 'mismo precio que en puerta', 'link' => ''],
     ],
+    // Texto debajo de las entradas con link (modo simple)
+    'link_note' => 'Pagás en Mercado Pago. Guardá el comprobante: en la puerta entrás con tu nombre y DNI.',
     'max_per_order'       => 4,
     'service_fee_percent' => 0,    // ej: 5 = se le suma 5% al comprador como "cargo por servicio"
     'reserve_minutes'     => 30,   // cuánto se reserva el cupo mientras la persona paga

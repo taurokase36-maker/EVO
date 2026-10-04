@@ -27,7 +27,7 @@ function page_start(string $title, string $bodyClass = '', string $base = ''): v
 <style>:root{--bg:<?= e($c['bg'] ?? '#070202') ?>;--glow:<?= e($c['glow'] ?? '#6b0d07') ?>;--accent:<?= e($c['accent'] ?? '#d9482c') ?>;--cream:<?= e($c['cream'] ?? '#efe2d6') ?>}</style>
 </head>
 <body class="<?= e($bodyClass) ?>">
-<?php if (demo()): ?><div class="demo-bar">modo demo · los pagos se aprueban solos</div><?php endif; ?>
+<?php if (demo() && uses_checkout()): ?><div class="demo-bar">modo demo · los pagos se aprueban solos</div><?php endif; ?>
 <?php
 }
 

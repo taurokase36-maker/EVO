@@ -21,6 +21,9 @@ $ref = clean_ref((string) ($_POST['ref'] ?? ''));
 if (!$tier) {
     $back('Elegí una entrada.');
 }
+if (tier_link($tier) !== '') {   // modo simple: esa entrada se paga con el link de Mercado Pago
+    redirect(tier_link($tier));
+}
 if ($qty < 1 || $qty > (int) cfg('max_per_order', 4)) {
     $back('Cantidad inválida.');
 }
