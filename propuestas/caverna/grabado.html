@@ -1,0 +1,353 @@
+<!doctype html>
+<!-- THE SUN · propuestas visuales "grabado antiguo" (1080x1920).
+     ?v=1 La pared · ?v=2 El sol grabado · ?v=3 La lámina -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>THE SUN · grabado</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=GFS+Didot&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=block" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #000; }
+  canvas { display: block; height: 100vh; aspect-ratio: 9 / 16; margin: 0 auto; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+(function () {
+  'use strict';
+  var W = 1080, H = 1920;
+  var C = { bg: '#070202', glow: '#6b0d07', accent: '#d9482c', cream: '#efe2d6', fire: '#e8803a' };
+  var V = new URLSearchParams(location.search).get('v') || '1';
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+
+  // ---------- utilidades ----------
+  function seedFrom(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function clamp(x) { return Math.max(0, Math.min(1, x)); }
+  function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  function layer() { var c = document.createElement('canvas'); c.width = W; c.height = H; return c; }
+  // ruido suave 1D (suma de senos con fases fijas)
+  function smooth(x, seed) { var r = rng(seed), s = 0, a = 1, tot = 0; for (var i = 0; i < 5; i++) { var f = 1 + i * 1.7 + r() * 2, p = r() * 10; s += a * Math.sin(x * f + p); tot += a; a *= 0.6; } return 0.5 + 0.5 * s / tot; }
+  function roman(n) { var m = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']], out = ''; if (n >= 20) { out = 'XX'; n -= 20; } else if (n >= 10) { out = 'X'; n -= 10; } m.slice(1).forEach(function (p) { while (n >= p[0]) { out += p[1]; n -= p[0]; } }); return out || '0'; }
+
+  // Grabado: líneas paralelas cuyo grosor sigue a light(x,y) (0 = sin línea, 1 = línea gruesa)
+  function engrave(c, o) {
+    var ang = o.angle || 0, sp = o.spacing || 6, maxW = o.maxW || 2.4, step = 4;
+    var dx = Math.cos(ang), dy = Math.sin(ang), nx = -dy, ny = dx;
+    var cx = W / 2, cy = H / 2, L = Math.hypot(W, H) / 2 + 10;
+    var buckets = []; for (var b = 0; b < 10; b++) buckets.push(new Path2D());
+    for (var d = -L; d <= L; d += sp) {
+      var prev = null, pb = -1;
+      for (var u = -L; u <= L; u += step) {
+        var wob = (o.wobble || 0.8) * Math.sin(u * 0.021 + d * 0.37);
+        var x = cx + u * dx + (d + wob) * nx, y = cy + u * dy + (d + wob) * ny;
+        if (x < -5 || y < -5 || x > W + 5 || y > H + 5) { prev = null; continue; }
+        var l = clamp(o.light(x, y));
+        var bi = Math.min(9, Math.floor(l * 10));
+        if (l < 0.06) { prev = null; continue; }
+        if (prev) { buckets[bi].moveTo(prev[0], prev[1]); buckets[bi].lineTo(x, y); }
+        prev = [x, y]; pb = bi;
+      }
+    }
+    c.save(); c.lineCap = 'round'; c.strokeStyle = o.color || C.cream; c.globalAlpha = o.alpha || 1;
+    buckets.forEach(function (p, i) { c.lineWidth = maxW * (i + 0.5) / 10; c.stroke(p); });
+    c.restore();
+  }
+
+  // Bailarines (siluetas) en una capa: devuelve la capa
+  function dancers(list, blur) {
+    var l = layer(), g = l.getContext('2d');
+    g.filter = blur ? 'blur(' + blur + 'px)' : 'none';
+    g.strokeStyle = g.fillStyle = '#fff'; g.lineCap = 'round'; g.lineJoin = 'round';
+    list.forEach(function (d) {
+      var h = d.h, x = d.x, y = d.y, r = rng(seedFrom('d' + d.seed));
+      var hipY = y - h * 0.47, neckY = y - h * 0.82, sway = (r() - 0.5) * h * 0.12;
+      var hip = [x + sway * 0.4, hipY], neck = [x + sway, neckY];
+      g.lineWidth = h * 0.13; g.beginPath(); g.moveTo(hip[0], hip[1]); g.lineTo(neck[0], neck[1]); g.stroke();
+      g.beginPath(); g.arc(neck[0] + sway * 0.2, neckY - h * 0.09, h * 0.075, 0, Math.PI * 2); g.fill();
+      g.lineWidth = h * 0.075;
+      [-1, 1].forEach(function (s) {           // piernas
+        var kx = hip[0] + s * h * (0.06 + r() * 0.06), ky = hipY + h * 0.24;
+        g.beginPath(); g.moveTo(hip[0], hip[1]); g.lineTo(kx, ky); g.lineTo(kx + s * h * r() * 0.08, y); g.stroke();
+      });
+      g.lineWidth = h * 0.06;
+      [-1, 1].forEach(function (s) {           // brazos: casi siempre arriba
+        var up = r() < 0.75, a1 = up ? -Math.PI / 2 + s * (0.35 + r() * 0.6) : Math.PI / 2 - s * (0.6 + r() * 0.5);
+        var ex = neck[0] + s * h * 0.06 + Math.cos(a1) * h * 0.2, ey = neckY + h * 0.03 + Math.sin(a1) * h * 0.2;
+        var a2 = a1 + s * (r() - 0.3) * 0.9;
+        g.beginPath(); g.moveTo(neck[0] + s * h * 0.06, neckY + h * 0.03); g.lineTo(ex, ey); g.lineTo(ex + Math.cos(a2) * h * 0.19, ey + Math.sin(a2) * h * 0.19); g.stroke();
+      });
+    });
+    return l;
+  }
+  function maskOf(l) { var d = l.getContext('2d').getImageData(0, 0, W, H).data; return function (x, y) { x |= 0; y |= 0; if (x < 0 || y < 0 || x >= W || y >= H) return 0; return d[(y * W + x) * 4 + 3] / 255; }; }
+
+  // Sol eclipse grabado: rayos de largo irregular, disco negro, borde con brillo
+  function engravedSun(c, cx, cy, R, o) {
+    o = o || {};
+    var l = layer(), g = l.getContext('2d'), n = o.rays || 720, seed = seedFrom(o.seed || 'sol');
+    var r = rng(seed);
+    g.strokeStyle = C.cream; g.lineCap = 'round';
+    for (var i = 0; i < n; i++) {
+      var a = (i / n) * Math.PI * 2 + (r() - 0.5) * 0.004;
+      if (o.from !== undefined && (a < o.from || a > o.to)) continue;
+      var s = Math.pow(smooth(a * 1.0, seed), 2.2) * 0.75 + Math.pow(smooth(a * 3.1, seed + 9), 3) * 0.35;
+      var len = R * ((o.minLen || 0.1) + s * (o.spread || 1.1) + r() * 0.08);
+      g.lineWidth = 0.8 + r() * 1.1;
+      g.beginPath(); g.moveTo(cx + Math.cos(a) * R * 1.01, cy + Math.sin(a) * R * 1.01); g.lineTo(cx + Math.cos(a) * (R + len), cy + Math.sin(a) * (R + len)); g.stroke();
+    }
+    // se desvanece hacia afuera y se tiñe de rojo cerca del disco
+    g.globalCompositeOperation = 'destination-in';
+    var fg = g.createRadialGradient(cx, cy, R, cx, cy, R * (1.2 + (o.spread || 1.1)));
+    fg.addColorStop(0, 'rgba(0,0,0,1)'); fg.addColorStop(0.45, 'rgba(0,0,0,0.55)'); fg.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = fg; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'source-atop';
+    var tg = g.createRadialGradient(cx, cy, R, cx, cy, R * 1.6);
+    tg.addColorStop(0, rgba(C.accent, 0.95)); tg.addColorStop(1, rgba(C.accent, 0));
+    g.fillStyle = tg; g.fillRect(0, 0, W, H);
+    // halo
+    c.save(); c.globalCompositeOperation = 'lighter';
+    var hg = c.createRadialGradient(cx, cy, R * 0.95, cx, cy, R * 2.4);
+    hg.addColorStop(0, rgba(C.accent, 0.5)); hg.addColorStop(0.2, rgba(C.glow, 0.45)); hg.addColorStop(1, rgba(C.glow, 0));
+    c.fillStyle = hg; c.beginPath(); c.arc(cx, cy, R * 2.4, 0, Math.PI * 2); c.fill(); c.restore();
+    c.drawImage(l, 0, 0);
+    if (!o.noDisc) { c.fillStyle = C.bg; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fill(); }
+    c.save(); c.shadowColor = C.accent; c.shadowBlur = 24; c.strokeStyle = C.cream; c.lineWidth = 2.2;
+    c.beginPath(); c.arc(cx, cy, R, o.from !== undefined ? o.from : 0, o.to !== undefined ? o.to : Math.PI * 2); c.stroke(); c.restore();
+  }
+
+  // Huella (líneas concéntricas) dentro del sol
+  function huella(c, cx, cy, size, seedStr, count, alpha) {
+    var r = rng(seedFrom(seedStr)), lobes = 2 + Math.floor(r() * 5), twist = (r() - 0.5) * 1.6, amp = 0.05 + r() * 0.09, phase = r() * Math.PI * 2, wob = 3 + Math.floor(r() * 6);
+    for (var k = 0; k < count; k++) {
+      var base = 0.12 + (k / (count - 1)) * 0.82;
+      c.beginPath();
+      for (var i = 0; i <= 200; i++) {
+        var a = i / 200 * Math.PI * 2, d = base * (1 + amp * Math.sin(lobes * a + phase + twist * k * 0.35) + amp * 0.45 * Math.sin(wob * a - phase * 1.7 + k * 0.5));
+        var x = cx + Math.cos(a) * d * size, y = cy + Math.sin(a) * d * size; i ? c.lineTo(x, y) : c.moveTo(x, y);
+      }
+      c.closePath(); c.globalAlpha = (alpha || 1) * (0.3 + 0.7 * k / count);
+      c.strokeStyle = k % 4 === 3 ? C.accent : C.cream; c.lineWidth = k % 4 === 3 ? 1.8 : 1.1; c.stroke();
+    }
+    c.globalAlpha = 1;
+  }
+
+  function text(str, x, y, font, color, opts) {
+    opts = opts || {};
+    ctx.save(); ctx.font = font; ctx.fillStyle = color; ctx.textAlign = opts.align || 'center'; ctx.textBaseline = 'alphabetic';
+    if (opts.spacing) ctx.letterSpacing = opts.spacing + 'px';
+    if (opts.glow) { ctx.shadowColor = opts.glow; ctx.shadowBlur = 30; }
+    ctx.fillText(str, x, y); ctx.restore();
+  }
+  function textOnCircle(str, cx, cy, r, center, font, color, spacing) {
+    ctx.save(); ctx.font = font; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    var widths = str.split('').map(function (ch) { return ctx.measureText(ch).width + (spacing || 0); });
+    var total = widths.reduce(function (a, b) { return a + b; }, 0), a = center - total / r / 2;
+    str.split('').forEach(function (ch, i) {
+      var aw = widths[i] / r; a += aw / 2;
+      ctx.save(); ctx.translate(cx + Math.cos(a) * r, cy + Math.sin(a) * r); ctx.rotate(a + Math.PI / 2); ctx.fillText(ch, 0, 0); ctx.restore();
+      a += aw / 2;
+    });
+    ctx.restore();
+  }
+  function grain(alpha) {
+    var g = document.createElement('canvas'); g.width = 540; g.height = 960;
+    var gx = g.getContext('2d'), img = gx.createImageData(540, 960), r = rng(7);
+    for (var i = 0; i < img.data.length; i += 4) { var v = r() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+    gx.putImageData(img, 0, 0);
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = alpha; ctx.drawImage(g, 0, 0, W, H); ctx.restore();
+  }
+  function vignette(a) {
+    var vg = ctx.createRadialGradient(W / 2, H / 2, 450, W / 2, H / 2, 1250);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,' + a + ')');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  }
+  function credits(y) {
+    text('SOMOS UNO  ×  MELT UNDERGROUND', W / 2, y, '600 26px Cinzel', rgba(C.cream, 0.7), { spacing: 6 });
+  }
+
+  // =====================================================================
+  //  1 · LA PARED: sombras de los que bailan, fuego abajo, el sol arriba como salida
+  // =====================================================================
+  function laPared() {
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+    // contorno de la pared iluminada (borde irregular de roca)
+    var wall = new Path2D(), r = rng(3), top = 640, bot = 1440, left = 70, right = 1010;
+    var pts = [];
+    for (var i = 0; i <= 60; i++) { var t = i / 60; pts.push([left + (right - left) * t, top + 40 * Math.sin(t * Math.PI) * -1 + (smooth(t * 9, 11) - 0.5) * 70]); }
+    for (i = 0; i <= 30; i++) { t = i / 30; pts.push([right + (smooth(t * 7, 12) - 0.5) * 60, top + (bot - top) * t]); }
+    for (i = 60; i >= 0; i--) { t = i / 60; pts.push([left + (right - left) * t, bot + (smooth(t * 8, 13) - 0.5) * 50]); }
+    for (i = 30; i >= 0; i--) { t = i / 30; pts.push([left + (smooth(t * 7, 14) - 0.5) * 60, top + (bot - top) * t]); }
+    pts.forEach(function (p, i) { i ? wall.lineTo(p[0], p[1]) : wall.moveTo(p[0], p[1]); }); wall.closePath();
+
+    var sh = dancers([
+      { x: 250, y: 1400, h: 560, seed: 1 }, { x: 430, y: 1420, h: 640, seed: 2 }, { x: 600, y: 1410, h: 600, seed: 3 },
+      { x: 770, y: 1420, h: 650, seed: 4 }, { x: 920, y: 1400, h: 520, seed: 5 }, { x: 340, y: 1440, h: 470, seed: 6 }, { x: 690, y: 1450, h: 480, seed: 7 }
+    ], 7);
+    var M = maskOf(sh);
+    // roca: trama cruzada tenue fuera de la pared
+    var rock = layer(), rg = rock.getContext('2d');
+    engrave(rg, { angle: 0.6, spacing: 9, maxW: 1.4, light: function (x, y) { return 0.25 + 0.35 * smooth(x * 0.01 + y * 0.004, 21) - Math.abs(y - 1000) / 3000; } });
+    engrave(rg, { angle: -0.9, spacing: 11, maxW: 1.1, light: function (x, y) { return 0.15 + 0.3 * smooth(y * 0.01, 22); } });
+    rg.globalCompositeOperation = 'destination-out'; rg.fill(wall);
+    ctx.globalAlpha = 0.35; ctx.drawImage(rock, 0, 0); ctx.globalAlpha = 1;
+    // pared: líneas horizontales, más gruesas donde llega el fuego, cortadas por las sombras
+    var wl = layer(), wg = wl.getContext('2d');
+    engrave(wg, { angle: 0, spacing: 5.5, maxW: 2.6, wobble: 1.4, light: function (x, y) {
+      var fire = clamp(1 - Math.hypot((x - 540) * 0.8, y - 1750) / 1250);
+      return (0.15 + fire * 1.0) * (1 - M(x, y) * 0.95);
+    } });
+    wg.globalCompositeOperation = 'destination-in'; wg.fill(wall);
+    wg.globalCompositeOperation = 'source-atop';   // tiñe solo las líneas: fuego abajo, crema arriba
+    var tint = wg.createLinearGradient(0, bot, 0, top);
+    tint.addColorStop(0, rgba(C.fire, 0.95)); tint.addColorStop(0.55, rgba(C.accent, 0.45)); tint.addColorStop(1, rgba(C.accent, 0));
+    wg.fillStyle = tint; wg.fillRect(0, 0, W, H);
+    ctx.drawImage(wl, 0, 0);
+    // fuego: brillo que sube desde abajo
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    var fg = ctx.createRadialGradient(540, 1720, 20, 540, 1720, 700);
+    fg.addColorStop(0, rgba(C.fire, 0.55)); fg.addColorStop(0.35, rgba(C.accent, 0.25)); fg.addColorStop(1, rgba(C.glow, 0));
+    ctx.fillStyle = fg; ctx.fillRect(0, 0, W, H); ctx.restore();
+    // el sol, lejos arriba: la salida
+    engravedSun(ctx, 540, 400, 92, { rays: 520, spread: 0.9, seed: 'pared' });
+    huella(ctx, 540, 400, 70, 'the-sun', 9, 0.8);
+    vignette(0.6);
+    text('THE SUN', W / 2, 1585, '600 132px Cinzel', C.cream, { spacing: 10, glow: C.accent });
+    text('entrás con el ocaso  ·  salís con otra luz', W / 2, 1650, 'italic 40px "Cormorant Garamond"', rgba(C.cream, 0.85));
+    text('XVIII  —  III', W / 2, 1720, '400 34px Cinzel', C.accent, { spacing: 8 });
+    credits(1780);
+    text('ΗΛΙΟΣ', W / 2, 270, '30px "GFS Didot"', rgba(C.cream, 0.55), { spacing: 14 });
+  }
+
+  // =====================================================================
+  //  2 · EL SOL GRABADO: lámina astronómica sobre mármol negro, con el reloj de la noche
+  // =====================================================================
+  function elSol() {
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+    // mármol negro: vetas
+    var mb = layer(), mg = mb.getContext('2d'), r = rng(42);
+    mg.strokeStyle = C.cream; mg.lineCap = 'round';
+    for (var v = 0; v < 26; v++) {
+      var x = r() * W, y = r() * H, a = r() * Math.PI * 2, w = 0.4 + r() * 1.6;
+      mg.globalAlpha = 0.04 + r() * 0.09; mg.lineWidth = w; mg.beginPath(); mg.moveTo(x, y);
+      for (var s = 0; s < 120; s++) { a += (smooth(s * 0.08, v * 13) - 0.5) * 0.5; x += Math.cos(a) * 9; y += Math.sin(a) * 9; mg.lineTo(x, y); if (r() < 0.02) { mg.moveTo(x, y); } }
+      mg.stroke();
+    }
+    mg.filter = 'blur(0.6px)'; ctx.drawImage(mb, 0, 0);
+    var cx = 540, cy = 860, R = 270;
+    engravedSun(ctx, cx, cy, R, { rays: 1100, spread: 1.0, seed: 'grabado' });
+    huella(ctx, cx, cy, R * 0.8, 'the-sun', 16, 0.9);
+    // reloj de 24 horas: la noche en la caverna, de XVIII a III
+    var RO = 470;
+    ctx.save(); ctx.strokeStyle = rgba(C.cream, 0.45); ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(cx, cy, RO, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, RO - 70, 0, Math.PI * 2); ctx.stroke();
+    var ha = function (h) { return -Math.PI / 2 + h / 24 * Math.PI * 2; };
+    ctx.strokeStyle = C.accent; ctx.lineWidth = 5; ctx.shadowColor = C.accent; ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.arc(cx, cy, RO, ha(18), ha(27)); ctx.stroke(); ctx.restore();
+    for (var h = 0; h < 24; h++) {
+      var a2 = ha(h), key = h === 18 || h === 3;
+      ctx.strokeStyle = key ? C.accent : rgba(C.cream, 0.5); ctx.lineWidth = key ? 3 : 1.2;
+      ctx.beginPath(); ctx.moveTo(cx + Math.cos(a2) * (RO - 12), cy + Math.sin(a2) * (RO - 12)); ctx.lineTo(cx + Math.cos(a2) * (RO + (key ? 22 : 12)), cy + Math.sin(a2) * (RO + (key ? 22 : 12))); ctx.stroke();
+      textOnCircle(h === 0 ? 'XXIV' : roman(h), cx, cy, RO - 36, a2, (key ? '600 26px' : '400 19px') + ' Cinzel', key ? C.accent : rgba(C.cream, 0.55), 1);
+    }
+    textOnCircle('ΕΙΣ ΤΟ ΣΠΗΛΑΙΟΝ  ·  ΠΡΟΣ ΤΟ ΦΩΣ', cx, cy, RO + 46, Math.PI / 2 * 3, '28px "GFS Didot"', rgba(C.cream, 0.6), 6);
+    vignette(0.55);
+    text('THE SUN', W / 2, 1520, '600 140px Cinzel', C.cream, { spacing: 12, glow: C.accent });
+    text('lo que vas a escuchar no se ve desde afuera', W / 2, 1590, 'italic 40px "Cormorant Garamond"', rgba(C.cream, 0.85));
+    text('XI · X · MMXXVI', W / 2, 1660, '400 32px Cinzel', C.accent, { spacing: 8 });
+    credits(1720);
+  }
+
+  // =====================================================================
+  //  3 · LA LÁMINA: corte de la caverna como grabado científico, con leyenda en griego
+  // =====================================================================
+  function laLamina() {
+    ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+    var M0 = 64;
+    // marco doble
+    ctx.strokeStyle = rgba(C.cream, 0.6); ctx.lineWidth = 2; ctx.strokeRect(M0, M0 + 120, W - 2 * M0, H - 2 * M0 - 240);
+    ctx.lineWidth = 0.8; ctx.strokeRect(M0 + 10, M0 + 130, W - 2 * M0 - 20, H - 2 * M0 - 260);
+    var G = 760;                                         // línea del suelo
+    var chamber = new Path2D(), cpts = [];
+    for (var i = 0; i <= 80; i++) {
+      var a = i / 80 * Math.PI * 2, rx = 400 + (smooth(a * 2, 31) - 0.5) * 60, ry = 190 + (smooth(a * 3, 32) - 0.5) * 50;
+      cpts.push([540 + Math.cos(a) * rx, 1170 + Math.sin(a) * ry]);
+    }
+    cpts.forEach(function (p, i) { i ? chamber.lineTo(p[0], p[1]) : chamber.moveTo(p[0], p[1]); }); chamber.closePath();
+    var stairs = new Path2D(); stairs.moveTo(170, G); stairs.lineTo(262, G); stairs.lineTo(330, 1000); stairs.lineTo(238, 1010); stairs.closePath();
+    var exit = new Path2D(); exit.moveTo(840, 1010); exit.lineTo(920, 1000); exit.lineTo(905, G); exit.lineTo(835, G); exit.closePath();
+    var frame = new Path2D(); frame.rect(M0 + 12, M0 + 132, W - 2 * M0 - 24, H - 2 * M0 - 264);
+    // cielo: líneas horizontales finas que se encienden cerca del sol
+    var sky = layer(), sg = sky.getContext('2d');
+    engrave(sg, { angle: 0, spacing: 8, maxW: 1.6, light: function (x, y) { return y > G ? 0 : 0.18 + 0.8 * clamp(1 - Math.hypot(x - 780, (y - G) * 1.6) / 520); } });
+    sg.globalCompositeOperation = 'destination-in'; sg.fill(frame);
+    sg.globalCompositeOperation = 'source-atop'; var tk = sg.createRadialGradient(780, G, 50, 780, G, 600); tk.addColorStop(0, rgba(C.accent, 0.9)); tk.addColorStop(1, rgba(C.accent, 0)); sg.fillStyle = tk; sg.fillRect(0, 0, W, H);
+    ctx.drawImage(sky, 0, 0);
+    // el sol poniéndose en el horizonte
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, G); ctx.clip();
+    engravedSun(ctx, 780, G, 105, { rays: 600, spread: 0.85, seed: 'ocaso' });
+    ctx.restore();
+    // tierra: trama diagonal, con la cámara y las escaleras vaciadas
+    var earth = layer(), eg = earth.getContext('2d');
+    engrave(eg, { angle: Math.PI / 4, spacing: 7, maxW: 1.5, light: function (x, y) { return y < G || y > 1430 ? 0 : (0.55 + 0.35 * smooth(x * 0.02 + y * 0.01, 33)) * clamp((1430 - y) / 60); } });
+    eg.globalCompositeOperation = 'destination-in'; eg.fill(frame);
+    eg.globalCompositeOperation = 'destination-out'; eg.fill(chamber); eg.fill(stairs); eg.fill(exit);
+    ctx.globalAlpha = 0.75; ctx.drawImage(earth, 0, 0); ctx.globalAlpha = 1;
+    ctx.strokeStyle = C.cream; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(M0 + 12, G); ctx.lineTo(W - M0 - 12, G); ctx.stroke();
+    // escalones
+    ctx.lineWidth = 1.4; ctx.strokeStyle = rgba(C.cream, 0.8);
+    for (i = 0; i < 9; i++) { var t = i / 9, y = G + 20 + t * 225, x0 = 175 + t * 68; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + 88, y); ctx.stroke(); }
+    // interior: luz del fuego en la pared, cortada por las sombras de los que bailan
+    var fx = 340, fy = 1300;
+    var people = [{ x: 470, y: 1320, h: 150, seed: 11 }, { x: 545, y: 1325, h: 160, seed: 12 }, { x: 620, y: 1318, h: 150, seed: 13 }, { x: 505, y: 1335, h: 130, seed: 14 }];
+    var shadows = dancers(people.map(function (p) { return { x: fx + (p.x - fx) * 1.75, y: p.y - 10, h: p.h * 1.9, seed: p.seed }; }), 5);
+    var SM = maskOf(shadows);
+    var inner = layer(), ig = inner.getContext('2d');
+    engrave(ig, { angle: 0, spacing: 4.5, maxW: 1.8, light: function (x, y) { return (0.12 + 0.95 * clamp(1 - Math.hypot(x - fx, (y - fy) * 1.3) / 560)) * (1 - SM(x, y) * 0.95); } });
+    ig.globalCompositeOperation = 'destination-in'; ig.fill(chamber);
+    ig.globalCompositeOperation = 'source-atop'; var ft = ig.createRadialGradient(fx, fy, 10, fx, fy, 600); ft.addColorStop(0, rgba(C.fire, 0.9)); ft.addColorStop(1, rgba(C.accent, 0.2)); ig.fillStyle = ft; ig.fillRect(0, 0, W, H);
+    ctx.drawImage(inner, 0, 0);
+    ctx.strokeStyle = rgba(C.cream, 0.9); ctx.lineWidth = 2; ctx.stroke(chamber);
+    // fuego
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    var gl = ctx.createRadialGradient(fx, fy - 20, 5, fx, fy - 20, 160); gl.addColorStop(0, rgba(C.fire, 0.9)); gl.addColorStop(1, rgba(C.glow, 0));
+    ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(fx, fy - 20, 160, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = C.fire; ctx.lineWidth = 2;
+    for (i = 0; i < 7; i++) { var off = (i - 3) * 9; ctx.beginPath(); ctx.moveTo(fx + off, fy + 10); ctx.bezierCurveTo(fx + off - 14, fy - 25, fx + off + 18, fy - 40 - Math.abs(3 - i) * -6, fx + off * 0.3, fy - 75 + Math.abs(3 - i) * 10); ctx.stroke(); }
+    // los que bailan: siluetas negras con borde de luz
+    var bodies = dancers(people, 0), bg2 = bodies.getContext('2d');
+    ctx.save(); ctx.shadowColor = C.fire; ctx.shadowBlur = 10; ctx.globalCompositeOperation = 'source-over';
+    bg2.globalCompositeOperation = 'source-in'; bg2.fillStyle = '#000'; bg2.fillRect(0, 0, W, H);
+    ctx.drawImage(bodies, 0, 0); ctx.restore();
+    // camino: bajar, quedarse, subir
+    ctx.save(); ctx.setLineDash([3, 9]); ctx.strokeStyle = rgba(C.cream, 0.8); ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(215, G - 60); ctx.lineTo(270, G + 120); ctx.quadraticCurveTo(330, 1090, 450, 1110); ctx.quadraticCurveTo(760, 1120, 860, 1020); ctx.lineTo(880, G - 60); ctx.stroke(); ctx.restore();
+    ctx.fillStyle = C.cream; ctx.beginPath(); ctx.moveTo(880, G - 80); ctx.lineTo(870, G - 56); ctx.lineTo(890, G - 56); ctx.closePath(); ctx.fill();
+    // letras de referencia
+    var tag = function (ch, x, y, lx, ly) {
+      ctx.strokeStyle = rgba(C.cream, 0.6); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(lx, ly); ctx.stroke();
+      text(ch, lx + (lx > x ? 18 : -18), ly + 12, 'italic 40px "GFS Didot"', C.accent);
+    };
+    tag('α', 720, G - 120, 640, G - 230); tag('β', 230, 880, 150, 860); tag('γ', fx, fy - 70, 250, 1440); tag('δ', 880, 900, 960, 860); tag('ε', 860, 1150, 960, 1420);
+    // encabezado y leyenda
+    text('THE SUN', W / 2, 330, '600 112px Cinzel', C.cream, { spacing: 10, glow: C.accent });
+    text('FIG. I', M0 + 40, 410, '400 24px Cinzel', rgba(C.cream, 0.6), { align: 'left', spacing: 6 });
+    text('ΣΠΗΛΑΙΟΝ', W - M0 - 40, 410, '24px "GFS Didot"', rgba(C.cream, 0.6), { align: 'right', spacing: 8 });
+    var leg = [['α', 'el ocaso · XVIII'], ['β', 'el descenso'], ['γ', 'el fuego: el sonido'], ['ε', 'las sombras: nosotros'], ['δ', 'la salida · III, con otra luz']];
+    leg.forEach(function (l, i) {
+      var y = 1500 + i * 46;
+      text(l[0], 190, y, 'italic 34px "GFS Didot"', C.accent, { align: 'left' });
+      text(l[1], 240, y, 'italic 36px "Cormorant Garamond"', rgba(C.cream, 0.88), { align: 'left' });
+    });
+    credits(1840 - 120 + 40);
+  }
+
+  var draw = { '1': laPared, '2': elSol, '3': laLamina }[V] || laPared;
+  document.fonts.load('600 40px Cinzel').then(function () { return Promise.all([document.fonts.load('30px "GFS Didot"', 'ΑΣ'), document.fonts.load('italic 40px "Cormorant Garamond"')]); })
+    .catch(function () {}).then(function () { draw(); grain(0.04); window.DONE = true; });
+})();
+</script>
+</body>
+</html>
