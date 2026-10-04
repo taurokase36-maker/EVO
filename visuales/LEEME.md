@@ -3,8 +3,9 @@
 Visuales para proyectar en Melt desde **Chrome**, con la estética de SOLARIS. Pulsan al BPM (127 por defecto) y se controlan con el teclado o con un **Xone:K2** por MIDI. **Funcionan sin internet**: las fuentes están en `fuentes/`.
 
 ## Abrirlas
-1. Copiá la carpeta del repo a la compu que va al proyector (como mínimo `visuales/`, `contenido/motor.js` y `fuentes/`, respetando las carpetas).
-2. Abrí `visuales/index.html` con **Chrome** (clic derecho → Abrir con → Google Chrome).
+1. Pasá **`visuales/SOLARIS-visuales.html`** a la compu que va al proyector (WhatsApp, Drive, mail o pendrive). Es un solo archivo con todo adentro, incluidas las fuentes.
+2. Abrilo con **Chrome** (clic derecho → Abrir con → Google Chrome).
+   Si cambiás el código, regeneralo con `python3 visuales/empaquetar.py`. Para trabajar sobre el código, usá `visuales/index.html`.
 3. Si Chrome pregunta por **dispositivos MIDI**, tocá *Permitir*.
 4. Apretá **Enter** para pantalla completa. El mouse se esconde solo.
 
