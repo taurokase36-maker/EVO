@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- SOLARIS · visuales en vivo. Abrir en Chrome (doble clic al archivo) y apretar Enter para pantalla completa.
+     Teclas: H muestra la ayuda. M abre el mapeo MIDI (Xone:K2). Funciona sin internet. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOLARIS · visuales</title>
+<link href="../fuentes/fuentes.css" rel="stylesheet">
+<style>
+  :root { --bg: #070202; --accent: #d9482c; --cream: #efe2d6; }
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; color: var(--cream); font: 13px/1.5 'Space Mono', monospace; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  body.idle { cursor: none; }
+  .panel { position: fixed; background: rgba(7, 2, 2, .92); border: 1px solid rgba(239, 226, 214, .2); border-radius: 12px; padding: 16px 18px; backdrop-filter: blur(6px); }
+  #hud { left: 16px; bottom: 16px; min-width: 260px; }
+  #hud b { color: var(--accent); font-weight: 700; }
+  .dots { display: flex; gap: 6px; margin: 6px 0; }
+  .dots i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--accent); }
+  .dots i.on { background: var(--accent); }
+  #help { right: 16px; top: 16px; width: 330px; max-height: calc(100vh - 64px); overflow: auto; }
+  #help h2, #midi h2 { font: 400 22px 'Major Mono Display', monospace; margin: 0 0 8px; text-transform: lowercase; }
+  #help kbd { display: inline-block; min-width: 22px; text-align: center; border: 1px solid rgba(239,226,214,.4); border-radius: 4px; padding: 0 4px; margin-right: 6px; }
+  #help p { margin: 3px 0; }
+  #midi { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(640px, 92vw); max-height: 86vh; overflow: auto; }
+  #midi table { width: 100%; border-collapse: collapse; }
+  #midi td { padding: 5px 4px; border-bottom: 1px solid rgba(239,226,214,.12); }
+  #midi td:nth-child(2) { color: rgba(239,226,214,.6); }
+  #midi button, .btn { background: none; border: 1px solid var(--accent); color: var(--cream); font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 20px; cursor: pointer; }
+  #midi button.learning { background: var(--accent); color: var(--bg); }
+  #midi .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  #toast { left: 50%; top: 24px; transform: translateX(-50%); padding: 8px 16px; transition: opacity .4s; pointer-events: none; }
+  .hidden { display: none !important; }
+  .fade { opacity: 0; }
+  #start { left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="toast" class="panel fade"></div>
+<div id="start" class="panel">cargando las texturas…</div>
+<div id="hud" class="panel hidden"></div>
+<div id="help" class="panel hidden">
+  <h2>solaris · visuales</h2>
+  <p><kbd>1</kbd>…<kbd>5</kbd> escenas: eclipse · la pared · tránsito · solaris · grabado</p>
+  <p><kbd>␣</kbd> tap tempo (tocá 4 veces en el beat)</p>
+  <p><kbd>S</kbd> sync: el próximo beat es el 1 del compás</p>
+  <p><kbd>↑</kbd><kbd>↓</kbd> BPM ±0,5</p>
+  <p><kbd>F</kbd> flash · <kbd>B</kbd> blackout · <kbd>L</kbd> logo encima</p>
+  <p><kbd>D</kbd> drop: en "tránsito" salta a la totalidad del eclipse</p>
+  <p><kbd>A</kbd> automático: cambia de escena cada 16 compases</p>
+  <p><kbd>Enter</kbd> pantalla completa · <kbd>H</kbd> esta ayuda · <kbd>M</kbd> mapeo MIDI</p>
+  <p><kbd>Q</kbd> calidad baja/alta (si la compu va lenta)</p>
+  <p style="margin-top:10px;color:rgba(239,226,214,.6)">K2 (de fábrica): faders 1–4 = brillo, pulso, fuego, logo · perillas de arriba = velocidad, grano, sombras, fundido. Los botones se asignan en <kbd>M</kbd>.</p>
+</div>
+<div id="midi" class="panel hidden">
+  <h2>mapeo midi</h2>
+  <p id="midi-status">buscando controladores…</p>
+  <p style="color:rgba(239,226,214,.6)">Tocá <b>aprender</b> y mové el fader, la perilla o el botón del K2. Se guarda solo en este navegador.</p>
+  <table id="midi-table"></table>
+  <div class="row">
+    <button id="midi-reset">volver a la configuración de fábrica</button>
+    <button id="midi-close">cerrar (M)</button>
+  </div>
+</div>
+<script src="../contenido/motor.js"></script>
+<script src="visuales.js"></script>
+</body>
+</html>

@@ -9,13 +9,15 @@
 - [ ] **Amigo de visuales:** pasarle también las piezas de la semana y avisarle del cambio de nombre a SOLARIS.
 - [ ] **Damian Santos:** confirmar cómo escribe su nombre (¿Damián con tilde?) y su usuario de Instagram para arrobarlo. Coordinar el momento del saxo dentro de tu set.
 
-## Web de entradas (Hostinger)
+## Web de entradas (Hostinger) · paso a paso en `GUIA-WEB.md`
+- [ ] Crear los dos links de pago en Mercado Pago (early bird y general) y pegarlos en `config.php`.
 - [ ] Subir los archivos nuevos (`assets/logo.svg`, `assets/melt.webp`, css, js, php).
 - [ ] Si ya existe `config.php`: copiar de `config.example.php` los bloques `brand`, `event` (incluye `guest`), `release`, `about` y `faq`.
 - [ ] Si no está hecho: apagar el modo demo, cargar el token de Mercado Pago, configurar el mail, cambiar los códigos de invitación y las contraseñas del panel.
 - [ ] Fechas clave: la early bird cierra el **viernes 9 a las 23:59** y la lista, el **domingo 11 a las 20:00**.
 
 ## Con Melt, para la noche
+- [ ] **Visuales en vivo:** probar `visuales/index.html` en la compu del proyector y asignar los botones del K2 (ver `visuales/LEEME.md`).
 - [ ] Proyector para la pantalla (`tudominio.com/pantalla.php`).
 - [ ] Luces: oscuridad total y una sola luz cálida que crece. Pico a las 00:00 con el estreno del track.
 
