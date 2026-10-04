@@ -193,3 +193,35 @@ td { padding: 10px 8px 10px 0; border-bottom: 1px solid var(--line); vertical-al
   .hero-glow { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+/* Pizarra */
+.board {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;
+  padding: 22px; border-radius: var(--radius); border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 60%, #000); box-shadow: inset 0 0 60px rgba(0,0,0,.5);
+}
+.note { transform: rotate(var(--r, 0deg)); padding: 6px 4px; }
+.note blockquote, .chalk { font-family: 'Caveat', cursive; font-size: 26px; line-height: 1.15; color: var(--cream); }
+.note figcaption { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--accent); margin-top: 6px; }
+.note-empty { font-family: 'Caveat', cursive; font-size: 26px; color: var(--soft); grid-column: 1 / -1; text-align: center; padding: 24px 0; }
+textarea { font: 16px/1.4 var(--sans); color: var(--cream); background: color-mix(in srgb, var(--bg) 70%, transparent); border: 1px solid var(--line); border-radius: 12px; padding: 13px 14px; width: 100%; resize: vertical; }
+textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Huella y compartir */
+.huella { width: 150px; height: 150px; margin: 0 auto 4px; }
+.huella svg { width: 100%; height: 100%; }
+.huella-label { font: 700 10px/1.4 var(--mono); letter-spacing: .18em; text-transform: uppercase; opacity: .6; margin-bottom: 14px; }
+.share { margin: 18px 0 8px; text-align: center; }
+.pizarra-form { margin: 24px 0 8px; }
+.pizarra-form h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 32px; margin-bottom: 8px; text-transform: none; letter-spacing: 0; color: var(--cream); }
+
+/* Panel: pagos y moderación */
+.status-pill { display: inline-block; font: 700 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; padding: 8px 12px; border-radius: 999px; }
+.status-demo { background: #fbbf24; color: #1a1300; }
+.status-live { background: #4ade80; color: #04210f; }
+.inline-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.inline-form input { flex: 1; min-width: 200px; }
+.inline-form .btn { padding: 12px 16px; min-height: 44px; }
+.mod-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.mod-item .chalk { font-size: 22px; }
+.mod-item form { display: inline; }

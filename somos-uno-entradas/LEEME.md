@@ -56,17 +56,33 @@ Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pag
 
 Mercado Pago descuenta unos $42.480 de lo online. **Neto: entre $1.037.520 y $1.157.520.**
 
-## 3. Conectar Mercado Pago (10 minutos)
+## 3. Conectar Mercado Pago y cobrar de verdad (10 minutos)
 
-1. Entrá a **https://www.mercadopago.com.ar/developers** con tu cuenta de vendedor.
-2. Ir a **Tus integraciones → Crear aplicación**. Elegí "Pagos online" y "Checkout Pro".
-3. Para probar primero sin plata real:
-   - Copiá el **Access Token de prueba** (empieza con `TEST-`) en `mercadopago.access_token`.
-   - Poné `demo_mode => false`.
-   - Pagá con las tarjetas de prueba que Mercado Pago muestra en "Cuentas de prueba".
-4. Para vender de verdad: copiá el **Access Token de producción** (empieza con `APP_USR-`).
-5. Opcional, para más seguridad: en tu aplicación, en **Webhooks**, cargá la URL `https://tudominio.com/webhook.php`, marcá el evento **Pagos** y copiá la **clave secreta** en `mercadopago.webhook_secret`.
-6. **Plazo de cobro:** en la app de Mercado Pago, en **Tu negocio → Costos → Checkout**, elegí cuándo recibís la plata. Cuanto más tarde, menos comisión:
+> Hostinger no tiene pasarela de pagos para sitios propios. El cobro lo hace **Mercado Pago**, que ya está programado: solo falta conectar tu cuenta.
+
+**Paso 1: sacar el Access Token**
+1. Entrá a **https://www.mercadopago.com.ar/developers/panel** con tu cuenta de vendedor.
+2. Tocá **Crear aplicación**. Nombre: "Somos Uno entradas". Elegí **Pagos online → CheckoutPro**.
+3. Dentro de la aplicación, en el menú de la izquierda:
+   - **Credenciales de prueba → Access Token**: empieza con `TEST-` y sirve para probar sin plata real.
+   - **Credenciales de producción → Access Token**: empieza con `APP_USR-` y es para cobrar de verdad. Puede pedirte completar datos del negocio antes de mostrarlo.
+
+**Paso 2: pegarlo en el panel (no hace falta tocar archivos)**
+1. Entrá a `tudominio.com/admin` → tarjeta **pagos**.
+2. Pegá el token y tocá **guardar**. El panel prueba la conexión y te dice "Conectado como TU_CUENTA".
+3. Tocá **apagar demo y cobrar**. Desde ese momento, cada compra pasa por Mercado Pago.
+
+**Paso 3: probar antes de vender (recomendado)**
+1. Primero usá el token `TEST-`. En el panel de Mercado Pago, en **Cuentas de prueba**, creá un comprador de prueba.
+2. Abrí tu sitio en una ventana privada, iniciá sesión en Mercado Pago con ese comprador y comprá. Usá las tarjetas de prueba que figuran en la documentación de Mercado Pago (Checkout Pro → Tarjetas de prueba).
+3. Si la entrada aparece, cambiá al token `APP_USR-` y listo.
+4. Antes de lanzar, en el panel tocá **borrar compras de prueba**, así los números arrancan en cero.
+
+**Prender y apagar el modo demo:** es el botón de la tarjeta **pagos** del panel. Arriba de todo se ve el estado: amarillo "modo demo · no se cobra" o verde "cobrando de verdad". El panel no te deja apagar el demo si el token no conecta.
+
+**Webhook (opcional, más seguro):** en tu aplicación de Mercado Pago → **Webhooks**, cargá `https://tudominio.com/webhook.php`, marcá **Pagos** y copiá la **clave secreta** en `config.php` → `mercadopago.webhook_secret`. Igual funciona sin esto: el sitio ya avisa a Mercado Pago a dónde notificar en cada compra.
+
+**Plazo de cobro:** en la app de Mercado Pago, en **Tu negocio → Costos → Checkout**, elegí cuándo recibís la plata. Cuanto más tarde, menos comisión:
 
 | Cuándo cobrás | Comisión + IVA | De una entrada de $10.000 te quedan |
 |---|---|---|
@@ -75,7 +91,11 @@ Mercado Pago descuenta unos $42.480 de lo online. **Neto: entre $1.037.520 y $1.
 | A 18 días | ~4,1% | $9.590 |
 | A 35 días | ~1,8% | $9.820 |
 
-Si querés que la comisión la pague el comprador, poné por ejemplo `service_fee_percent => 5`.
+## La pizarra, el arte y la pantalla
+
+- **Pizarra:** cada persona con entrada, lista o invitación puede dejar **un mensaje** de hasta 120 caracteres desde su entrada. Llega al panel como "por revisar". Lo publicás o lo ocultás, y los publicados aparecen en la portada, en la sección **la pizarra**.
+- **Huella:** cada entrada tiene un arte único, que siempre es el mismo para esa entrada, y el número de asistente ("somos el nº 7"). El botón **compartir en historias** arma una imagen vertical lista para Instagram, **sin el QR**.
+- **Pantalla para el proyector de Melt:** `tudominio.com/pantalla.php`, también enlazada desde el panel. Muestra "somos X" (la gente que ya ingresó) y los mensajes publicados en rotación. Tocá "pantalla completa" en la compu del proyector.
 
 ## 4. Mails con la entrada (5 minutos)
 

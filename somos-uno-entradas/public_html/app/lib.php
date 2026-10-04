@@ -24,7 +24,18 @@ function cfg(string $path, $default = null)
     return $v;
 }
 
-function demo(): bool { return (bool) cfg('demo_mode', false); }
+/** Modo demo: lo que diga el panel (si se tocó el interruptor) o, si no, config.php. */
+function demo(): bool
+{
+    $v = setting('demo_mode');
+    return $v === null ? (bool) cfg('demo_mode', false) : $v === '1';
+}
+
+/** Access Token de Mercado Pago: el cargado desde el panel o, si no, el de config.php. */
+function mp_token(): string
+{
+    return (string) (setting('mp_token') ?? cfg('mercadopago.access_token', ''));
+}
 
 // ---------------------------------------------------------------------
 // Helpers
@@ -168,6 +179,18 @@ function db(): PDO
         created_at VARCHAR(19) NOT NULL,
         paid_at VARCHAR(19) NOT NULL DEFAULT ''
     )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS settings (
+        k VARCHAR(64) PRIMARY KEY,
+        v TEXT NOT NULL
+    )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS messages (
+        id VARCHAR(16) PRIMARY KEY,
+        owner VARCHAR(64) NOT NULL UNIQUE,
+        author VARCHAR(40) NOT NULL,
+        body VARCHAR(255) NOT NULL,
+        status VARCHAR(16) NOT NULL DEFAULT 'pending',
+        created_at VARCHAR(19) NOT NULL
+    )");
     $pdo->exec("CREATE TABLE IF NOT EXISTS passes (
         id VARCHAR(16) PRIMARY KEY,
         token VARCHAR(64) NOT NULL UNIQUE,
@@ -197,6 +220,65 @@ function order_by(string $field, string $value): ?array
     }
     $row = q("SELECT * FROM orders WHERE $field = ?", [$value])->fetch();
     return $row ?: null;
+}
+
+function setting(string $k): ?string
+{
+    static $cache = null;
+    if ($cache === null || $k === '__reset') {
+        $cache = [];
+        foreach (q('SELECT k, v FROM settings')->fetchAll() as $r) {
+            $cache[$r['k']] = $r['v'];
+        }
+    }
+    return $cache[$k] ?? null;
+}
+
+function set_setting(string $k, ?string $v): void
+{
+    q('DELETE FROM settings WHERE k = ?', [$k]);
+    if ($v !== null) {
+        q('INSERT INTO settings (k, v) VALUES (?, ?)', [$k, $v]);
+    }
+    setting('__reset');
+}
+
+// ---------------------------------------------------------------------
+// Pizarra (mensajes de los asistentes, moderados)
+// ---------------------------------------------------------------------
+const MESSAGE_MAX = 120;
+
+function message_for(string $owner): ?array
+{
+    $row = q('SELECT * FROM messages WHERE owner = ?', [$owner])->fetch();
+    return $row ?: null;
+}
+
+function approved_messages(int $limit = 40): array
+{
+    return q("SELECT author, body FROM messages WHERE status = 'approved' ORDER BY created_at DESC LIMIT " . max(1, $limit))->fetchAll();
+}
+
+/** Primer nombre, para firmar la pizarra sin exponer el apellido. */
+function first_name(string $full): string
+{
+    $parts = preg_split('/\s+/u', trim($full)) ?: [''];
+    return mb_substr($parts[0], 0, 40);
+}
+
+/** Cantidad de personas adentro (ingresos registrados en la puerta). */
+function people_inside(): int
+{
+    return (int) q("SELECT COALESCE(SUM(checked_in),0) FROM orders WHERE status = 'approved'")->fetchColumn()
+        + (int) q('SELECT COALESCE(SUM(checked_in),0) FROM passes')->fetchColumn();
+}
+
+/** Número de asistente: posición de esta entrada entre todas (pagas, lista e invitaciones) por fecha de creación. */
+function attendee_number(string $createdAt, string $id): int
+{
+    $paid = (int) q("SELECT COALESCE(SUM(qty),0) FROM orders WHERE status = 'approved' AND (created_at < ? OR (created_at = ? AND id < ?))", [$createdAt, $createdAt, $id])->fetchColumn();
+    $passes = (int) q('SELECT COUNT(*) FROM passes WHERE created_at < ? OR (created_at = ? AND id < ?)', [$createdAt, $createdAt, $id])->fetchColumn();
+    return $paid + $passes + 1;
 }
 
 function pass_by_token(string $token): ?array
@@ -309,9 +391,9 @@ function create_pass(string $kind, string $name, string $email, string $ref, str
 // ---------------------------------------------------------------------
 function mp_request(string $method, string $path, ?array $body = null): array
 {
-    $token = (string) cfg('mercadopago.access_token');
+    $token = mp_token();
     if ($token === '') {
-        throw new RuntimeException('Falta el Access Token de Mercado Pago en config.php');
+        throw new RuntimeException('Falta el Access Token de Mercado Pago (cargalo en el panel → Pagos).');
     }
     $headers = ['Authorization: Bearer ' . $token, 'Content-Type: application/json'];
     if ($method === 'POST') {

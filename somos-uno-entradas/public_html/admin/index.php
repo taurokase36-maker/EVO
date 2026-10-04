@@ -44,19 +44,93 @@ if (current_role() === 'door') {
 require_role('admin');
 
 // ---------- Acciones ----------
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_ok($_POST['csrf'] ?? null)) {
-    $id = (string) ($_POST['id'] ?? '');
-    if (($_POST['action'] ?? '') === 'resend') {
-        if ($o = order_by('id', $id)) {
-            q('UPDATE orders SET emailed = 0 WHERE id = ?', [$id]);
-            send_order_email(order_by('id', $id));
-        } elseif ($p = q('SELECT * FROM passes WHERE id = ?', [$id])->fetch()) {
-            q('UPDATE passes SET emailed = 0 WHERE id = ?', [$id]);
-            send_pass_email(q('SELECT * FROM passes WHERE id = ?', [$id])->fetch());
-        }
-    }
-    redirect('index.php?ok=1');
+function flash(string $text, bool $ok = true): void { $_SESSION['flash'] = [$ok, $text]; }
+
+/** Prueba el token contra Mercado Pago. Devuelve el nickname de la cuenta o lanza un error. */
+function mp_check(): string
+{
+    $me = mp_request('GET', '/users/me');
+    return (string) ($me['nickname'] ?? $me['email'] ?? ('cuenta ' . ($me['id'] ?? '?')));
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_ok($_POST['csrf'] ?? null)) {
+        flash('La página estuvo abierta mucho tiempo. Probá de nuevo.', false);
+        redirect('index.php');
+    }
+    $id = (string) ($_POST['id'] ?? '');
+    switch ((string) ($_POST['action'] ?? '')) {
+        case 'resend':
+            if (order_by('id', $id)) {
+                q('UPDATE orders SET emailed = 0 WHERE id = ?', [$id]);
+                send_order_email(order_by('id', $id));
+            } elseif (q('SELECT id FROM passes WHERE id = ?', [$id])->fetch()) {
+                q('UPDATE passes SET emailed = 0 WHERE id = ?', [$id]);
+                send_pass_email(q('SELECT * FROM passes WHERE id = ?', [$id])->fetch());
+            }
+            flash('Mail reenviado (si el mail está configurado).');
+            break;
+
+        case 'mp_token':
+            $tok = preg_replace('/\s+/', '', (string) ($_POST['token'] ?? '')) ?? '';
+            if ($tok === '') {
+                set_setting('mp_token', null);
+                flash('Token borrado del panel.');
+            } elseif (!preg_match('/^(TEST|APP_USR)-[A-Za-z0-9-]{20,}$/', $tok)) {
+                flash('Ese no parece un Access Token. Tiene que empezar con APP_USR- (real) o TEST- (prueba).', false);
+            } else {
+                set_setting('mp_token', $tok);
+                try {
+                    flash('Token guardado. Conectado como ' . mp_check() . '.');
+                } catch (Throwable $ex) {
+                    flash('Token guardado, pero Mercado Pago lo rechazó: ' . $ex->getMessage(), false);
+                }
+            }
+            break;
+
+        case 'mp_test':
+            try {
+                flash('Conexión OK: conectado como ' . mp_check() . '.');
+            } catch (Throwable $ex) {
+                flash('No conecta: ' . $ex->getMessage(), false);
+            }
+            break;
+
+        case 'demo_off':
+            try {
+                $who = mp_check();
+                set_setting('demo_mode', '0');
+                flash('Modo demo apagado. Ahora se cobra de verdad con la cuenta ' . $who . (str_starts_with(mp_token(), 'TEST-') ? ' (token de PRUEBA: todavía no entra plata real).' : '.'));
+            } catch (Throwable $ex) {
+                flash('No se puede apagar el modo demo: ' . $ex->getMessage(), false);
+            }
+            break;
+
+        case 'demo_on':
+            set_setting('demo_mode', '1');
+            flash('Modo demo prendido: los pagos se aprueban solos y no se cobra nada.');
+            break;
+
+        case 'purge_demo':
+            $tokens = q("SELECT token FROM orders WHERE mp_payment = 'DEMO'")->fetchAll(PDO::FETCH_COLUMN);
+            foreach ($tokens as $tk) {
+                q('DELETE FROM messages WHERE owner = ?', [$tk]);
+            }
+            $n = q("DELETE FROM orders WHERE mp_payment = 'DEMO'")->rowCount();
+            flash("Se borraron $n compras de prueba.");
+            break;
+
+        case 'msg_approve':
+        case 'msg_reject':
+            $status = $_POST['action'] === 'msg_approve' ? 'approved' : 'rejected';
+            q('UPDATE messages SET status = ? WHERE id = ?', [$status, $id]);
+            flash($status === 'approved' ? 'Mensaje publicado en la pizarra.' : 'Mensaje oculto.');
+            break;
+    }
+    redirect('index.php' . (str_starts_with((string) ($_POST['action'] ?? ''), 'msg_') ? '#pizarra' : ''));
+}
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
 
 // ---------- Números ----------
 $sold = q("SELECT tier, COALESCE(SUM(qty),0) AS n, COALESCE(SUM(total),0) AS gross, COALESCE(SUM(checked_in),0) AS inside FROM orders WHERE status = 'approved' GROUP BY tier")->fetchAll();
@@ -97,6 +171,10 @@ foreach (array_keys((array) cfg('invitations.codes', [])) as $code) {
     $invites[] = invite_info($code);
 }
 
+$demoOrders = (int) q("SELECT COUNT(*) FROM orders WHERE mp_payment = 'DEMO'")->fetchColumn();
+$pending = q("SELECT * FROM messages WHERE status = 'pending' ORDER BY created_at")->fetchAll();
+$published = q("SELECT * FROM messages WHERE status = 'approved' ORDER BY created_at DESC LIMIT 100")->fetchAll();
+
 // ---------- Listados ----------
 $search = clean_text((string) ($_GET['q'] ?? ''), 60);
 $like = '%' . $search . '%';
@@ -111,7 +189,36 @@ page_start('Panel · ' . cfg('brand.name'), 'page-admin', $B);
     <h1>panel</h1>
     <nav><a class="btn btn-solid" href="scan.php">escanear QR</a> <a class="btn btn-ghost" href="logout.php">salir</a></nav>
   </div>
-  <?php if (!empty($_GET['ok'])): ?><p class="ok-note">Listo.</p><?php endif; ?>
+  <?php if ($flash): ?><p class="<?= $flash[0] ? 'ok-note' : 'alert' ?>" role="status"><?= e($flash[1]) ?></p><?php endif; ?>
+
+  <section class="card payments">
+    <div class="card-top">
+      <h2>pagos</h2>
+      <span class="status-pill <?= demo() ? 'status-demo' : 'status-live' ?>"><?= demo() ? 'modo demo · no se cobra' : 'cobrando de verdad' ?></span>
+    </div>
+    <p class="muted">Access Token de Mercado Pago:
+      <?php if ($tok = mp_token()): ?>
+        <b><?= e(substr($tok, 0, strpos($tok, '-') + 1) . '…' . substr($tok, -4)) ?></b>
+        <?= str_starts_with($tok, 'TEST-') ? '(de prueba: no entra plata real)' : '(real)' ?>
+      <?php else: ?><b>sin cargar</b><?php endif; ?>
+    </p>
+    <form method="post" class="inline-form">
+      <?= csrf_field() ?><input type="hidden" name="action" value="mp_token">
+      <input name="token" placeholder="pegá acá tu Access Token (APP_USR-… o TEST-…)" autocomplete="off" spellcheck="false">
+      <button class="btn btn-ghost">guardar</button>
+    </form>
+    <div class="inline-form">
+      <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="mp_test"><button class="btn btn-ghost">probar conexión</button></form>
+      <?php if (demo()): ?>
+        <form method="post" onsubmit="return confirm('¿Apagar el modo demo? Desde ahora las compras se cobran con Mercado Pago.')"><?= csrf_field() ?><input type="hidden" name="action" value="demo_off"><button class="btn btn-solid">apagar demo y cobrar</button></form>
+      <?php else: ?>
+        <form method="post" onsubmit="return confirm('¿Prender el modo demo? Las compras se aprueban solas SIN cobrar.')"><?= csrf_field() ?><input type="hidden" name="action" value="demo_on"><button class="btn btn-ghost">prender demo</button></form>
+      <?php endif; ?>
+      <?php if ($demoOrders): ?>
+        <form method="post" onsubmit="return confirm('¿Borrar las <?= $demoOrders ?> compras de prueba?')"><?= csrf_field() ?><input type="hidden" name="action" value="purge_demo"><button class="link">borrar <?= $demoOrders ?> compras de prueba</button></form>
+      <?php endif; ?>
+    </div>
+  </section>
 
   <section class="kpis">
     <div><span class="label">entradas vendidas</span><strong><?= (int) $totals['n'] ?></strong></div>
@@ -144,6 +251,30 @@ page_start('Panel · ' . cfg('brand.name'), 'page-admin', $B);
         <tr><td><?= e($i['owner']) ?><br><small class="muted copy" data-copy="<?= e(url('invitacion.php?c=' . $i['code'])) ?>">invitacion.php?c=<?= e($i['code']) ?> · copiar</small></td><td><?= $i['used'] ?> / <?= (int) $i['quota'] ?></td></tr>
       <?php endforeach; ?></table>
     </div>
+  </section>
+
+  <section class="card" id="pizarra">
+    <div class="card-top"><h2>pizarra · <?= count($pending) ?> por revisar</h2><a href="../pantalla.php" target="_blank" rel="noopener">abrir pantalla ↗</a></div>
+    <?php foreach ($pending as $m): ?>
+      <div class="mod-item">
+        <div><p class="chalk"><?= e($m['body']) ?></p><small class="muted">— <?= e($m['author']) ?> · <?= e($m['created_at']) ?></small></div>
+        <div>
+          <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="msg_approve"><input type="hidden" name="id" value="<?= e($m['id']) ?>"><button class="btn btn-solid">publicar</button></form>
+          <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="msg_reject"><input type="hidden" name="id" value="<?= e($m['id']) ?>"><button class="btn btn-ghost">ocultar</button></form>
+        </div>
+      </div>
+    <?php endforeach; ?>
+    <?php if (!$pending): ?><p class="muted">No hay mensajes por revisar.</p><?php endif; ?>
+    <?php if ($published): ?>
+      <details><summary class="muted">publicados (<?= count($published) ?>)</summary>
+        <?php foreach ($published as $m): ?>
+          <div class="mod-item">
+            <div><p class="chalk"><?= e($m['body']) ?></p><small class="muted">— <?= e($m['author']) ?></small></div>
+            <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="msg_reject"><input type="hidden" name="id" value="<?= e($m['id']) ?>"><button class="link">ocultar</button></form>
+          </div>
+        <?php endforeach; ?>
+      </details>
+    <?php endif; ?>
   </section>
 
   <form class="search" method="get"><input name="q" value="<?= e($search) ?>" placeholder="buscar por nombre, mail o código"><button class="btn btn-ghost">buscar</button></form>

@@ -31,6 +31,16 @@ if ($order) {
 }
 $done = $used >= $people;
 $expired = $pass && $pass['kind'] === 'invitacion' && is_past(cfg('invitations.valid_until'));
+$row = $order ?: $pass;
+$number = attendee_number($row['created_at'], $row['id']);
+$myMessage = message_for($token);
+$msgNotes = [
+    'ok' => 'listo. tu mensaje queda en revisión y aparece en la pizarra cuando se apruebe.',
+    'ya' => 'ya dejaste tu mensaje.',
+    'vacio' => 'escribí algo antes de enviar.',
+    'expirado' => 'la página estuvo abierta mucho tiempo. probá de nuevo.',
+];
+$msgNote = $msgNotes[(string) ($_GET['msg'] ?? '')] ?? '';
 
 page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
 ?>
@@ -46,6 +56,8 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
         <h1><?= e($title) ?></h1>
       </div>
     </header>
+    <div class="huella" data-huella="<?= e($token) ?>" data-color="<?= e(cfg('brand.colors.bg')) ?>"></div>
+    <p class="huella-label">tu huella · somos el nº <?= $number ?></p>
     <div class="qr" data-qr="<?= e(url('ticket.php?t=' . $token)) ?>" role="img" aria-label="Código QR de ingreso"></div>
     <p class="ticket-code"><?= e($code) ?></p>
     <?php if ($done): ?><p class="badge badge-off">ya ingresó</p><?php elseif ($expired): ?><p class="badge badge-off">vencida</p><?php endif; ?>
@@ -58,5 +70,35 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
     <p class="ticket-detail"><?= e($detail) ?></p>
     <p class="ticket-motto"><?= e(cfg('event.motto')) ?></p>
   </article>
+
+  <div class="share">
+    <button class="btn btn-solid btn-block" type="button"
+      data-share="<?= e($token) ?>"
+      data-kicker="<?= e(cfg('event.kicker')) ?>"
+      data-headline="<?= e(cfg('event.headline')) ?>"
+      data-motto="<?= e(cfg('event.motto')) ?>"
+      data-when="<?= e(cfg('event.date_label') . ' · ' . cfg('event.venue')) ?>"
+      data-number="<?= $number ?>">compartir en historias</button>
+    <p class="fine">La imagen lleva tu huella, no tu QR: compartila tranquilo.</p>
+  </div>
+
+  <section class="card pizarra-form" id="pizarra">
+    <h2>la pizarra</h2>
+    <?php if ($msgNote): ?><p class="ok-note"><?= e($msgNote) ?></p><?php endif; ?>
+    <?php if ($myMessage): ?>
+      <p class="chalk">“<?= e($myMessage['body']) ?>”</p>
+      <p class="muted"><?= ['pending' => 'en revisión', 'approved' => 'publicado en la pizarra', 'rejected' => 'no publicado'][$myMessage['status']] ?? '' ?></p>
+    <?php else: ?>
+      <p class="muted">Dejá un mensaje corto para la pizarra de Somos Uno. Se ve en la página y se proyecta en la fiesta.</p>
+      <form method="post" action="mensaje.php" class="buy">
+        <?= csrf_field() ?>
+        <input type="hidden" name="t" value="<?= e($token) ?>">
+        <label>tu mensaje (máximo <?= MESSAGE_MAX ?> caracteres)
+          <textarea name="body" maxlength="<?= MESSAGE_MAX ?>" rows="3" required></textarea>
+        </label>
+        <button class="btn btn-ghost btn-block" type="submit">dejar mi mensaje</button>
+      </form>
+    <?php endif; ?>
+  </section>
 </main>
-<?php page_end('', ['assets/qrcode.js', 'assets/app.js']);
+<?php page_end('', ['assets/qrcode.js', 'assets/art.js', 'assets/app.js']);

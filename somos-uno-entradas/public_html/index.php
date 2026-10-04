@@ -20,6 +20,7 @@ $lista = lista_state();
 $feePct = (float) cfg('service_fee_percent', 0);
 $max = (int) cfg('max_per_order', 4);
 $error = (string) ($_GET['error'] ?? '');
+$wall = approved_messages(40);
 
 page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
 ?>
@@ -59,6 +60,23 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <?php foreach ((array) cfg('pillars', []) as $i => $p): ?>
       <div class="pillar"><span class="num">0<?= $i + 1 ?></span><h3><?= e($p[0]) ?></h3><p><?= e($p[1]) ?></p></div>
     <?php endforeach; ?>
+  </section>
+
+  <section class="wrap wall" id="pizarra" aria-label="La pizarra">
+    <h2 class="section-title">la pizarra</h2>
+    <div class="board">
+      <?php if ($wall): ?>
+        <?php foreach ($wall as $i => $m): ?>
+          <figure class="note" style="--r: <?= (crc32($m['author'] . $m['body']) % 7) - 3 ?>deg">
+            <blockquote><?= e($m['body']) ?></blockquote>
+            <figcaption>— <?= e($m['author']) ?></figcaption>
+          </figure>
+        <?php endforeach; ?>
+      <?php else: ?>
+        <p class="note-empty">todavía está en blanco. sacá tu entrada y sé el primero en escribir.</p>
+      <?php endif; ?>
+    </div>
+    <p class="fine">Cada persona con entrada deja un mensaje. Lo vas a ver proyectado bajo tierra.</p>
   </section>
 
   <section class="wrap" id="entradas">
