@@ -1,0 +1,7 @@
+Options -Indexes
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>
+<FilesMatch "\.(sqlite|log|md)$">
+  Require all denied
+</FilesMatch>

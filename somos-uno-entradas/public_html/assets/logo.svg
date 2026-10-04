@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Somos Uno">
+  <!-- Logo aproximado: reemplazalo por el logo real de Somos Uno -->
+  <g fill="none" stroke="#f3e6cf" stroke-width="7" stroke-linecap="round">
+    <path d="M50 8 V92"/>
+    <path d="M70 30 C66 16 36 14 33 30 C30 46 68 48 67 66 C66 82 40 86 33 74"/>
+  </g>
+  <circle cx="24" cy="24" r="6.5" fill="#f3e6cf"/>
+  <circle cx="33" cy="84" r="6.5" fill="#f3e6cf"/>
+</svg>

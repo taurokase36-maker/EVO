@@ -1,0 +1,3 @@
+public_html/app/config.php
+public_html/data/*
+!public_html/data/.htaccess
