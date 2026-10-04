@@ -1,0 +1,11 @@
+{
+  "_como_usar": "Una entrada por amigo. rol: embajador | productora | fotografia | redes | escenografia | vj. nombre vacío = la propuesta dice 'para vos'. marca: nombre de la productora (solo rol productora). nota: una o dos líneas personales que aparecen en la página 2. invitaciones: opcional, pisa el número del rol. Después: node propuestas/crew_11_10/generar.mjs",
+  "amigos": [
+    { "nombre": "", "rol": "embajador", "nota": "" },
+    { "nombre": "", "rol": "productora", "marca": "", "nota": "" },
+    { "nombre": "", "rol": "fotografia", "nota": "" },
+    { "nombre": "", "rol": "redes", "nota": "" },
+    { "nombre": "", "rol": "escenografia", "nota": "" },
+    { "nombre": "", "rol": "vj", "nota": "" }
+  ]
+}
