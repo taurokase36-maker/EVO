@@ -1027,12 +1027,16 @@ window.MELT_LOGO = "data:image/webp;base64,UklGRqbAAABXRUJQVlA4WAoAAAAQAAAAgwMAz
       h.fillStyle = gr; h.beginPath(); P2.forEach(function (p, i) { i ? h.lineTo(p[0], p[1]) : h.moveTo(p[0], p[1]); }); h.closePath(); h.fill();
       if (idx === 0) F.P2 = P2;
     });
-    // la sombra del personaje en la pared del fondo (se ve a través de las caras, sutil)
-    var back = faces[0].P2;
+    // las sombras de los personajes en la pared del fondo (se ven a través de las caras). Cantidad: perilla "cantidad de personajes"
+    var back = faces[0].P2, ns = 1 + Math.floor(P.crowd * 5.99);
     h.save(); h.globalCompositeOperation = 'destination-out'; h.globalAlpha = 0.6;
     var o = back[0], ex = [back[1][0] - o[0], back[1][1] - o[1]], ey = [back[3][0] - o[0], back[3][1] - o[1]];
     h.transform(ex[0], ex[1], ey[0], ey[1], o[0], o[1]);
-    h.strokeStyle = h.fillStyle = '#000'; figure(h, 0.5, 0.94, 0.82, poseAt(B.b, Math.floor(B.b / 8) + 2, 0), B.k);
+    h.strokeStyle = h.fillStyle = '#000';
+    for (var si = 0; si < ns; si++) {
+      var fx = ns === 1 ? 0.5 : 0.14 + 0.72 * si / (ns - 1), fh = ns === 1 ? 0.82 : 0.78 - 0.12 * (si % 2) - Math.min(0.2, ns * 0.03);
+      figure(h, fx, 0.95, fh, poseAt(B.b, Math.floor(B.b / 8) + 2 + si, si * 0.15), B.k);
+    }
     h.restore();
     h.globalAlpha = 1;
     // grano: la imagen se arma con puntitos que titilan
@@ -1079,13 +1083,14 @@ window.MELT_LOGO = "data:image/webp;base64,UklGRqbAAABXRUJQVlA4WAoAAAAQAAAAgwMAz
     wordmark(c, CX, base, size, B.k, 1);
     slogan(c, CX, base + size * 0.5, Math.max(14, size * 0.14), 0.95);
     // abajo: Somos Uno × Melt Underground
-    var ly = H * 0.87, ls = S * 0.085;
+    var ly = H * 0.875, ls = S * 0.065;
     if (MELT.complete && MELT.naturalWidth) {
-      var mw = S * 0.44, mh = mw * MELT.naturalHeight / MELT.naturalWidth;
-      somosUno(c, CX - mw * 0.5 - ls * 0.9, ly, ls, B.k);
-      c.save(); c.font = '400 ' + Math.round(ls * 0.35) + 'px ' + MONO; c.fillStyle = rgba(C.cream, 0.6); c.textAlign = 'center'; c.fillText('×', CX - mw * 0.5 + ls * 0.05, ly + ls * 0.12); c.restore();
-      c.save(); c.globalAlpha = 0.92; c.shadowColor = rgba(C.accent, 0.5); c.shadowBlur = 10 + 14 * B.k;
-      c.drawImage(MELT, CX - mw * 0.5 + ls * 0.6, ly - mh / 2, mw, mh); c.restore();
+      // los dos logos con el mismo peso visual (misma superficie aprox.) y el grupo centrado
+      var sw = ls * 0.63, mh = ls * 0.4, mw = mh * MELT.naturalWidth / MELT.naturalHeight, gap = ls * 0.45, xw = ls * 0.2;
+      var x0 = CX - (sw + gap + xw + gap + mw) / 2;
+      somosUno(c, x0 + sw / 2, ly, ls, B.k * 0.4);
+      c.save(); c.font = '400 ' + Math.round(ls * 0.28) + 'px ' + MONO; c.fillStyle = rgba(C.cream, 0.45); c.textAlign = 'center'; c.fillText('×', x0 + sw + gap + xw / 2, ly + ls * 0.09); c.restore();
+      c.save(); c.globalAlpha = 0.8; c.drawImage(MELT, x0 + sw + gap + xw + gap, ly - mh / 2, mw, mh); c.restore();
     } else {
       somosUno(c, CX, ly, ls, B.k);
     }
