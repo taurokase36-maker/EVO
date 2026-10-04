@@ -21,8 +21,8 @@ El muñeco que baila es la mascota. Se mueve **fluido y sutil**: cambia de pose 
 |---|---|---|
 | 1 | **el ritual** | Ronda de personajes alrededor del sol eclipsado, como sus rayos. Gira y baila en ola |
 | 2 | **la pared** | La pared de la caverna, limpia, con las sombras de los personajes y la luz del fuego. En la roca, pinturas rupestres sutiles |
-| 3 | **la caverna** | Un cubo de grano que gira y respira, con aristas de luz y un pequeño sol en la esquina. Adentro, en la pared del fondo, baila la sombra de la mascota. **Drop**: el cubo se abre y se ilumina. Muy liviana |
-| 4 | **solaris** | Solo el logo, con "for the solar people" y el logo de Somos Uno |
+| 3 | **la caverna** | Un cubo de grano que gira y respira, con aristas de luz y un pequeño sol que se desliza suave por la zona iluminada. Adentro, en la pared del fondo, baila la sombra de la mascota. **Drop**: el cubo se abre y se ilumina. Muy liviana |
+| 4 | **solaris** | Solo el logo, con "for the solar people" y abajo Somos Uno × Melt Underground |
 | 5 | **el gigante** | Un personaje enorme hecho de líneas de grabado, con el sol de aureola y su sombra |
 | 6 | **polvo solar** | Fibras de partículas que fluyen como humo y dibujan a la mascota bailando, con un anillo de sol tenue. Liviana |
 

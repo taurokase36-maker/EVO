@@ -22,6 +22,7 @@ for b in re.findall(r'(?:/\*[^*]*\*/\s*)?@font-face\s*\{[^}]+\}', css):
 html = leer(AQUI, 'index.html')
 html = html.replace('<link href="../fuentes/fuentes.css" rel="stylesheet">', '<style>\n%s\n</style>' % '\n'.join(bloques))
 html = html.replace('<script src="../contenido/motor.js"></script>', '<script>\n%s\n</script>' % leer(RAIZ, 'contenido', 'motor.js'))
+html = html.replace('<script src="melt-logo.js"></script>', '<script>\n%s\n</script>' % leer(AQUI, 'melt-logo.js'))
 html = html.replace('<script src="visuales.js"></script>', '<script>\n%s\n</script>' % leer(AQUI, 'visuales.js'))
 assert 'src="' not in html and 'fuentes.css' not in html, 'quedó algún archivo sin incluir'
 

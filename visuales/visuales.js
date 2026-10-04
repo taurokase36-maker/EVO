@@ -186,6 +186,7 @@
     c.save(); c.globalAlpha = alpha === undefined ? 1 : alpha; c.font = '700 ' + size + 'px ' + MONO; c.fillStyle = C.accent;
     c.textAlign = 'center'; c.letterSpacing = size * 0.45 + 'px'; c.fillText('FOR THE SOLAR PEOPLE', x + size * 0.22, y); c.restore();
   }
+  var MELT = new Image(); if (window.MELT_LOGO) MELT.src = window.MELT_LOGO;
   var SOMOS = new Path2D('M80 258 L80 270 A110 110 0 0 1 190 160 L210 160 A110 110 0 0 1 320 270 L320 370 A110 110 0 0 0 430 480 L450 480 A110 110 0 0 0 560 370 L560 382');
   function somosUno(c, x, y, size, k) {
     c.save(); c.translate(x, y); c.rotate(Math.PI / 2); c.scale(size / 540, size / 540); c.translate(-320, -320);
@@ -432,8 +433,13 @@
       c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke();
     });
     // la fuga de luz: un pequeño sol eclipsado en la esquina más iluminada
-    var best = 0, bv = -1e9; V.forEach(function (v, i) { var d = -(v[0] * L[0] + v[1] * L[1] + v[2] * L[2]); if (d > bv) { bv = d; best = i; } });
-    var lp = proj(V[best]), lr = S * 0.2 * (1 + 0.25 * B.k + boom);
+    // la luz se desliza entre las esquinas: promedio pesado por cuánto mira cada esquina al sol, suavizado en el tiempo
+    var sw = 0, tx = 0, ty = 0;
+    V.forEach(function (v) { var d = -(v[0] * L[0] + v[1] * L[1] + v[2] * L[2]), wgt = Math.exp(d * 2.2), pp = proj(v); sw += wgt; tx += pp[0] * wgt; ty += pp[1] * wgt; });
+    tx /= sw; ty /= sw;
+    if (!st.leak || st.leakW !== W) { st.leak = [tx, ty]; st.leakW = W; }
+    st.leak[0] += (tx - st.leak[0]) * 0.06; st.leak[1] += (ty - st.leak[1]) * 0.06;
+    var lp = st.leak, lr = S * 0.2 * (1 + 0.25 * B.k + boom);
     var lg = c.createRadialGradient(lp[0], lp[1], 0, lp[0], lp[1], lr * 2.2);
     lg.addColorStop(0, rgba(C.cream, 0.7)); lg.addColorStop(0.15, rgba(C.fire, 0.6 * P.glow)); lg.addColorStop(0.45, rgba(C.accent, 0.3 * P.glow)); lg.addColorStop(1, rgba(C.glow, 0));
     c.fillStyle = lg; c.fillRect(lp[0] - lr * 2.2, lp[1] - lr * 2.2, lr * 4.4, lr * 4.4);
@@ -456,7 +462,17 @@
     var size = Math.min(W * 0.12, H * 0.22) * (1 + 0.02 * B.k), base = CY + size * 0.45;
     wordmark(c, CX, base, size, B.k, 1);
     slogan(c, CX, base + size * 0.5, Math.max(14, size * 0.14), 0.95);
-    somosUno(c, CX, H * 0.88, S * 0.08, B.k);
+    // abajo: Somos Uno × Melt Underground
+    var ly = H * 0.87, ls = S * 0.085;
+    if (MELT.complete && MELT.naturalWidth) {
+      var mw = S * 0.44, mh = mw * MELT.naturalHeight / MELT.naturalWidth;
+      somosUno(c, CX - mw * 0.5 - ls * 0.9, ly, ls, B.k);
+      c.save(); c.font = '400 ' + Math.round(ls * 0.35) + 'px ' + MONO; c.fillStyle = rgba(C.cream, 0.6); c.textAlign = 'center'; c.fillText('×', CX - mw * 0.5 + ls * 0.05, ly + ls * 0.12); c.restore();
+      c.save(); c.globalAlpha = 0.92; c.shadowColor = rgba(C.accent, 0.5); c.shadowBlur = 10 + 14 * B.k;
+      c.drawImage(MELT, CX - mw * 0.5 + ls * 0.6, ly - mh / 2, mw, mh); c.restore();
+    } else {
+      somosUno(c, CX, ly, ls, B.k);
+    }
   }
 
   // =====================================================================
