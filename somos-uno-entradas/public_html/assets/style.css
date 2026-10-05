@@ -52,27 +52,52 @@ button.link { background: none; border: 0; color: var(--accent); font: inherit; 
 .hero-brand { display: flex; flex-direction: column; align-items: center; gap: 10px; width: clamp(110px, 32vw, 150px); }
 .hero-brand figcaption { font: 700 11px/1.3 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--cream); }
 .hero-logo { width: clamp(84px, 24vw, 112px); height: clamp(84px, 24vw, 112px); object-fit: contain; }
-.hero-logo-partner { mix-blend-mode: screen; transform: scale(1.12); }  /* el fondo negro del logo desaparece */
+.hero-logo-partner { transform: scale(1.12); }
 .hero-x { font-family: var(--mono); color: var(--accent); font-size: 26px; margin-bottom: 22px; }
 .ig { flex: none; vertical-align: -3px; margin-right: 6px; }
 .hero-cta .btn .ig { margin-right: 0; }
 .display { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(56px, 16vw, 120px); line-height: .95; letter-spacing: -.01em; }
-.eclipse { position: relative; width: clamp(240px, 68vw, 360px); aspect-ratio: 1; display: grid; place-items: center; margin: 28px 0 22px; }
-.eclipse::before {
-  content: ''; position: absolute; inset: -30%; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(closest-side, transparent 60%, color-mix(in srgb, var(--accent) 85%, transparent) 63.5%,
-    color-mix(in srgb, var(--glow) 90%, transparent) 70%, color-mix(in srgb, var(--glow) 30%, transparent) 84%, transparent 100%);
-  filter: blur(5px); animation: breathe 7s ease-in-out infinite;
+
+/* Logo SOLARIS: la "o" es el eclipse; las letras flotan apenas */
+.title { position: relative; margin: 34px 0 26px; font-family: var(--brand); font-weight: 400; font-size: clamp(52px, 16.5vw, 128px); line-height: 1; color: var(--cream); }
+.title::before {  /* resplandor de fondo */
+  content: ''; position: absolute; left: 50%; top: 50%; width: 130%; aspect-ratio: 2.4; transform: translate(-50%, -50%); pointer-events: none; z-index: -1;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow) 55%, transparent), transparent);
+  filter: blur(10px);
 }
-.eclipse-disc {
+.wordmark { display: inline-flex; align-items: baseline; letter-spacing: .02em; text-shadow: 0 0 .3em color-mix(in srgb, var(--accent) 45%, transparent); }
+.ch { display: inline-block; animation: letter-in 1.4s cubic-bezier(.2,.7,.2,1) both, float 7s ease-in-out infinite; animation-delay: calc(.35s + var(--i) * .11s), calc(var(--i) * -1.1s); }
+@keyframes letter-in { from { opacity: 0; filter: blur(8px); } }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-.045em) rotate(.6deg); } }
+.eo { position: relative; width: .74em; height: .74em; margin: 0 .07em; }
+.eo i {  /* disco de la luna con el aro del sol */
   position: absolute; inset: 0; border-radius: 50%; background: var(--bg);
-  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--accent) 70%, var(--cream)), 0 0 22px 3px var(--accent);
+  box-shadow: 0 0 0 .022em color-mix(in srgb, var(--cream) 85%, var(--accent)), 0 0 .14em .03em var(--accent), 0 0 .5em .1em color-mix(in srgb, var(--glow) 90%, transparent);
 }
-.eclipse-disc::after {  /* anillo de diamante */
-  content: ''; position: absolute; top: 10%; right: 11%; width: 9px; height: 9px; border-radius: 50%;
-  background: var(--cream); box-shadow: 0 0 12px 4px var(--cream), 0 0 34px 10px var(--accent);
+.eo::before {  /* corona que respira */
+  content: ''; position: absolute; inset: -55%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, transparent 52%, color-mix(in srgb, var(--accent) 70%, transparent) 56%, color-mix(in srgb, var(--glow) 60%, transparent) 70%, transparent 100%);
+  filter: blur(3px); animation: breathe 7s ease-in-out infinite;
 }
-.eclipse .display { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: var(--brand); text-transform: lowercase; font-style: normal; letter-spacing: .04em; font-size: clamp(40px, 12.5vw, 112px); white-space: nowrap; text-shadow: 0 0 24px var(--bg); }
+.eo i::after {  /* anillo de diamante */
+  content: ''; position: absolute; top: 9%; right: 9%; width: .07em; height: .07em; border-radius: 50%;
+  background: var(--cream); box-shadow: 0 0 .08em .03em var(--cream), 0 0 .22em .07em var(--accent);
+  animation: glint 7s ease-in-out infinite;
+}
+@keyframes glint { 50% { opacity: .55; transform: scale(.8); } }
+
+/* Entrada suave al abrir la página */
+.hero-inner > * { animation: rise 1.1s cubic-bezier(.2,.7,.2,1) both; }
+.hero-inner > :nth-child(2) { animation-delay: .15s; }
+.hero-inner > :nth-child(3) { animation: none; }
+.hero-inner > :nth-child(4) { animation-delay: 1.05s; }
+.hero-inner > :nth-child(5) { animation-delay: 1.2s; }
+.hero-inner > :nth-child(6) { animation-delay: 1.35s; }
+.hero-inner > :nth-child(7) { animation-delay: 1.5s; }
+.hero-inner > :nth-child(n+8) { animation-delay: 1.65s; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 1s ease, transform 1s cubic-bezier(.2,.7,.2,1); }
+.reveal.in { opacity: 1; transform: none; }
 .hero-sub { font-family: var(--mono); font-size: 13px; letter-spacing: .32em; text-transform: uppercase; color: var(--accent); margin-right: -.32em; }
 .hero-date { font-family: var(--mono); font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
 .hero-motto { font-family: var(--serif); font-style: italic; font-size: 30px; line-height: 1.1; }
@@ -226,7 +251,8 @@ td { padding: 10px 8px 10px 0; border-bottom: 1px solid var(--line); vertical-al
   .info > div { padding-right: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .eclipse::before { animation: none; }
+  .ch, .eo::before, .eo i::after, .hero-inner > *, .sax { animation: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
 }
 
@@ -279,3 +305,8 @@ textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .tier-head { flex-direction: column; align-items: flex-start; gap: 10px; }
 .tier .badge { white-space: normal; text-align: left; line-height: 1.3; }
 .tier > .btn { margin-top: auto; padding-inline: 14px; letter-spacing: .08em; }
+
+/* Saxo junto al invitado especial */
+.guest-name { display: inline-flex; align-items: center; gap: .3em; }
+.sax { width: 1em; height: 1.4em; margin: -.2em 0; flex: none; color: var(--cream); transform-origin: 30% 20%; animation: sway 6s ease-in-out infinite; }
+@keyframes sway { 50% { transform: rotate(-6deg); } }

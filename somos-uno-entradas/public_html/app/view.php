@@ -23,7 +23,7 @@ function page_start(string $title, string $bodyClass = '', string $base = ''): v
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Major+Mono+Display&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=7">
+<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=8">
 <style>:root{--bg:<?= e($c['bg'] ?? '#070202') ?>;--glow:<?= e($c['glow'] ?? '#6b0d07') ?>;--accent:<?= e($c['accent'] ?? '#d9482c') ?>;--cream:<?= e($c['cream'] ?? '#efe2d6') ?>}</style>
 </head>
 <body class="<?= e($bodyClass) ?>">
@@ -43,6 +43,32 @@ function page_end(string $base = '', array $scripts = []): void
 </body>
 </html>
 <?php
+}
+
+/** Logo SOLARIS: letras sueltas que flotan; la "o" es un sol eclipsado (disco negro, corona y anillo de diamante). */
+function wordmark(string $word): string
+{
+    $out = '';
+    foreach (mb_str_split(mb_strtolower($word)) as $i => $ch) {
+        $out .= $ch === 'o'
+            ? '<span class="ch eo" style="--i:' . $i . '"><i></i></span>'
+            : '<span class="ch" style="--i:' . $i . '">' . e($ch) . '</span>';
+    }
+    return '<span class="wordmark" aria-hidden="true">' . $out . '</span>';
+}
+
+/** Saxo en línea (junto al invitado especial). */
+function sax_icon(): string
+{
+    return '<svg class="sax" viewBox="0 0 72 100" aria-hidden="true">'
+        . '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">'
+        . '<path d="M8 9 L19 14" stroke-width="3.2"/>'
+        . '<path d="M19 14 C29 17 36 19 36 29 L35 70 C35 91 59 91 59 73 L59 60" stroke-width="7"/>'
+        . '<path d="M55.5 61 L62.5 61 L69 46 L49 46 Z" fill="currentColor" stroke-width="2"/>'
+        . '<path d="M49 46 Q59 43 69 46" stroke-width="2.4"/>'
+        . '<path d="M40 36 L44 34 M40 48 L44 46 M39.5 60 L43.5 58" stroke-width="1.6"/></g>'
+        . '<g fill="var(--accent)"><circle cx="35.8" cy="37" r="1.9"/><circle cx="35.6" cy="45" r="1.9"/><circle cx="35.4" cy="53" r="1.9"/><circle cx="35.2" cy="61" r="1.9"/></g>'
+        . '</svg>';
 }
 
 /** Ícono de Instagram (hereda el color del texto). */

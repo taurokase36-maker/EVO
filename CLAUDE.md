@@ -18,6 +18,8 @@
 - Eclipse: negro `#070202`, corona rojo oscuro `#6b0d07`, acento `#d9482c`, crema `#efe2d6`, fuego `#e8803a`.
 - Logo: **"solaris" en Major Mono Display, siempre en minúscula** (todas las letras del mismo grosor). La O puede ser un sol eclipsado. Textos chicos en Space Mono, prosa en Cormorant Garamond italic, inscripciones en griego con GFS Didot.
 - Grabado antiguo (líneas), sombras sobre la pared de la caverna, fuego, números romanos (XVIII → III).
+- **Logo de Somos Uno:** el símbolo de la onda con la barra y los dos puntos, **siempre en vertical** (`somos-uno-entradas/public_html/assets/logo.svg`, mismo trazo que `visuales/visuales.js`).
+- En la web: la O de "solaris" es el eclipse, las letras flotan apenas y el texto entra en fade. Todo en CSS, sin librerías.
 - La mascota: el muñeco de palitos que baila (las sombras de la pared). Animación fluida y sutil.
 
 ## Dónde está cada cosa

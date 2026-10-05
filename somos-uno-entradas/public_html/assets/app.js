@@ -1,6 +1,16 @@
 (function () {
   'use strict';
 
+  // Las secciones de más abajo aparecen en fade al llegar a ellas
+  if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('main > section, main .tier, main .pillar, .guest, .intl').forEach(function (el) {
+      if (el.getBoundingClientRect().top > window.innerHeight) { el.classList.add('reveal'); io.observe(el); }
+    });
+  }
+
   // Cuenta regresiva
   var cd = document.querySelector('.countdown');
   if (cd) {

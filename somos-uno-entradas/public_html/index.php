@@ -49,10 +49,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
       <?php endif; ?>
     </div>
     <p class="kicker"><?= e(cfg('event.kicker')) ?></p>
-    <div class="eclipse">
-      <div class="eclipse-disc" aria-hidden="true"></div>
-      <h1 class="display"><?= e(cfg('event.headline')) ?></h1>
-    </div>
+    <h1 class="title" aria-label="<?= e(cfg('event.headline')) ?>"><?= wordmark((string) cfg('event.headline')) ?></h1>
     <?php if (cfg('event.subhead')): ?><p class="hero-sub"><?= e(cfg('event.subhead')) ?></p><?php endif; ?>
     <p class="hero-date"><?= e(cfg('event.date_label')) ?> · <?= e(cfg('event.venue')) ?></p>
     <p class="hero-motto"><?= e(cfg('event.motto')) ?></p>
@@ -84,7 +81,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <?php if (cfg('event.guest.name')): ?>
       <div class="guest">
         <span class="label"><?= e(cfg('event.guest.label')) ?></span>
-        <p class="guest-name"><?= e(cfg('event.guest.name')) ?></p>
+        <p class="guest-name"><?= sax_icon() ?><?= e(cfg('event.guest.name')) ?></p>
         <p class="guest-detail"><?= e(cfg('event.guest.detail')) ?></p>
       </div>
     <?php endif; ?>
@@ -239,4 +236,4 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <?php endforeach; ?>
   </section>
 </main>
-<?php page_end('', ['assets/app.js']);
+<?php page_end('', ['assets/app.js?v=8']);
