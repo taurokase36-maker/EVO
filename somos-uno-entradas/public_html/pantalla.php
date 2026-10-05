@@ -88,7 +88,7 @@ header('X-Robots-Tag: noindex');
     setTimeout(function () {
       var m = messages[idx++ % messages.length];
       document.getElementById('msg-text').textContent = m.body;
-      document.getElementById('msg-author').textContent = '— ' + m.author;
+      document.getElementById('msg-author').textContent = m.author ? '— ' + m.author : '';
       box.classList.remove('hidden');
     }, 1200);
   }

@@ -71,7 +71,7 @@ return [
             'detail'    => 'llega de la mano de Kankari Music Lab, productora de música electrónica de Guayaquil, Ecuador.',
             'by'        => 'Kankari Music Lab',
             'logo'      => 'assets/kankari.png',
-            'instagram' => 'kankariclub',
+            'instagram' => 'kankarimusiclab',
         ],
         'motto'      => 'para la gente del sol.',
         'age'        => '+18 con DNI',

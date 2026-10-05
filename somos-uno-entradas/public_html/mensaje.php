@@ -5,7 +5,7 @@ require __DIR__ . '/app/view.php';
 
 // Guarda el mensaje de un asistente para la pizarra. Queda "en revisión" hasta que se aprueba en el panel.
 
-// Mensaje desde la portada (pizarra pública): sin entrada, con nombre, límite por hora y moderación.
+// Mensaje desde la portada (pizarra pública): anónimo, sin entrada, con límite por hora y moderación.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['public'] ?? '') === '1') {
     $home = fn(string $msg) => redirect('./?pz=' . $msg . '#pizarra');
     if (!cfg('wall.public', false)) {
@@ -18,8 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['public'] ?? '') === '1') {
         $home('ok');  // campo trampa: solo lo completan los bots
     }
     $body = clean_text((string) ($_POST['body'] ?? ''), MESSAGE_MAX);
-    $author = first_name(clean_text((string) ($_POST['name'] ?? ''), 40));
-    if (mb_strlen($body) < 2 || mb_strlen($author) < 2) {
+    if (mb_strlen($body) < 2) {
         $home('vacio');
     }
     // Límite por conexión: se guarda un hash de la IP, nunca la IP.
@@ -33,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['public'] ?? '') === '1') {
     }
     q(
         'INSERT INTO messages (id, owner, author, body, created_at) VALUES (?, ?, ?, ?, ?)',
-        ['MS-' . rand_code(4) . '-' . rand_code(4), $who . '-' . rand_code(8), $author, $body, now()]
+        ['MS-' . rand_code(4) . '-' . rand_code(4), $who . '-' . rand_code(8), '', $body, now()]  // sin autor: anónimo
     );
     $home('ok');
 }
@@ -60,7 +59,7 @@ $body = clean_text((string) ($_POST['body'] ?? ''), MESSAGE_MAX);
 if (mb_strlen($body) < 2) {
     $back('&msg=vacio');
 }
-$author = first_name($order ? $order['name'] : $pass['name']);
+$author = '';  // la pizarra es anónima
 
 try {
     q(

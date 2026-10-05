@@ -257,7 +257,7 @@ page_start('Panel · ' . cfg('brand.name'), 'page-admin', $B);
     <div class="card-top"><h2>pizarra · <?= count($pending) ?> por revisar</h2><a href="../pantalla.php" target="_blank" rel="noopener">abrir pantalla ↗</a></div>
     <?php foreach ($pending as $m): ?>
       <div class="mod-item">
-        <div><p class="chalk"><?= e($m['body']) ?></p><small class="muted">— <?= e($m['author']) ?> · <?= e($m['created_at']) ?></small></div>
+        <div><p class="chalk"><?= e($m['body']) ?></p><small class="muted">— <?= e($m['author'] !== '' ? $m['author'] : 'anónimo') ?> · <?= e($m['created_at']) ?></small></div>
         <div>
           <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="msg_approve"><input type="hidden" name="id" value="<?= e($m['id']) ?>"><button class="btn btn-solid">publicar</button></form>
           <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="msg_reject"><input type="hidden" name="id" value="<?= e($m['id']) ?>"><button class="btn btn-ghost">ocultar</button></form>
@@ -269,7 +269,7 @@ page_start('Panel · ' . cfg('brand.name'), 'page-admin', $B);
       <details><summary class="muted">publicados (<?= count($published) ?>)</summary>
         <?php foreach ($published as $m): ?>
           <div class="mod-item">
-            <div><p class="chalk"><?= e($m['body']) ?></p><small class="muted">— <?= e($m['author']) ?></small></div>
+            <div><p class="chalk"><?= e($m['body']) ?></p><small class="muted">— <?= e($m['author'] !== '' ? $m['author'] : 'anónimo') ?></small></div>
             <form method="post"><?= csrf_field() ?><input type="hidden" name="action" value="msg_reject"><input type="hidden" name="id" value="<?= e($m['id']) ?>"><button class="link">ocultar</button></form>
           </div>
         <?php endforeach; ?>

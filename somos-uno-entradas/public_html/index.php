@@ -23,7 +23,7 @@ $error = (string) ($_GET['error'] ?? '');
 $wall = approved_messages(40);
 $wallNote = [
     'ok'       => 'listo. tu mensaje queda en revisión y aparece en la pizarra cuando se apruebe.',
-    'vacio'    => 'escribí tu nombre y un mensaje.',
+    'vacio'    => 'escribí un mensaje.',
     'limite'   => 'ya dejaste varios mensajes. probá de nuevo en un rato.',
     'expirado' => 'la página estuvo abierta mucho tiempo. probá de nuevo.',
     'cerrada'  => 'la pizarra no está recibiendo mensajes.',
@@ -116,13 +116,13 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
   </section>
 
   <section class="wrap wall" id="pizarra" aria-label="La pizarra">
-    <h2 class="section-title">la pizarra</h2>
+    <h2 class="section-title section-caps">LA PIZARRA</h2>
     <div class="board">
       <?php if ($wall): ?>
         <?php foreach ($wall as $i => $m): ?>
           <figure class="note" style="--r: <?= (crc32($m['author'] . $m['body']) % 7) - 3 ?>deg">
             <blockquote><?= e($m['body']) ?></blockquote>
-            <figcaption>— <?= e($m['author']) ?></figcaption>
+            <?php if ($m['author'] !== ''): ?><figcaption>— <?= e($m['author']) ?></figcaption><?php endif; ?>
           </figure>
         <?php endforeach; ?>
       <?php else: ?>
@@ -135,13 +135,12 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
         <input type="hidden" name="public" value="1">
         <label class="hp" aria-hidden="true">web<input name="web" tabindex="-1" autocomplete="off"></label>
         <?php if ($wallNote): ?><p class="ok-note" role="status"><?= e($wallNote) ?></p><?php endif; ?>
-        <label>tu nombre<input name="name" required minlength="2" maxlength="40" autocomplete="given-name"></label>
         <label>tu mensaje para la solar people <small class="muted" data-count>(máximo <?= MESSAGE_MAX ?>)</small>
           <textarea name="body" maxlength="<?= MESSAGE_MAX ?>" rows="3" required></textarea>
         </label>
         <button class="btn btn-ghost btn-block" type="submit">escribir en la pizarra</button>
       </form>
-      <p class="fine">Los mensajes se revisan antes de publicarse. Esa noche se proyectan en Melt.</p>
+      <p class="fine">Es anónimo. Los mensajes se revisan antes de publicarse y esa noche se proyectan en Melt.</p>
     <?php else: ?>
       <p class="fine">Cada persona con entrada deja un mensaje. Lo vas a ver proyectado en Melt esa noche.</p>
     <?php endif; ?>

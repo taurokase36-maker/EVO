@@ -45,7 +45,7 @@ Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pag
 - **Lista amigos:** 40 entradas a $5.000, para entrar hasta las 22:00. Link: https://mpago.la/1JExs82
 - **Early bird:** 30 entradas a $7.000 (con $10.000 tachado), hasta el viernes 9 a las 23:59. Link: https://mpago.la/13HtgZh
 - **General:** 65 entradas online a $10.000. Link: https://mpago.la/19N795Q
-- **RUF:** dj invitado internacional, de la mano de Kankari Music Lab (Guayaquil). Logo en `assets/kankari.png`, Instagram @kankariclub (bloque `event.intl_guest`).
+- **RUF:** dj invitado internacional, de la mano de Kankari Music Lab (Guayaquil). Logo en `assets/kankari.png`, Instagram @kankarimusiclab (bloque `event.intl_guest`).
 - **Invitaciones:** 25 en total (EVO THE SUN 15, ODA 5, Sandman 5). Son nominales y el **QR deja de servir a las 00:00**.
 - **Lista gratis con mail:** apagada (`lista.enabled`), porque la lista de esta fecha es la lista amigos paga.
 - **Tope total:** la venta online y las invitaciones nunca pasan de 160. Con los links de pago, el cupo de cada entrada se controla en Mercado Pago.
@@ -103,7 +103,7 @@ Si en `tickets` cargás un `link` (un link de pago de Mercado Pago, empieza con 
 
 ## La pizarra, el arte y la pantalla
 
-- **Pizarra:** cualquiera puede dejar un mensaje de hasta 120 caracteres desde la portada (con su nombre), y quienes tienen entrada con QR también desde su entrada. Todo llega al panel como "por revisar". Lo publicás o lo ocultás, y los publicados aparecen en la portada, en la sección **la pizarra**, y en la pantalla. Se configura en el bloque `wall` (`public` y `per_hour`).
+- **Pizarra:** cualquiera puede dejar un mensaje anónimo de hasta 120 caracteres desde la portada, y quienes tienen entrada con QR también desde su entrada. Todo llega al panel como "por revisar". Lo publicás o lo ocultás, y los publicados aparecen en la portada, en la sección **la pizarra**, y en la pantalla. Se configura en el bloque `wall` (`public` y `per_hour`).
 - **Huella:** cada entrada tiene un arte único, que siempre es el mismo para esa entrada, y el número de asistente ("somos el nº 7"). El botón **compartir en historias** arma una imagen vertical lista para Instagram, **sin el QR**.
 - **Pantalla para el proyector de Melt:** `tudominio.com/pantalla.php`, también enlazada desde el panel. Muestra "somos X" (la gente que ya ingresó) y los mensajes publicados en rotación. Tocá "pantalla completa" en la compu del proyector.
 

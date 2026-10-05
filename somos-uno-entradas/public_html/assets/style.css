@@ -139,6 +139,7 @@ button.link { background: none; border: 0; color: var(--accent); font: inherit; 
 
 /* Entradas */
 .section-title { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(40px, 10vw, 64px); margin-bottom: 18px; }
+.section-caps { font-family: var(--brand); font-style: normal; text-transform: lowercase; letter-spacing: .06em;  /* en Major Mono las minúsculas se ven como mayúsculas parejas */ font-size: clamp(34px, 9vw, 56px); }
 section[id] { scroll-margin-top: 16px; margin-bottom: 64px; }
 .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 .tier, .card { border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--panel); backdrop-filter: blur(6px); }

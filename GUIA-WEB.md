@@ -90,7 +90,7 @@ Abrí `https://tudominio.com` desde el celular:
 
 - [ ] Arriba **no** aparece la franja "modo demo".
 - [ ] Se ven los logos de **Somos Uno × Melt Underground**, con sus nombres.
-- [ ] El line up muestra a **RUF** como invitado internacional, con el logo de Kankari y el link a @kankariclub.
+- [ ] El line up muestra a **RUF** como invitado internacional, con el logo de Kankari y el link a @kankarimusiclab.
 - [ ] Los tres botones "comprar en mercado pago" abren **tu** link, con el precio correcto ($5.000, $7.000 y $10.000).
 - [ ] Los botones de Instagram abren **@somos.uno._**.
 - [ ] Escribí un mensaje en **la pizarra**. Entrá a `tudominio.com/admin` → tarjeta **pizarra** → **publicar**, y fijate que aparezca en la portada.
@@ -102,7 +102,7 @@ Abrí `https://tudominio.com` desde el celular:
 
 ## La pizarra
 
-Cualquiera puede dejar un mensaje desde la portada (nombre + hasta 120 caracteres). **Nada se publica solo:** cada mensaje llega al panel como "por revisar" y aparece en la web y en la pantalla del proyector recién cuando tocás **publicar**. Desde una misma conexión se pueden mandar hasta 3 mensajes por hora (`wall.per_hour`). Para cerrarla: `'public' => false` en el bloque `wall`.
+Cualquiera puede dejar un mensaje anónimo desde la portada (hasta 120 caracteres). **Nada se publica solo:** cada mensaje llega al panel como "por revisar" y aparece en la web y en la pantalla del proyector recién cuando tocás **publicar**. Desde una misma conexión se pueden mandar hasta 3 mensajes por hora (`wall.per_hour`). Para cerrarla: `'public' => false` en el bloque `wall`.
 
 ---
 
