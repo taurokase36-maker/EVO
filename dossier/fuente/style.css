@@ -108,5 +108,14 @@ img { display: block; }
   background: rgba(255,255,255,.05); }
 
 .hair { height: 1px; background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,0)); }
-.tbd { font-size: 12.5px !important; line-height: 1.6 !important; vertical-align: middle; }
-.stat .n .tbd, .n .tbd { font-size: 13px !important; }
+
+/* ---------- EXPORT MODES (ver build.js) ---------- */
+/* fondo: todo menos el texto (los brillos de text-shadow quedan) */
+body.mode-bg *:not(svg):not(svg *) { color: transparent !important; }
+body.mode-bg svg { color: #fff; }
+/* texto: solo el texto, sin fondos ni imágenes */
+body.mode-text { background: transparent !important; }
+body.mode-text * { background: transparent !important; border-color: transparent !important; box-shadow: none !important;
+  text-shadow: none !important; filter: none !important; }
+body.mode-text *::before, body.mode-text *::after { visibility: hidden !important; }
+body.mode-text img, body.mode-text svg, body.mode-text .grain, body.mode-text .vignette { visibility: hidden !important; }
