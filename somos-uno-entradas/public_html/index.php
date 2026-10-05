@@ -21,16 +21,31 @@ $feePct = (float) cfg('service_fee_percent', 0);
 $max = (int) cfg('max_per_order', 4);
 $error = (string) ($_GET['error'] ?? '');
 $wall = approved_messages(40);
+$wallNote = [
+    'ok'       => 'listo. tu mensaje queda en revisión y aparece en la pizarra cuando se apruebe.',
+    'vacio'    => 'escribí tu nombre y un mensaje.',
+    'limite'   => 'ya dejaste varios mensajes. probá de nuevo en un rato.',
+    'expirado' => 'la página estuvo abierta mucho tiempo. probá de nuevo.',
+    'cerrada'  => 'la pizarra no está recibiendo mensajes.',
+][(string) ($_GET['pz'] ?? '')] ?? '';
+$ig = (string) cfg('brand.instagram');
+$intl = (array) cfg('event.intl_guest', []);
 
 page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
 ?>
 <header class="hero">
   <div class="wrap hero-inner">
     <div class="hero-logos">
-      <img src="<?= e(cfg('brand.logo')) ?>" alt="<?= e(cfg('brand.name')) ?>" class="hero-logo">
+      <figure class="hero-brand">
+        <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="hero-logo">
+        <figcaption><?= e(cfg('brand.name')) ?></figcaption>
+      </figure>
       <?php if (cfg('brand.partner_logo')): ?>
         <span class="hero-x" aria-hidden="true">×</span>
-        <img src="<?= e(cfg('brand.partner_logo')) ?>" alt="<?= e(cfg('event.venue')) ?>" class="hero-logo hero-logo-partner">
+        <figure class="hero-brand">
+          <img src="<?= e(cfg('brand.partner_logo')) ?>" alt="" class="hero-logo hero-logo-partner">
+          <figcaption><?= e(cfg('event.venue')) ?></figcaption>
+        </figure>
       <?php endif; ?>
     </div>
     <p class="kicker"><?= e(cfg('event.kicker')) ?></p>
@@ -45,6 +60,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <div class="hero-cta">
       <a href="#entradas" class="btn btn-solid">comprar entrada</a>
       <?php if ($lista['open']): ?><a href="#lista" class="btn btn-ghost">anotarme en la lista</a><?php endif; ?>
+      <?php if ($ig !== ''): ?><a href="https://instagram.com/<?= e($ig) ?>" class="btn btn-ghost" target="_blank" rel="noopener"><?= ig_icon() ?>@<?= e($ig) ?></a><?php endif; ?>
     </div>
   </div>
 </header>
@@ -63,13 +79,27 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
   <section class="wrap lineup" aria-label="Line up">
     <span class="label">line up</span>
     <ul class="sets"><?php foreach ((array) cfg('event.lineup', []) as $dj): ?>
-      <?php if (is_array($dj)): ?><li><span class="set-time"><?= e($dj[0]) ?></span><?= e($dj[1]) ?></li><?php else: ?><li><?= e($dj) ?></li><?php endif; ?>
+      <?php if (is_array($dj)): ?><li><span class="set-time"><?= e($dj[0]) ?></span><?= e($dj[1]) ?><?php if (!empty($dj[2])): ?><span class="set-tag"><?= e($dj[2]) ?></span><?php endif; ?></li><?php else: ?><li><?= e($dj) ?></li><?php endif; ?>
     <?php endforeach; ?></ul>
     <?php if (cfg('event.guest.name')): ?>
       <div class="guest">
         <span class="label"><?= e(cfg('event.guest.label')) ?></span>
         <p class="guest-name"><?= e(cfg('event.guest.name')) ?></p>
         <p class="guest-detail"><?= e(cfg('event.guest.detail')) ?></p>
+      </div>
+    <?php endif; ?>
+    <?php if (!empty($intl['name'])): ?>
+      <div class="intl">
+        <span class="label"><?= e($intl['label'] ?? '') ?></span>
+        <p class="guest-name"><?= e($intl['name']) ?></p>
+        <?php if (!empty($intl['time'])): ?><p class="set-time"><?= e($intl['time']) ?></p><?php endif; ?>
+        <p class="guest-detail"><?= e($intl['detail'] ?? '') ?></p>
+        <?php if (!empty($intl['logo']) || !empty($intl['instagram'])): ?>
+          <a class="intl-by" <?php if (!empty($intl['instagram'])): ?>href="https://instagram.com/<?= e($intl['instagram']) ?>" target="_blank" rel="noopener"<?php endif; ?>>
+            <?php if (!empty($intl['logo'])): ?><img src="<?= e($intl['logo']) ?>" alt="<?= e($intl['by'] ?? '') ?>" class="intl-logo"><?php endif; ?>
+            <?php if (!empty($intl['instagram'])): ?><span><?= ig_icon() ?>@<?= e($intl['instagram']) ?></span><?php endif; ?>
+          </a>
+        <?php endif; ?>
       </div>
     <?php endif; ?>
   </section>
@@ -99,10 +129,25 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
           </figure>
         <?php endforeach; ?>
       <?php else: ?>
-        <p class="note-empty">todavía está en blanco. sacá tu entrada y sé el primero en escribir.</p>
+        <p class="note-empty">todavía está en blanco. sé el primero en escribir.</p>
       <?php endif; ?>
     </div>
-    <p class="fine">Cada persona con entrada deja un mensaje. Lo vas a ver proyectado en Melt esa noche.</p>
+    <?php if (cfg('wall.public', false)): ?>
+      <form method="post" action="mensaje.php" class="buy wall-form">
+        <?= csrf_field() ?>
+        <input type="hidden" name="public" value="1">
+        <label class="hp" aria-hidden="true">web<input name="web" tabindex="-1" autocomplete="off"></label>
+        <?php if ($wallNote): ?><p class="ok-note" role="status"><?= e($wallNote) ?></p><?php endif; ?>
+        <label>tu nombre<input name="name" required minlength="2" maxlength="40" autocomplete="given-name"></label>
+        <label>tu mensaje para la solar people <small class="muted" data-count>(máximo <?= MESSAGE_MAX ?>)</small>
+          <textarea name="body" maxlength="<?= MESSAGE_MAX ?>" rows="3" required></textarea>
+        </label>
+        <button class="btn btn-ghost btn-block" type="submit">escribir en la pizarra</button>
+      </form>
+      <p class="fine">Los mensajes se revisan antes de publicarse. Esa noche se proyectan en Melt.</p>
+    <?php else: ?>
+      <p class="fine">Cada persona con entrada deja un mensaje. Lo vas a ver proyectado en Melt esa noche.</p>
+    <?php endif; ?>
   </section>
 
   <section class="wrap" id="entradas">
@@ -124,6 +169,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
             <?php if (!empty($t['anchor']) && (int) $t['anchor'] > (int) $t['price']): ?><s><?= money((int) $t['anchor']) ?></s><?php endif; ?>
             <?= money((int) $t['price']) ?>
           </p>
+          <?php if (!empty($t['detail'])): ?><p class="tier-detail"><?= e($t['detail']) ?></p><?php endif; ?>
           <?php if ($s['open'] && tier_link($t) !== ''): ?>
             <a class="btn btn-solid btn-block" href="<?= e(tier_link($t)) ?>" rel="noopener">comprar en mercado pago</a>
           <?php elseif ($s['open']): ?>
@@ -175,6 +221,14 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
         <p class="muted"><?= e($lista['label']) ?>.</p>
       <?php endif; ?>
     </div>
+  </section>
+  <?php endif; ?>
+
+  <?php if ($ig !== ''): ?>
+  <section class="wrap follow" aria-label="Instagram">
+    <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="follow-logo">
+    <p>novedades, horarios y la próxima fecha</p>
+    <a href="https://instagram.com/<?= e($ig) ?>" class="btn btn-solid" target="_blank" rel="noopener"><?= ig_icon() ?>seguir a @<?= e($ig) ?></a>
   </section>
   <?php endif; ?>
 

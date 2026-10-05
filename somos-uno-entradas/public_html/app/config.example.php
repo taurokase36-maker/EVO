@@ -59,10 +59,20 @@ return [
             ['21:00 — 22:30', 'ODA'],
             ['22:30 — 00:00', 'EVO THE SUN'],
             ['00:00 — 01:30', 'LUCILA'],
-            ['01:30 — 03:00', 'RUF'],
+            ['01:30 — 03:00', 'RUF', 'invitado internacional'],  // 3er dato opcional: etiqueta chica
         ],
         // Invitado especial: aparece debajo del line up. '' en name = no mostrar.
         'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica, junto a EVO THE SUN (22:30)'],
+        // DJ invitado internacional: bloque con el logo y el Instagram de quien lo trae. '' en name = no mostrar.
+        'intl_guest' => [
+            'label'     => 'dj invitado internacional',
+            'name'      => 'RUF',
+            'time'      => '01:30 — 03:00',
+            'detail'    => 'llega de la mano de Kankari Music Lab, productora de música electrónica de Guayaquil, Ecuador.',
+            'by'        => 'Kankari Music Lab',
+            'logo'      => 'assets/kankari.png',
+            'instagram' => 'kankariclub',
+        ],
         'motto'      => 'para la gente del sol.',
         'age'        => '+18 con DNI',
         'door_price' => 10000,                  // precio en puerta (solo informativo)
@@ -87,7 +97,7 @@ return [
     ],
 
     // ---------------------------------------------------------------
-    //  ENTRADAS PAGAS (se muestran en este orden)
+    //  ENTRADAS (se muestran en este orden)
     //  price  = precio real
     //  anchor = precio tachado de referencia (0 = no mostrar)
     //  stock  = cuántas hay
@@ -96,25 +106,37 @@ return [
     //           Con link, el botón lleva directo a Mercado Pago (sin QR ni mail automático).
     //           Vacío ('') = compra completa dentro de la web, con QR (necesita el Access Token).
     // ---------------------------------------------------------------
+    //  detail = aclaración debajo del precio (opcional)
     'tickets' => [
-        ['id' => 'early',   'name' => 'Early bird', 'price' => 5000,  'anchor' => 10000, 'stock' => 30,  'until' => '2026-10-09 23:59', 'note' => 'cupo limitado',              'link' => ''],
-        ['id' => 'general', 'name' => 'General',    'price' => 10000, 'anchor' => 0,     'stock' => 65,  'until' => null,               'note' => 'mismo precio que en puerta', 'link' => ''],
+        ['id' => 'lista',   'name' => 'Lista amigos', 'price' => 5000,  'anchor' => 10000, 'stock' => 40, 'until' => '2026-10-11 22:00', 'note' => 'entrás hasta las 22:00',     'detail' => 'Para amigos y conocidos. Válida para entrar hasta las 22:00; después, entrada general.', 'link' => 'https://mpago.la/1JExs82'],
+        ['id' => 'early',   'name' => 'Early bird',   'price' => 7000,  'anchor' => 10000, 'stock' => 30, 'until' => '2026-10-09 23:59', 'note' => 'cupo limitado',              'detail' => '', 'link' => 'https://mpago.la/13HtgZh'],
+        ['id' => 'general', 'name' => 'General',      'price' => 10000, 'anchor' => 0,     'stock' => 65, 'until' => null,               'note' => 'mismo precio que en puerta', 'detail' => '', 'link' => 'https://mpago.la/19N795Q'],
     ],
     // Texto debajo de las entradas con link (modo simple)
-    'link_note' => 'Pagás en Mercado Pago. Guardá el comprobante: en la puerta entrás con tu nombre y DNI.',
+    'link_note' => 'Pagás en Mercado Pago (pesos argentinos). Guardá el comprobante: en la puerta entrás con tu nombre y DNI.',
     'max_per_order'       => 4,
     'service_fee_percent' => 0,    // ej: 5 = se le suma 5% al comprador como "cargo por servicio"
     'reserve_minutes'     => 30,   // cuánto se reserva el cupo mientras la persona paga
 
     // ---------------------------------------------------------------
-    //  LISTA PÚBLICA (gratis anotarse, beneficio en puerta hasta valid_until de invitaciones)
+    //  LISTA GRATIS (anotarse con mail, beneficio en puerta). Apagada: la lista de esta fecha
+    //  es la "Lista amigos" paga de arriba, con su propio link.
     // ---------------------------------------------------------------
     'lista' => [
-        'enabled'  => true,
+        'enabled'  => false,
         'benefit'  => '$7.000 en puerta hasta las 00:00',
         'note'     => 'Sujeto a capacidad del lugar.',
         'capacity' => 40,
         'closes'   => '2026-10-11 20:00',
+    ],
+
+    // ---------------------------------------------------------------
+    //  PIZARRA: mensajes para la solar people. Se aprueban en el panel antes de publicarse.
+    //  public = true: cualquiera puede escribir desde la portada (además de quienes tienen entrada).
+    // ---------------------------------------------------------------
+    'wall' => [
+        'public'   => true,
+        'per_hour' => 3,   // máximo de mensajes por hora desde una misma conexión
     ],
 
     // ---------------------------------------------------------------
@@ -153,9 +175,11 @@ return [
         ['¿es en un sótano?', 'sí, y suena hermoso.'],
         ['¿es una secta?', 'no, es minimal.'],
         ['¿a qué hora termina?', 'a las 3:00.'],
-        ['¿hasta qué hora valen la lista y las invitaciones?', 'hasta las 00:00. después, entrada general.'],
+        ['¿hasta qué hora vale la lista amigos?', 'entrás hasta las 22:00. después, entrada general.'],
+        ['¿hasta qué hora valen las invitaciones?', 'hasta las 00:00. después, entrada general.'],
+        ['¿quién es RUF?', 'nuestro dj invitado internacional: llega desde Guayaquil de la mano de Kankari Music Lab y cierra la noche de 01:30 a 03:00.'],
         ['¿hay edad mínima?', '+18 con DNI.'],
-        ['¿puedo comprar en puerta?', 'sí, a precio general. online sale menos si llegás a la early bird.'],
+        ['¿puedo comprar en puerta?', 'sí, a precio general ($10.000). online sale menos con la lista amigos o la early bird.'],
     ],
 
     // ---------------------------------------------------------------

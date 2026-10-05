@@ -3,7 +3,8 @@
 Plataforma propia de venta de entradas para Somos Uno. Tiene:
 - landing de la marca,
 - compra con **Mercado Pago**,
-- lista con beneficio,
+- lista amigos con link de pago propio,
+- pizarra de mensajes moderada,
 - invitaciones con cupo por persona,
 - entradas con **QR** que llegan por mail,
 - panel de administración,
@@ -40,23 +41,26 @@ Listo: entrá a tu dominio. El sitio ya funciona en **modo demo**, donde los pag
 - **Concepto:** *Somos Uno × Melt Underground presentan SOLARIS · for the solar people*. Estética eclipse y caverna: negro con corona roja, logos de Somos Uno y Melt en la portada, invitado especial (Damian Santos, saxo en vivo) y, como detalle, el estreno del primer single de THE SUN.
   > **Si ya creaste tu `config.php` antes de este cambio**, no se actualiza solo: copiá de `config.example.php` los bloques `brand` (colores y `partner_logo`), `event` (`title`, `kicker`, `headline`, `subhead`, `guest`, `motto`), `release`, `about` y `faq`.
 - **Horario:** de 18:00 a 03:00. **Capacidad: 160 personas.**
-- **Early bird:** 30 entradas a $5.000 (con $10.000 tachado), hasta el viernes 9 a las 23:59.
-- **General:** 65 entradas online a $10.000.
+- **Cobro con links de pago de Mercado Pago**, ya cargados en `config.example.php` (ver `GUIA-WEB.md`).
+- **Lista amigos:** 40 entradas a $5.000, para entrar hasta las 22:00. Link: https://mpago.la/1JExs82
+- **Early bird:** 30 entradas a $7.000 (con $10.000 tachado), hasta el viernes 9 a las 23:59. Link: https://mpago.la/13HtgZh
+- **General:** 65 entradas online a $10.000. Link: https://mpago.la/19N795Q
+- **RUF:** dj invitado internacional, de la mano de Kankari Music Lab (Guayaquil). Logo en `assets/kankari.png`, Instagram @kankariclub (bloque `event.intl_guest`).
 - **Invitaciones:** 25 en total (EVO THE SUN 15, ODA 5, Sandman 5). Son nominales y el **QR deja de servir a las 00:00**.
-- **Lista:** cupo de 40, con $7.000 en puerta hasta las 00:00 y sujeto a capacidad.
-- **Tope total:** la venta online y las invitaciones nunca pasan de 160. Se dejan unos 40 lugares para la lista y la puerta.
+- **Lista gratis con mail:** apagada (`lista.enabled`), porque la lista de esta fecha es la lista amigos paga.
+- **Tope total:** la venta online y las invitaciones nunca pasan de 160. Con los links de pago, el cupo de cada entrada se controla en Mercado Pago.
 
 **Números con casa llena** (cobrando a 10 días en Mercado Pago):
 
 | | Personas | Bruto |
 |---|---|---|
-| Early bird | 30 × $5.000 | $150.000 |
+| Lista amigos | 40 × $5.000 | $200.000 |
+| Early bird | 30 × $7.000 | $210.000 |
 | General online | 65 × $10.000 | $650.000 |
 | Invitaciones | 25 × $0 | $0 |
-| Lista o puerta | 40 × $7.000 a $10.000 | $280.000 a $400.000 |
-| **Total** | **160** | **$1.080.000 a $1.200.000** |
+| **Total** | **160** | **$1.060.000** |
 
-Mercado Pago descuenta unos $42.480 de lo online. **Neto: entre $1.037.520 y $1.157.520.**
+Mercado Pago descuenta unos $56.300 (5,31%). **Neto: unos $1.003.700.**
 
 ## Modo simple: links de pago
 
@@ -99,7 +103,7 @@ Si en `tickets` cargás un `link` (un link de pago de Mercado Pago, empieza con 
 
 ## La pizarra, el arte y la pantalla
 
-- **Pizarra:** cada persona con entrada, lista o invitación puede dejar **un mensaje** de hasta 120 caracteres desde su entrada. Llega al panel como "por revisar". Lo publicás o lo ocultás, y los publicados aparecen en la portada, en la sección **la pizarra**.
+- **Pizarra:** cualquiera puede dejar un mensaje de hasta 120 caracteres desde la portada (con su nombre), y quienes tienen entrada con QR también desde su entrada. Todo llega al panel como "por revisar". Lo publicás o lo ocultás, y los publicados aparecen en la portada, en la sección **la pizarra**, y en la pantalla. Se configura en el bloque `wall` (`public` y `per_hour`).
 - **Huella:** cada entrada tiene un arte único, que siempre es el mismo para esa entrada, y el número de asistente ("somos el nº 7"). El botón **compartir en historias** arma una imagen vertical lista para Instagram, **sin el QR**.
 - **Pantalla para el proyector de Melt:** `tudominio.com/pantalla.php`, también enlazada desde el panel. Muestra "somos X" (la gente que ya ingresó) y los mensajes publicados en rotación. Tocá "pantalla completa" en la compu del proyector.
 
@@ -134,7 +138,8 @@ Si no configurás el mail, la entrada igual aparece en pantalla después de paga
 ## 6. Personalizar
 
 - **Textos, precios, preguntas frecuentes y colores:** `app/config.php`.
-- **Logos:** `assets/logo.svg` (Somos Uno) y `assets/melt.webp` (Melt, en `brand.partner_logo`; dejalo vacío para no mostrarlo).
+- **Logos:** `assets/logo.svg` (Somos Uno), `assets/melt.webp` (Melt, en `brand.partner_logo`; dejalo vacío para no mostrarlo) y `assets/kankari.png` (Kankari, en `event.intl_guest.logo`).
+- **Instagram:** `brand.instagram` (`somos.uno._`) arma los botones de la portada y el pie.
 - **Textos de la landing:** el bloque "for the solar people" sale de `about`, la nota del estreno de `release` y el invitado de `event.guest`.
 - **Estilos:** `assets/style.css`.
 - **Base de datos:** se crea sola en `data/somosuno.sqlite`. Si tu plan no tiene SQLite, creá una base MySQL en hPanel y cambiá `db` en la configuración (las instrucciones están ahí).

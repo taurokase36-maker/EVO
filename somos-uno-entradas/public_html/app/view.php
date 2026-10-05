@@ -23,7 +23,7 @@ function page_start(string $title, string $bodyClass = '', string $base = ''): v
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Major+Mono+Display&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=6">
+<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=7">
 <style>:root{--bg:<?= e($c['bg'] ?? '#070202') ?>;--glow:<?= e($c['glow'] ?? '#6b0d07') ?>;--accent:<?= e($c['accent'] ?? '#d9482c') ?>;--cream:<?= e($c['cream'] ?? '#efe2d6') ?>}</style>
 </head>
 <body class="<?= e($bodyClass) ?>">
@@ -36,13 +36,20 @@ function page_end(string $base = '', array $scripts = []): void
     ?>
 <footer class="foot">
   <img src="<?= e($base . cfg('brand.logo')) ?>" alt="" class="foot-logo">
-  <p><?= e(cfg('brand.name')) ?> · <a href="https://instagram.com/<?= e(cfg('brand.instagram')) ?>" target="_blank" rel="noopener">@<?= e(cfg('brand.instagram')) ?></a></p>
+  <p><?= e(cfg('brand.name')) ?> · <a href="https://instagram.com/<?= e(cfg('brand.instagram')) ?>" target="_blank" rel="noopener"><?= ig_icon() ?>@<?= e(cfg('brand.instagram')) ?></a></p>
 </footer>
 <?php foreach ($scripts as $s): ?><script src="<?= e($base . $s) ?>"></script>
 <?php endforeach; ?>
 </body>
 </html>
 <?php
+}
+
+/** Ícono de Instagram (hereda el color del texto). */
+function ig_icon(): string
+{
+    return '<svg class="ig" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">'
+        . '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
 }
 
 /** Página simple de mensaje (errores, estados). */

@@ -11,11 +11,11 @@
 - [ ] **Line up:** pedir los usuarios de Instagram de COCO, Gremora, Sandman, ODA, Lucila y RUF para arrobarlos. Mandarles su link de embajador (`tudominio.com/?ref=nombre`).
 
 ## Web de entradas (Hostinger) · paso a paso en `GUIA-WEB.md`
-- [ ] Crear los dos links de pago en Mercado Pago (early bird y general) y pegarlos en `config.php`.
-- [ ] Subir los archivos nuevos (`assets/logo.svg`, `assets/melt.webp`, css, js, php).
-- [ ] Si ya existe `config.php`: copiar de `config.example.php` los bloques `brand`, `event` (incluye `guest`), `release`, `about` y `faq`.
+- [x] Links de pago cargados: lista amigos $5.000, early bird $7.000 y general $10.000.
+- [ ] En Mercado Pago, limitar unidades de cada link (40 / 30 / 65) y pedir nombre y DNI.
+- [ ] Subir el zip nuevo y rehacer `config.php` desde `config.example.php` (trae los links, RUF y la pizarra pública).
 - [ ] Si no está hecho: apagar el modo demo, cargar el token de Mercado Pago, configurar el mail, cambiar los códigos de invitación y las contraseñas del panel.
-- [ ] Fechas clave: la early bird cierra el **viernes 9 a las 23:59** y la lista, el **domingo 11 a las 20:00**.
+- [ ] Fechas clave: la early bird cierra el **viernes 9 a las 23:59** y la lista amigos, el **domingo 11 a las 22:00** (es también el horario límite para entrar con ella).
 
 ## Con Melt, para la noche
 - [ ] **Visuales en vivo:** probar `visuales/index.html` en la compu del proyector y asignar los botones del K2 (ver `visuales/LEEME.md`).

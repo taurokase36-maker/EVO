@@ -30,7 +30,7 @@ Historias 1080×1920 · posts 1080×1350. En las historias con entradas, sumá e
 > 18:00 COCO · 19:30 GREMORA b2b SANDMAN · 21:00 ODA · 22:30 EVO THE SUN (con Damian Santos en saxo) · 00:00 LUCILA · 01:30 RUF
 > Y un detalle: esa noche estreno el primer single de THE SUN.
 >
-> Early bird a $5.000 hasta el viernes. Link en la bio.
+> Early bird a $7.000 hasta el viernes. Lista amigos a $5.000 (entrás hasta las 22:00). Link en la bio.
 > Somos Uno × Melt Underground
 
 ## Mar 6 · la pared (historia)

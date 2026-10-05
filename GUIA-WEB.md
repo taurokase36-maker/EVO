@@ -1,38 +1,35 @@
 # Guía: dejar lista la web de SOLARIS
 
-Tiempo: unos 30 minutos. Necesitás entrar a **hPanel de Hostinger** y a tu cuenta de **Mercado Pago**.
+Tiempo: unos 20 minutos. Necesitás entrar a **hPanel de Hostinger** y a tu cuenta de **Mercado Pago**.
 Archivo a subir: `somos-uno-entradas/somos-uno-entradas.zip`.
 
 ---
 
-## Paso 0 · Elegí cómo cobrar
+## Cómo cobra la web: links de pago de Mercado Pago
 
-| | **Simple: link de pago** (recomendado para esta fecha) | **Completo: compra en la web** |
-|---|---|---|
-| Qué hace el botón | Lleva directo a un link de pago de Mercado Pago | Pide nombre y mail, cobra y manda una entrada con QR |
-| Configuración | Pegar dos links | Cargar el Access Token de Mercado Pago |
-| En la puerta | Revisás la lista de pagos en Mercado Pago (nombre + DNI) | Escaneás el QR con el celular |
-| Cupo y early bird | El botón de early bird se cierra solo el viernes a las 23:59. El cupo lo controlás vos en Mercado Pago | Todo automático |
-| Pizarra y "solar people nº" | Solo para quienes están en lista o tienen invitación | Para todos |
+Cada entrada tiene su botón, que lleva directo a su link de pago. **Los tres links ya están cargados** en `app/config.example.php`:
 
-**La lista y las invitaciones funcionan igual en los dos modos**, con QR.
-Si más adelante querés el modo completo, se pasa borrando los links. Los pasos están en `somos-uno-entradas/LEEME.md`, sección 3.
+| Entrada | Precio | Link | Se cierra sola en la web |
+|---|---|---|---|
+| Lista amigos (entrás hasta las 22:00) | $5.000 | https://mpago.la/1JExs82 | domingo 11 a las 22:00 |
+| Early bird | $7.000 | https://mpago.la/13HtgZh | viernes 9 a las 23:59 |
+| General | $10.000 | https://mpago.la/19N795Q | no se cierra |
+
+- **En la puerta:** revisás la lista de pagos en Mercado Pago, por nombre y DNI. Quien pagó la lista amigos tiene que entrar antes de las 22:00; después de esa hora corre la entrada general.
+- **El cupo** (40 lista, 30 early bird, 65 general) se controla en Mercado Pago, limitando las unidades de cada link. La web no ve las ventas de los links.
+- **Las invitaciones** (EVO THE SUN, ODA, Sandman) siguen con QR, válidas hasta las 00:00.
+- **La lista gratis** con mail quedó apagada: la lista de esta fecha es la lista amigos paga. Se prende con `'enabled' => true` en el bloque `lista`.
+
+Si más adelante querés la compra completa dentro de la web (con QR y mail), se pasa borrando los links. Los pasos están en `somos-uno-entradas/LEEME.md`, sección 3.
 
 ---
 
-## Paso 1 · Crear los links en Mercado Pago (5 min)
+## Paso 1 · Revisar los links en Mercado Pago (5 min)
 
-Creá **dos links**, uno por entrada. En Mercado Pago buscá **"Link de pago"** (en la app: *Cobrar → Link de pago*; en la web: *Tu negocio → Link de pago*).
-
-| Título | Precio |
-|---|---|
-| `SOLARIS · Early bird` | $5.000 |
-| `SOLARIS · General` | $10.000 |
-
-- Si te deja elegir, que el link sirva para **muchos pagos** (no un solo uso).
-- Si te deja **limitar unidades**, poné 30 en la early bird y 65 en la general.
-- Si te deja pedir datos al comprador, pedí **nombre completo y DNI**. Es lo que vas a mirar en la puerta.
-- Copiá los dos links (empiezan con `https://`).
+En la app: *Cobrar → Link de pago*. En cada uno de los tres:
+- Que sirva para **muchos pagos** (no un solo uso).
+- Si te deja **limitar unidades**: 40 en la lista amigos, 30 en la early bird y 65 en la general.
+- Si te deja pedir datos al comprador: **nombre completo y DNI**. Es lo que vas a mirar en la puerta.
 
 ---
 
@@ -47,24 +44,17 @@ Creá **dos links**, uno por entrada. En Mercado Pago buscá **"Link de pago"** 
 
 ---
 
-## Paso 3 · Configurar (10 min)
+## Paso 3 · Configurar (5 min)
 
 En `public_html/app/`:
-- **Si no existe `config.php`:** duplicá `config.example.php` y nombrá la copia `config.php`.
-- **Si ya existía:** abrí los dos y copiá de `config.example.php` a tu `config.php` los bloques `brand`, `event`, `release`, `about`, `faq` y `tickets` (más la línea `link_note`).
+- **Si no existe `config.php`:** duplicá `config.example.php` y nombrá la copia `config.php`. Ya trae los links, los precios, RUF y la pizarra.
+- **Si ya existía:** el sitio sigue usando tu `config.php` viejo, con los precios y links viejos. Lo más simple es borrarlo y hacer una copia nueva de `config.example.php` (después volvés a poner tus contraseñas). Si preferís editarlo, copiá de `config.example.php` los bloques `event` (incluye `lineup` e `intl_guest`), `tickets`, `link_note`, `lista`, `wall` y `faq`.
 
 Editá `config.php` (clic derecho → Editar) y cambiá solo esto:
 
 ```php
-'demo_mode' => false,                          // línea 1: apagá el modo demo
+'demo_mode' => false,                          // apagá el modo demo
 'site_url'  => 'https://tudominio.com',        // tu dominio, sin barra al final
-```
-
-En `tickets`, pegá cada link en su entrada:
-
-```php
-['id' => 'early',   ... 'link' => 'https://mpago.la/xxxxx'],
-['id' => 'general', ... 'link' => 'https://mpago.la/yyyyy'],
 ```
 
 En `admin`, poné dos contraseñas:
@@ -80,9 +70,9 @@ Guardá.
 
 ---
 
-## Paso 4 · Mail (opcional, 5 min, recomendado)
+## Paso 4 · Mail (opcional, 5 min)
 
-Sirve para que la lista y las invitaciones reciban su QR por mail. Sin esto igual se muestra en pantalla al anotarse.
+Sirve para que las invitaciones reciban su QR por mail. Sin esto igual se muestra en pantalla.
 
 1. hPanel → **Emails** → creá `entradas@tudominio.com`.
 2. En `config.php`, en `mail`:
@@ -99,19 +89,26 @@ Sirve para que la lista y las invitaciones reciban su QR por mail. Sin esto igua
 Abrí `https://tudominio.com` desde el celular:
 
 - [ ] Arriba **no** aparece la franja "modo demo".
-- [ ] Dice **SOLARIS · for the solar people**, el line up y Damian Santos como invitado especial.
-- [ ] Los dos botones "comprar en mercado pago" abren **tu** link, con el precio correcto.
-- [ ] Anotate en la **lista** con tu mail: te muestra el QR y, si configuraste el mail, te llega.
+- [ ] Se ven los logos de **Somos Uno × Melt Underground**, con sus nombres.
+- [ ] El line up muestra a **RUF** como invitado internacional, con el logo de Kankari y el link a @kankariclub.
+- [ ] Los tres botones "comprar en mercado pago" abren **tu** link, con el precio correcto ($5.000, $7.000 y $10.000).
+- [ ] Los botones de Instagram abren **@somos.uno._**.
+- [ ] Escribí un mensaje en **la pizarra**. Entrá a `tudominio.com/admin` → tarjeta **pizarra** → **publicar**, y fijate que aparezca en la portada.
 - [ ] Abrí uno de tus links de **invitación** y pedí una.
-- [ ] Entrá a `tudominio.com/admin` con tu contraseña y fijate que aparezcan esas dos personas.
-- [ ] Entrá a `tudominio.com/admin/scan.php` con la contraseña de la puerta y escaneá tu QR.
-- [ ] Desde el panel, borrá las pruebas antes de difundir.
+- [ ] Entrá a `tudominio.com/admin/scan.php` con la contraseña de la puerta y escaneá ese QR.
+- [ ] Desde el panel, ocultá o borrá las pruebas antes de difundir.
+
+---
+
+## La pizarra
+
+Cualquiera puede dejar un mensaje desde la portada (nombre + hasta 120 caracteres). **Nada se publica solo:** cada mensaje llega al panel como "por revisar" y aparece en la web y en la pantalla del proyector recién cuando tocás **publicar**. Desde una misma conexión se pueden mandar hasta 3 mensajes por hora (`wall.per_hour`). Para cerrarla: `'public' => false` en el bloque `wall`.
 
 ---
 
 ## El día de la fiesta
 
-- **Puerta:** un celular con `tudominio.com/admin/scan.php` para lista e invitaciones, y otro con la actividad de Mercado Pago (o una lista impresa) para quienes pagaron con link. La lista y las invitaciones valen hasta las 00:00.
-- **Proyector:** abrí `tudominio.com/pantalla.php` en Chrome y tocá "pantalla completa" (los mensajes de la gente).
+- **Puerta:** un celular con `tudominio.com/admin/scan.php` para las invitaciones, y otro con la actividad de Mercado Pago (o una lista impresa) para quienes pagaron con link. La lista amigos entra hasta las 22:00; las invitaciones, hasta las 00:00.
+- **Proyector:** abrí `tudominio.com/pantalla.php` en Chrome y tocá "pantalla completa" (los mensajes de la pizarra).
 - **Visuales en vivo:** `tudominio.com/visuales` en Chrome (ver `visuales/LEEME.md`). Ese link es el que le pasás a quien maneje las visuales.
-- **Después del viernes a las 23:59:** desactivá el link de la early bird en Mercado Pago. El botón de la web ya se cierra solo, pero el link sigue funcionando si alguien lo tiene guardado.
+- **Después del viernes a las 23:59:** desactivá el link de la early bird en Mercado Pago. El botón de la web ya se cierra solo, pero el link sigue funcionando si alguien lo tiene guardado. Lo mismo con la lista amigos después de las 22:00 del domingo.

@@ -10,6 +10,8 @@
 - Slogan bilingüe: **FOR THE SOLAR PEOPLE** / para la gente del sol. La gente es la "solar people".
 - Concepto: la caverna de Platón, contada de forma sutil. Entrás con el ocaso, salís a las 3 con otra luz. La música es el sol. No se nombra a Platón.
 - Line up oficial: 18:00 COCO · 19:30 GREMORA B2B SANDMAN · 21:00 ODA · 22:30 EVO THE SUN · 00:00 LUCILA · 01:30 RUF.
+- **RUF: dj invitado internacional**, de la mano de **Kankari Music Lab** (productora de música electrónica de Guayaquil, Ecuador; Instagram `@kankariclub`).
+- Entradas (links de Mercado Pago): lista amigos $5.000 (entrás hasta las 22:00), early bird $7.000, general $10.000.
 - **Invitado especial: Damian Santos**, saxo en vivo sobre base electrónica, durante el set de EVO THE SUN. Siempre aparte de EVO THE SUN, como invitado especial.
 
 ## Estética
