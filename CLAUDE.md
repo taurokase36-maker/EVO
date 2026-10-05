@@ -29,3 +29,4 @@
 - `teaser/`: animación del eclipse a 127 BPM (`node teaser/render.js`).
 - `fuentes/`: tipografías locales. Al exportar con Chromium headless usarlas siempre, porque Google Fonts no carga en este entorno.
 - `PENDIENTES.md`: lo que falta.
+- `CONTEXTO-COMPLETO.md`: todo el contexto (artista, SOLARIS, web, ramas, pendientes y cómo trabajar con EVO). Leerlo antes de trabajar.
