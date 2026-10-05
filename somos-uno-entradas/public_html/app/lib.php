@@ -164,6 +164,9 @@ function db(): PDO
         if (!is_dir($dir)) {
             mkdir($dir, 0775, true);
         }
+        if (!is_file($dir . '/.htaccess')) {
+            @file_put_contents($dir . '/.htaccess', "Require all denied\n");  // si borraron la carpeta data, se vuelve a proteger
+        }
     }
     $pdo = new PDO($dsn, cfg('db.user'), cfg('db.pass'), [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
