@@ -62,7 +62,7 @@ return [
             ['01:30 — 03:00', 'RUF', 'invitado internacional'],  // 3er dato opcional: etiqueta chica
         ],
         // Invitado especial: aparece debajo del line up. '' en name = no mostrar.
-        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'saxo en vivo sobre base electrónica, junto a EVO THE SUN (22:30)'],
+        'guest'      => ['label' => 'invitado especial', 'name' => 'Damian Santos', 'detail' => 'Saxofón en vivo'],
         // DJ invitado internacional: bloque con el logo y el Instagram de quien lo trae. '' en name = no mostrar.
         'intl_guest' => [
             'label'     => 'dj invitado internacional',
@@ -90,10 +90,18 @@ return [
                  . 'te quedás en la oscuridad del sótano y salís a las 3 con otra luz.',
     ],
 
+    // [título, texto, ícono opcional: 'no-phone' = celular tachado]
     'pillars' => [
-        ['Unidad',      'Público, artistas y espacio somos una sola cosa. La fiesta la hacemos entre todos.'],
-        ['Conexión',    'Groove largo para que la pista viaje junta durante horas.'],
-        ['Consciencia', 'Una noche cuidada: que cada persona se vaya mejor de lo que llegó.'],
+        ['Unidad',      'Aquí creemos en la empatía y el disfrute con respeto. Cuida del espacio y de quien baila a tu lado.'],
+        ['Conexión',    'Promovemos el no uso del celular con el objetivo de aumentar tu presencia en la pista.', 'no-phone'],
+        ['Consciencia', 'Una selección musical y un lineup construido pensando en la energía de la pista y en una progresión natural de energía.'],
+    ],
+
+    // Música de fondo: arranca con el primer toque en la página; el sol de la esquina la silencia.
+    // file = mp3 dentro de la web ('' = sin música). volume = de 0 a 1.
+    'music' => [
+        'file'   => 'assets/musica.mp3',
+        'volume' => 0.6,
     ],
 
     // ---------------------------------------------------------------
@@ -171,8 +179,8 @@ return [
         ['¿qué es SOLARIS?', 'la nueva fiesta de somos uno. for the solar people: para la gente del sol. y va a volver.'],
         ['¿hay show en vivo?', 'sí: damian santos toca saxo en vivo sobre base electrónica.'],
         ['¿por qué ese día?', 'el 10 hay luna nueva. el 11 la luna se esconde a las 20:26, detrás del sol, y queda la noche más oscura del mes. adentro, sale el sol.'],
-        ['¿hay dress code?', 'negro. venir.'],
-        ['¿es en un sótano?', 'sí, y suena hermoso.'],
+        ['¿hay dress code?', 'usar lo que te haga sentir más libre.'],
+        ['¿es en un sótano?', 'sí, y suena increíble.'],
         ['¿es una secta?', 'no, es minimal.'],
         ['¿a qué hora termina?', 'a las 3:00.'],
         ['¿hasta qué hora vale la lista amigos?', 'entrás hasta las 22:00. después, entrada general.'],

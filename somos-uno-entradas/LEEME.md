@@ -141,6 +141,7 @@ Si no configurás el mail, la entrada igual aparece en pantalla después de paga
 - **Logos:** `assets/logo.svg` (Somos Uno), `assets/melt.webp` (Melt, en `brand.partner_logo`; dejalo vacío para no mostrarlo) y `assets/kankari.png` (Kankari, en `event.intl_guest.logo`).
 - **Instagram:** `brand.instagram` (`somos.uno._`) arma los botones de la portada y el pie.
 - **Textos de la landing:** el bloque "for the solar people" sale de `about`, la nota del estreno de `release` y el invitado de `event.guest`.
+- **Música:** `assets/musica.mp3` (bloque `music`). Arranca con el primer toque en la página, porque los navegadores no dejan que suene sola, y el sol de abajo a la derecha la silencia. Para cambiarla, reemplazá el mp3; `'file' => ''` la apaga.
 - **Estilos:** `assets/style.css`.
 - **Base de datos:** se crea sola en `data/somosuno.sqlite`. Si tu plan no tiene SQLite, creá una base MySQL en hPanel y cambiá `db` en la configuración (las instrucciones están ahí).
 

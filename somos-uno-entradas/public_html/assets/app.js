@@ -11,6 +11,47 @@
     });
   }
 
+  // Música: arranca con el primer toque (los navegadores no dejan que suene sola); el sol la silencia.
+  var audio = document.getElementById('bg-music'), btn = document.getElementById('sound');
+  if (audio && btn) {
+    var target = Math.min(1, Math.max(0, Number(audio.getAttribute('data-volume')) || 0.6));
+    var muted = false, fadeT = null;
+    try { muted = sessionStorage.getItem('su_mute') === '1'; } catch (e) {}
+    var show = function (on) {
+      btn.classList.toggle('is-on', on); btn.classList.toggle('is-off', !on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? 'silenciar música' : 'activar música');
+    };
+    var fadeTo = function (v, done) {
+      clearInterval(fadeT);
+      fadeT = setInterval(function () {
+        var d = v - audio.volume;
+        if (Math.abs(d) < 0.03) { audio.volume = v; clearInterval(fadeT); if (done) done(); return; }
+        audio.volume = Math.min(1, Math.max(0, audio.volume + d * 0.12));
+      }, 60);
+    };
+    var play = function () {
+      audio.volume = 0;
+      var p = audio.play();
+      if (p && p.then) p.then(function () { show(true); fadeTo(target); }).catch(function () { show(false); });
+      else { show(true); fadeTo(target); }
+    };
+    var stop = function () { show(false); fadeTo(0, function () { audio.pause(); }); };
+    var first = function (ev) {
+      off();
+      if (muted || btn.contains(ev.target)) return;   // el botón se maneja aparte
+      play();
+    };
+    var off = function () { ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.removeEventListener(t, first, true); }); };
+    ['pointerdown', 'keydown', 'touchstart'].forEach(function (t) { document.addEventListener(t, first, true); });
+    btn.addEventListener('click', function () {
+      off();
+      muted = !audio.paused && btn.classList.contains('is-on');
+      try { sessionStorage.setItem('su_mute', muted ? '1' : '0'); } catch (e) {}
+      if (muted) stop(); else play();
+    });
+  }
+
   // Cuenta regresiva
   var cd = document.querySelector('.countdown');
   if (cd) {

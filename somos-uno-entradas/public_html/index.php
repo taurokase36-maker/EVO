@@ -111,7 +111,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
 
   <section class="wrap pillars" aria-label="Concepto">
     <?php foreach ((array) cfg('pillars', []) as $i => $p): ?>
-      <div class="pillar"><span class="num">0<?= $i + 1 ?></span><h3><?= e($p[0]) ?></h3><p><?= e($p[1]) ?></p></div>
+      <div class="pillar"><span class="num">0<?= $i + 1 ?></span><h3><?= e($p[0]) ?><?php if (($p[2] ?? '') === 'no-phone'): ?><?= no_phone_icon() ?><?php endif; ?></h3><p><?= e($p[1]) ?></p></div>
     <?php endforeach; ?>
   </section>
 
@@ -235,4 +235,10 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <?php endforeach; ?>
   </section>
 </main>
+<?php $music = (string) cfg('music.file', 'assets/musica.mp3'); if ($music !== '' && is_file(__DIR__ . '/' . $music)): ?>
+<audio id="bg-music" src="<?= e(asset($music)) ?>" loop preload="auto" data-volume="<?= e((string) cfg('music.volume', 0.6)) ?>"></audio>
+<button type="button" class="sound is-off" id="sound" aria-label="activar música" aria-pressed="false">
+  <svg viewBox="0 0 40 40" aria-hidden="true"><g class="sound-rays"><?php for ($r = 0; $r < 12; $r++): ?><line x1="20" y1="3" x2="20" y2="8" transform="rotate(<?= $r * 30 ?> 20 20)"/><?php endfor; ?></g><circle class="sound-sun" cx="20" cy="20" r="8.5"/><circle class="sound-moon" cx="20" cy="20" r="8.5"/></svg>
+</button>
+<?php endif; ?>
 <?php page_end('', ['assets/app.js']);

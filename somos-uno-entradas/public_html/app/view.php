@@ -71,6 +71,14 @@ function sax_icon(): string
         . '</svg>';
 }
 
+/** Celular tachado (pilar "Conexión"). */
+function no_phone_icon(): string
+{
+    return '<svg class="no-phone" viewBox="0 0 32 32" aria-label="sin celular" role="img" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'
+        . '<rect x="10" y="4" width="12" height="24" rx="2.5"/><path d="M14.5 24.5h3"/>'
+        . '<path d="M5 5l22 22" stroke="var(--accent)" stroke-width="2.6"/></svg>';
+}
+
 /** Ícono de Instagram (hereda el color del texto). */
 function ig_icon(): string
 {
