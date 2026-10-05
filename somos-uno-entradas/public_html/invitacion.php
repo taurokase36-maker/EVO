@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 page_start('Invitación · ' . cfg('event.title'), 'page-msg');
 ?>
 <main class="wrap narrow msg">
-  <img src="<?= e(cfg('brand.logo')) ?>" alt="<?= e(cfg('brand.name')) ?>" class="msg-logo-img">
+  <img src="<?= e(asset((string) cfg('brand.logo'))) ?>" alt="<?= e(cfg('brand.name')) ?>" class="msg-logo-img">
   <p class="kicker"><?= e(event_full()) ?></p>
   <h1>te invita <?= e($inv['owner']) ?></h1>
   <p class="lead"><?= e(cfg('event.date_label')) ?> · <?= e(cfg('event.venue')) ?></p>

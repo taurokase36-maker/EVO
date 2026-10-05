@@ -50,7 +50,7 @@ page_start($title . ' · ' . cfg('event.title'), 'page-ticket');
   <?php endif; ?>
   <article class="ticket <?= $done || $expired ? 'is-used' : '' ?>">
     <header class="ticket-head">
-      <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="ticket-logo">
+      <img src="<?= e(asset((string) cfg('brand.logo'))) ?>" alt="" class="ticket-logo">
       <div>
         <p class="kicker"><?= e(event_full()) ?></p>
         <h1><?= e($title) ?></h1>

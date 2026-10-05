@@ -19,11 +19,11 @@ function page_start(string $title, string $bodyClass = '', string $base = ''): v
 <meta property="og:title" content="<?= e(cfg('event.title')) ?>">
 <meta property="og:description" content="<?= e($desc) ?>">
 <meta name="theme-color" content="<?= e($c['bg'] ?? '#070202') ?>">
-<link rel="icon" href="<?= e($base . cfg('brand.logo')) ?>">
+<link rel="icon" href="<?= e($base . asset((string) cfg('brand.logo'))) ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Major+Mono+Display&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e($base) ?>assets/style.css?v=8">
+<link rel="stylesheet" href="<?= e($base . asset('assets/style.css')) ?>">
 <style>:root{--bg:<?= e($c['bg'] ?? '#070202') ?>;--glow:<?= e($c['glow'] ?? '#6b0d07') ?>;--accent:<?= e($c['accent'] ?? '#d9482c') ?>;--cream:<?= e($c['cream'] ?? '#efe2d6') ?>}</style>
 </head>
 <body class="<?= e($bodyClass) ?>">
@@ -35,10 +35,10 @@ function page_end(string $base = '', array $scripts = []): void
 {
     ?>
 <footer class="foot">
-  <img src="<?= e($base . cfg('brand.logo')) ?>" alt="" class="foot-logo">
+  <img src="<?= e($base . asset((string) cfg('brand.logo'))) ?>" alt="" class="foot-logo">
   <p><?= e(cfg('brand.name')) ?> · <a href="https://instagram.com/<?= e(cfg('brand.instagram')) ?>" target="_blank" rel="noopener"><?= ig_icon() ?>@<?= e(cfg('brand.instagram')) ?></a></p>
 </footer>
-<?php foreach ($scripts as $s): ?><script src="<?= e($base . $s) ?>"></script>
+<?php foreach ($scripts as $s): ?><script src="<?= e($base . asset($s)) ?>"></script>
 <?php endforeach; ?>
 </body>
 </html>
@@ -85,7 +85,7 @@ function message_page(string $title, string $html, string $base = '', int $statu
     page_start($title . ' · ' . cfg('brand.name'), 'page-msg', $base);
     ?>
 <main class="wrap narrow msg">
-  <a href="<?= e($base ?: './') ?>" class="msg-logo"><img src="<?= e($base . cfg('brand.logo')) ?>" alt="<?= e(cfg('brand.name')) ?>"></a>
+  <a href="<?= e($base ?: './') ?>" class="msg-logo"><img src="<?= e($base . asset((string) cfg('brand.logo'))) ?>" alt="<?= e(cfg('brand.name')) ?>"></a>
   <h1><?= e($title) ?></h1>
   <div class="msg-body"><?= $html ?></div>
 </main>

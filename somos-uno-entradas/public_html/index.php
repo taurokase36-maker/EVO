@@ -37,13 +37,13 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
   <div class="wrap hero-inner">
     <div class="hero-logos">
       <figure class="hero-brand">
-        <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="hero-logo">
+        <img src="<?= e(asset((string) cfg('brand.logo'))) ?>" alt="" class="hero-logo">
         <figcaption><?= e(cfg('brand.name')) ?></figcaption>
       </figure>
       <?php if (cfg('brand.partner_logo')): ?>
         <span class="hero-x" aria-hidden="true">×</span>
         <figure class="hero-brand">
-          <img src="<?= e(cfg('brand.partner_logo')) ?>" alt="" class="hero-logo hero-logo-partner">
+          <img src="<?= e(asset((string) cfg('brand.partner_logo'))) ?>" alt="" class="hero-logo hero-logo-partner">
           <figcaption><?= e(cfg('event.venue')) ?></figcaption>
         </figure>
       <?php endif; ?>
@@ -93,7 +93,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
         <p class="guest-detail"><?= e($intl['detail'] ?? '') ?></p>
         <?php if (!empty($intl['logo']) || !empty($intl['instagram'])): ?>
           <a class="intl-by" <?php if (!empty($intl['instagram'])): ?>href="https://instagram.com/<?= e($intl['instagram']) ?>" target="_blank" rel="noopener"<?php endif; ?>>
-            <?php if (!empty($intl['logo'])): ?><img src="<?= e($intl['logo']) ?>" alt="<?= e($intl['by'] ?? '') ?>" class="intl-logo"><?php endif; ?>
+            <?php if (!empty($intl['logo'])): ?><img src="<?= e(asset((string) $intl['logo'])) ?>" alt="<?= e($intl['by'] ?? '') ?>" class="intl-logo"><?php endif; ?>
             <?php if (!empty($intl['instagram'])): ?><span><?= ig_icon() ?>@<?= e($intl['instagram']) ?></span><?php endif; ?>
           </a>
         <?php endif; ?>
@@ -223,7 +223,7 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
 
   <?php if ($ig !== ''): ?>
   <section class="wrap follow" aria-label="Instagram">
-    <img src="<?= e(cfg('brand.logo')) ?>" alt="" class="follow-logo">
+    <img src="<?= e(asset((string) cfg('brand.logo'))) ?>" alt="" class="follow-logo">
     <p>novedades, horarios y la próxima fecha</p>
     <a href="https://instagram.com/<?= e($ig) ?>" class="btn btn-solid" target="_blank" rel="noopener"><?= ig_icon() ?>seguir a @<?= e($ig) ?></a>
   </section>
@@ -236,4 +236,4 @@ page_start(cfg('event.title') . ' · ' . cfg('event.date_label'));
     <?php endforeach; ?>
   </section>
 </main>
-<?php page_end('', ['assets/app.js?v=8']);
+<?php page_end('', ['assets/app.js']);

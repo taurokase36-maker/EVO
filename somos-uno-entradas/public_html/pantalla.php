@@ -36,7 +36,7 @@ header('X-Robots-Tag: noindex');
 <div class="msg hidden" id="msg"><p id="msg-text"></p><span id="msg-author"></span></div>
 <div class="count"><span id="count">somos uno.</span><small id="count-sub"></small></div>
 <button class="full" id="full">pantalla completa</button>
-<script src="assets/art.js"></script>
+<script src="<?= e(asset('assets/art.js')) ?>"></script>
 <script>
 (function () {
   'use strict';

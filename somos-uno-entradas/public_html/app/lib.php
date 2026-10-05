@@ -69,6 +69,17 @@ function base_url(): string
     $dir = preg_replace('#/admin$#', '', rtrim($dir, '/'));
     return ($https ? 'https' : 'http') . '://' . $host . $dir;
 }
+/** Ruta de un archivo de la web con su versión (?v=huella del contenido): si el archivo cambia, el navegador y la caché de Hostinger bajan el nuevo. */
+function asset(string $path): string
+{
+    static $memo = [];
+    $clean = (string) preg_replace('/\?.*$/', '', $path);
+    if (!isset($memo[$clean])) {
+        $file = __DIR__ . '/../' . ltrim($clean, '/');
+        $memo[$clean] = is_file($file) ? $clean . '?v=' . substr((string) md5_file($file), 0, 8) : $path;
+    }
+    return $memo[$clean];
+}
 function url(string $path = ''): string { return base_url() . '/' . ltrim($path, '/'); }
 function is_past(?string $when): bool { return $when !== null && $when !== '' && time() > strtotime($when); }
 

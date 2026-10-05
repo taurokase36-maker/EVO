@@ -21,7 +21,7 @@ if (current_role() === null) {
     page_start('Panel · ' . cfg('brand.name'), 'page-admin', $B);
     ?>
 <main class="wrap narrow msg">
-  <img src="<?= e($B . cfg('brand.logo')) ?>" alt="" class="msg-logo-img">
+  <img src="<?= e($B . asset((string) cfg('brand.logo'))) ?>" alt="" class="msg-logo-img">
   <h1>panel</h1>
   <?php if (!$configured): ?>
     <p class="alert">Primero poné una contraseña en <b>app/config.php</b> → <code>admin.password</code>.</p>
